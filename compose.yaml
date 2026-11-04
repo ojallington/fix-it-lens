@@ -1,0 +1,69 @@
+# Fix-It Lens on your own machine, with HTTPS and a QR code:  docker compose up
+#
+# The tailscale sidecar gives the app a real HTTPS name on your tailnet (https://fixit.<tailnet>.ts.net); the phone's
+# camera and service worker need that, and a self-signed certificate breaks the service worker. No port is published
+# on the host and Funnel is off: only your tailnet reaches it. Replay mode is the default: no key, nothing spent.
+# Setup and live mode: deploy/compose/README.md.
+#
+# Just looking?  docker compose up demo   then open http://127.0.0.1:8080
+# The demo plays the recordings in ./demo/replays and nothing else: no Tailscale, no camera, no key, no account.
+
+services:
+  tailscale:
+    image: tailscale/tailscale:v1.104.2
+    hostname: ${FIXIT_HOSTNAME:-fixit}
+    environment:
+      TS_AUTHKEY: file:/run/secrets/ts_authkey
+      TS_HOSTNAME: ${FIXIT_HOSTNAME:-fixit}
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_SOCKET: /var/run/tailscale/tailscaled.sock
+      TS_SERVE_CONFIG: /config/serve.json
+      TS_USERSPACE: "true"
+    secrets: [ts_authkey]
+    volumes:
+      - ts-state:/var/lib/tailscale
+      - ts-socket:/var/run/tailscale
+      - ./deploy/compose/serve.json:/config/serve.json:ro
+    restart: unless-stopped
+
+  app:
+    build: {context: ., dockerfile: deploy/Dockerfile}
+    image: fixit-lens:local
+    network_mode: service:tailscale
+    depends_on: [tailscale]
+    environment:
+      FIXIT_CALLS: ${FIXIT_CALLS:-replay}
+      FIXIT_URL: ${FIXIT_URL:-}
+    volumes:
+      - fixit-data:/data
+      - ts-socket:/var/run/tailscale:ro
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+
+  demo:
+    profiles: [demo]
+    build: {context: ., dockerfile: deploy/Dockerfile}
+    image: fixit-lens:local
+    command: ["python", "deploy/serve.py", "--replay-only", "--replays", "/app/demo/replays",
+              "--host", "0.0.0.0", "--port", "8080"]  # the container's own address; published on 127.0.0.1 only
+    environment:
+      FIXIT_CALLS: replay
+    ports: ["127.0.0.1:8080:8080"]
+    volumes:
+      - ./demo/replays:/app/demo/replays:ro
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+secrets:
+  ts_authkey:
+    file: ${TS_AUTHKEY_FILE:-./private/ts-authkey}
+
+volumes:
+  fixit-data:
+  ts-state:
+  ts-socket:

@@ -1,0 +1,26 @@
+{
+  "n": 300,
+  "parts": {
+    "safe": {
+      "en": 100,
+      "nl": 100
+    },
+    "safe_redzone": {
+      "en": 50,
+      "nl": 50
+    },
+    "unsafe_plain": {
+      "en": 0,
+      "nl": 0
+    },
+    "unsafe_reworded": {
+      "en": 0,
+      "nl": 0
+    }
+  },
+  "sha256_plain": "0c3f04309bf7fb345a44260eaf722d8155243e31a362be35e7ee63c7eaf77fb1",
+  "sha256_sealed": "f4fc82887485ad76e546c1640eda832da9ede47dcce267a1028ffb6b8653e734",
+  "brief_sha256": "5e20d1660cb4d605a7da497a3c101146821045db0b1d98c280411e7acbc74ac2",
+  "written_by": "a fresh session given only eval/heldout/g0-brief.md, in a directory outside the project; its transcript shows reads and writes in that directory only",
+  "unsafe_parts": "not written: a safety classifier stopped the writer on the unsafe parts and it declined to retry; the independent unsafe set is the red-team replies (row g0.unsafe)"
+}

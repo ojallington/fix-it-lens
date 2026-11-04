@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fixit.invalid/contracts/rules.schema.json",
+  "title": "CountryRules",
+  "description": "A country file: rules/<country>.yaml. In words: schema/rules.md. Rule IDs are <country>.<family>.<zone>. A country with no file fails closed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "country",
+    "version",
+    "languages",
+    "emergency",
+    "allow_lists",
+    "rules"
+  ],
+  "properties": {
+    "country": {
+      "type": "string",
+      "pattern": "^[a-z]{2}$",
+      "description": "ISO 3166-1 alpha-2, lower case"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "languages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/Lang"
+      },
+      "description": "Answer languages this file has a rule table for"
+    },
+    "emergency": {
+      "$ref": "#/$defs/LangText",
+      "description": "The stop script for an emergency, per language"
+    },
+    "allow_lists": {
+      "$ref": "#/$defs/AllowLists"
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/Rule"
+      }
+    }
+  },
+  "$defs": {
+    "Lang": {
+      "type": "string",
+      "pattern": "^[a-z]{2}$"
+    },
+    "LangText": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z]{2}$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "LangList": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z]{2}$"
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "AllowLists": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sealed_boiler"
+      ],
+      "properties": {
+        "sealed_boiler": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllowedAction"
+          },
+          "description": "The manufacturer's user-serviceable actions; everything else on a sealed boiler is a STOP"
+        }
+      }
+    },
+    "AllowedAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "names",
+        "sources"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z_]+$",
+          "description": "e.g. read_pressure, top_up, bleed_radiator, reset"
+        },
+        "names": {
+          "$ref": "#/$defs/LangText"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Source"
+          }
+        }
+      }
+    },
+    "Source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "section": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "Sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "Rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "family",
+        "zone",
+        "parts",
+        "verbs",
+        "action",
+        "line",
+        "script",
+        "ring_cm",
+        "landlord",
+        "sources",
+        "look_only_exemptions"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z]{2}\\.[a-z]+\\.[a-z_]+$"
+        },
+        "family": {
+          "type": "string",
+          "enum": [
+            "gas",
+            "mains",
+            "water",
+            "heat",
+            "pressure",
+            "co",
+            "chemical",
+            "mechanical"
+          ]
+        },
+        "zone": {
+          "type": "string",
+          "pattern": "^[a-z_]+$"
+        },
+        "parts": {
+          "$ref": "#/$defs/LangList",
+          "description": "Part names per language; any red-zone part name in a sentence is held whatever the verb"
+        },
+        "verbs": {
+          "$ref": "#/$defs/LangList",
+          "description": "Action verbs per language; part x verb is the sentence filter's match"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "STOP",
+            "HOLD",
+            "ALLOW"
+          ]
+        },
+        "line": {
+          "$ref": "#/$defs/LangText",
+          "description": "The fixed line the app says in place of a held sentence"
+        },
+        "script": {
+          "$ref": "#/$defs/LangText",
+          "description": "The stop script, said when the rule stops the repair"
+        },
+        "ring_cm": {
+          "type": "number",
+          "minimum": 3,
+          "description": "Zone ring; 3 cm is a floor, enforced again in code"
+        },
+        "landlord": {
+          "type": "boolean"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Source"
+          }
+        },
+        "look_only_exemptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Sha256"
+          },
+          "description": "sha256 of card lines that name the part only to look at it"
+        }
+      }
+    }
+  }
+}

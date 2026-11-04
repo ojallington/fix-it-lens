@@ -1,0 +1,4 @@
+{
+  "description": "The makers whose own support sites the manual lookup covers first (large makers with public manual pages; Samsung is left out until it agrees, as its terms forbid mining). One request per lookup, within each site's terms; never mirrors.",
+  "makers": ["bosch", "siemens", "miele", "aeg"]
+}

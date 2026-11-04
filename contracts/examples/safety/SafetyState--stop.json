@@ -1,0 +1,6 @@
+{
+  "state": "STOP",
+  "rule_id": "nl.mains.casing",
+  "evidence": "screwdriver at the back panel screws",
+  "script": "Handen terug."
+}

@@ -1,0 +1,130 @@
+<title>Fix-It Lens Mark Directions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560;9..144,600&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a field-manual spread. One strip of every mark at 16 px up top, then one plate per direction:
+   the mark, its sizes, lockups and icons, then the same mark in three places it will live. */
+:root {
+  --bg: #15130f; --surface: #211e18; --surface-2: #2b2720; --line: rgba(241, 236, 224, 0.16);
+  --fg: #f1ece0; --muted: #c8c1b1; --faint: #958e7e; --accent: #93a8ff;
+  --plate: #0f0e0b; --paper: #f2ede2;
+  --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f2ede2; --surface: #faf7f0; --surface-2: #e8e1d1; --line: rgba(28, 26, 22, 0.16);
+    --fg: #1c1a16; --muted: #4a463d; --faint: #736d5f; --accent: #2a49d8; --plate: #e8e1d1;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f2ede2; --surface: #faf7f0; --surface-2: #e8e1d1; --line: rgba(28, 26, 22, 0.16);
+  --fg: #1c1a16; --muted: #4a463d; --faint: #736d5f; --accent: #2a49d8; --plate: #e8e1d1;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 40px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 56px; }
+.kicker, figcaption, .ladder span, .icon-row span, .t16 span { font: 500 11px/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+h1 { font: 560 clamp(32px, 5vw, 52px)/1.05 var(--display); letter-spacing: -0.02em; margin: 6px 0 12px; text-wrap: balance; }
+h2 { font: 560 34px/1.1 var(--display); letter-spacing: -0.015em; margin: 4px 0 8px; text-wrap: balance; }
+p { margin: 0; }
+.intro { display: grid; gap: 4px; max-width: 68ch; }
+.intro .lede { color: var(--muted); font-size: 17px; }
+.rubric { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+.rubric span { font: 500 11px/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 3px; padding: 7px 9px; color: var(--muted); }
+
+/* The 16 px strip */
+.strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-block: 20px; display: grid; gap: 14px; }
+.strip-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+.t16 { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.t16 .z { width: 64px; height: 64px; image-rendering: pixelated; }
+.t16 span { flex-basis: 100%; }
+.t16.today span { color: var(--muted); }
+
+/* A direction */
+.dir { display: grid; gap: 20px; border-top: 2px solid var(--fg); padding-top: 20px; }
+.dir-head { display: grid; gap: 2px; max-width: 70ch; }
+.why { color: var(--muted); font: 400 19px/1.45 var(--display); }
+.grid { display: grid; grid-template-columns: 220px 1fr; gap: 16px; }
+.cell { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.hero { grid-row: span 3; background: #15130f; place-items: center; }
+.hero figcaption { color: #958e7e; }
+.big { width: 100%; max-width: 180px; }
+.ladder { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 20px; }
+.ladder > div { display: grid; justify-items: center; gap: 6px; }
+.s64 { width: 64px; height: 64px; }
+.s256 { width: 128px; height: 128px; }
+.zoom { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.zoom img { width: 96px; height: 96px; image-rendering: pixelated; border-radius: 2px; }
+.zoom span { font: 400 13px/1.4 var(--sans); color: var(--faint); max-width: 22ch; }
+.lockups .lockup { width: 100%; max-width: 360px; height: auto; border-radius: 3px; display: block; }
+.icon-row { display: flex; flex-wrap: wrap; gap: 20px; }
+.icon-row > div { display: grid; justify-items: center; gap: 6px; }
+.appicon { width: 76px; height: 76px; border-radius: 17px; }
+.mask .appicon { border-radius: 50%; }
+.mask.sq .appicon { border-radius: 30%; }
+.sizes, .lockups, .icons { grid-column: 2; }
+
+/* Mocks */
+.mocks { display: grid; grid-template-columns: 240px 1fr 300px; gap: 16px; align-items: start; }
+.mock { margin: 0; display: grid; gap: 8px; min-width: 0; }
+.screen { aspect-ratio: 9 / 15; max-width: 100%; border-radius: 26px; padding: 14px 14px; color: #f1ece0;
+  background: radial-gradient(120% 70% at 20% 0%, #3a3550 0%, #1d1a26 45%, #121014 100%); border: 6px solid #0a0908; }
+.status { display: flex; justify-content: space-between; font: 600 11px/1 var(--sans); padding: 2px 6px 18px; opacity: 0.85; }
+.apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; }
+.app { display: grid; justify-items: center; gap: 4px; font: 500 9.5px/1.2 var(--sans); text-align: center; }
+.app .appicon, .blank { width: 44px; height: 44px; border-radius: 11px; }
+.blank { background: #4a4757; } .b1 { background: #5b5a52; } .b2 { background: #3e4a52; } .b3 { background: #574a44; }
+.browser { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #f2ede2; color: #1c1a16; }
+.tabs { display: flex; gap: 2px; padding: 8px 8px 0; background: #d9d2c2; }
+.tab { display: flex; align-items: center; gap: 8px; font: 400 12px/1 var(--sans); padding: 8px 14px; background: #f2ede2; border-radius: 6px 6px 0 0; min-width: 0; }
+.tab.off { background: transparent; color: #4a463d; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid rgba(28, 26, 22, 0.16); background: #15130f; }
+.site-lockup { height: 30px; width: auto; }
+.bar nav { display: flex; flex-wrap: wrap; gap: 16px; font: 500 11px/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: #c8c1b1; }
+.page-body { padding: 28px 20px 34px; display: grid; gap: 6px; background: #15130f; color: #f1ece0; }
+.page-body .kicker { color: #958e7e; }
+.headline { font: 560 30px/1.1 var(--display); letter-spacing: -0.02em; }
+.ha-card { background: #1c1c1f; color: #e6e6e6; border-radius: 12px; padding: 16px; display: grid; gap: 10px; font: 400 13px/1.3 system-ui, sans-serif; border: 1px solid #2c2c30; }
+.ha-top { display: flex; gap: 12px; align-items: center; }
+.ha-logo { width: 48px; height: 48px; border-radius: 10px; background: #fff; display: grid; place-items: center; }
+.ha-icon { width: 40px; height: 40px; }
+.ha-name { font-weight: 600; font-size: 15px; }
+.ha-sub { color: #9b9ba0; font-size: 12px; }
+.ha-row { display: flex; justify-content: space-between; border-top: 1px solid #2c2c30; padding-top: 10px; color: #b8b8bd; }
+.ha-row b { color: #e6e6e6; font-weight: 500; }
+.foot { color: var(--faint); font-size: 14px; max-width: 70ch; border-top: 1px solid var(--line); padding-top: 16px; }
+.foot code { font: 500 13px var(--mono); color: var(--muted); }
+
+@media (max-width: 860px) {
+  .grid { grid-template-columns: 1fr; }
+  .hero { grid-row: auto; }
+  .sizes, .lockups, .icons { grid-column: auto; }
+  .mocks { grid-template-columns: 1fr; }
+  .phone .screen { max-width: 260px; }
+}
+</style>
+
+<main class="wrap">
+  <header class="intro">
+    <p class="kicker">Fix-It Lens · brand · step 1 of 3</p>
+    <h1>Four directions for the mark</h1>
+    <p class="lede">Each one is drawn from something the product does: it outlines the part on the camera, reads the manual, checks each step, or keeps today's ring and gives it a job. All four keep the field-manual look: charcoal and paper, one blue-lavender accent, Fraunces for the wordmark.</p>
+    <div class="rubric"><span>Reads as a product</span><span>Legible at 16 px</span><span>Fits the field manual</span></div>
+  </header>
+
+  <section class="strip" aria-label="Every mark at 16 pixels">
+    <p class="kicker">Browser-tab size first: each mark at 16 px, real size and enlarged, with today's mark for reference</p>
+    <div class="strip-row">{{STRIP}}</div>
+  </section>
+
+  {{SECTIONS}}
+
+  <p class="foot">The SVGs live in <code>brand/directions/</code>, drawn by <code>make.py</code>. The wordmark is live Fraunces text for now; the chosen direction gets it as outlines, plus the favicon, PWA, apple-touch, HA, add-on, OG and video assets and a short <code>BRAND.md</code>. Mocks use placeholder apps and no real brands.</p>
+</main>

@@ -1,0 +1,9 @@
+{
+  "type": "rail",
+  "seq": 17,
+  "t_ms": 5300,
+  "tool": "locate",
+  "args_short": "filter system",
+  "result_short": "box 612,700,760,880",
+  "ms": 2140
+}

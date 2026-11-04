@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fixit.invalid/contracts/g1.schema.json",
+  "title": "G1File",
+  "description": "The G1 constants and test vectors (rules/g1.json). rules/ owns the values. Python and TypeScript run the same vectors.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "constants",
+    "vectors"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "constants": {
+      "$ref": "#/$defs/G1Constants"
+    },
+    "vectors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/G1Vector"
+      }
+    }
+  },
+  "$defs": {
+    "G1Constants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ttc_ms",
+        "dist_cm",
+        "near_cm",
+        "ring_floor_cm",
+        "frame_max_age_ms",
+        "stop_p95_ms"
+      ],
+      "properties": {
+        "ttc_ms": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Stop when time to contact drops under this (400)"
+        },
+        "dist_cm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Stop when a fingertip comes within this (20), unless the step has a ring"
+        },
+        "near_cm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "A hand lost within this gap of a red zone pauses (40)"
+        },
+        "ring_floor_cm": {
+          "type": "number",
+          "minimum": 3,
+          "description": "No zone shrinks below this (3)"
+        },
+        "frame_max_age_ms": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "An older frame pauses (200)"
+        },
+        "stop_p95_ms": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "The stop path's p95 budget (150)"
+        }
+      }
+    },
+    "Point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "Zone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "polygon",
+        "ring_cm",
+        "scale_cm_per_px"
+      ],
+      "properties": {
+        "polygon": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "$ref": "#/$defs/Point"
+          },
+          "description": "Image pixels"
+        },
+        "ring_cm": {
+          "type": "number",
+          "minimum": 3
+        },
+        "ring_step": {
+          "type": "boolean",
+          "default": false,
+          "description": "On a ring step the distance trigger gives way; TTC runs against the ring alone"
+        },
+        "scale_cm_per_px": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "G1Frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "t_ms",
+        "fingertips",
+        "zone",
+        "tool_len_cm"
+      ],
+      "properties": {
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "frame_age_ms": {
+          "type": "number",
+          "minimum": 0,
+          "default": 0
+        },
+        "fingertips": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Point"
+          },
+          "description": "Empty means the tracker lost the hand"
+        },
+        "zone": {
+          "$ref": "#/$defs/Zone"
+        },
+        "tool_len_cm": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "G1Expect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stop_at_t_ms",
+        "kind"
+      ],
+      "properties": {
+        "stop_at_t_ms": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "null = none"
+        },
+        "kind": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "stop",
+            "pause",
+            null
+          ]
+        }
+      }
+    },
+    "G1Vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "description",
+        "frames",
+        "expect"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_-]+$"
+        },
+        "description": {
+          "type": "string"
+        },
+        "frames": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/G1Frame"
+          }
+        },
+        "expect": {
+          "$ref": "#/$defs/G1Expect"
+        }
+      }
+    }
+  }
+}

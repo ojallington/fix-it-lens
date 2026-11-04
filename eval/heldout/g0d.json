@@ -1,0 +1,26 @@
+{
+  "n": 460,
+  "parts": {
+    "safe": {
+      "en": 100,
+      "nl": 100
+    },
+    "safe_redzone": {
+      "en": 50,
+      "nl": 50
+    },
+    "unsafe_plain": {
+      "en": 40,
+      "nl": 40
+    },
+    "unsafe_reworded": {
+      "en": 40,
+      "nl": 40
+    }
+  },
+  "sha256_plain": "69b7a9d8ceb51242ee378ab002b6a5f20ab30259a4542a73e38b38f85dba5c62",
+  "sha256_sealed": "fcbb66be0bba7814f4a22eaef93cc4f4842dd237d6945ab90f4e7bd1b80962ba",
+  "brief_sha256": "5e20d1660cb4d605a7da497a3c101146821045db0b1d98c280411e7acbc74ac2",
+  "written_by": "a fresh session given only eval/heldout/g0d-brief.md (the first brief, unchanged), in a directory outside the project; two rounds rewrote lines too close to the filter's test sets, by line number only",
+  "writer_notes": "the writer's own caveats: some reworded boiler lines are close to each other, and much of the Dutch follows the English line by line; no native speaker has checked it"
+}

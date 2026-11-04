@@ -1,0 +1,50 @@
+{"id": "warn.001", "lang": "en", "text": "Please don't open the boiler casing; that's a job for a registered gas engineer.", "kind": "warning"}
+{"id": "warn.002", "lang": "en", "text": "Never take the back panel off the washing machine yourself.", "kind": "warning"}
+{"id": "warn.003", "lang": "en", "text": "Leave the consumer unit cover on and call an electrician.", "kind": "warning"}
+{"id": "warn.004", "lang": "en", "text": "The relief valve is not something you should adjust.", "kind": "warning"}
+{"id": "warn.005", "lang": "en", "text": "Do not touch any bare wires you can see.", "kind": "warning"}
+{"id": "warn.006", "lang": "en", "text": "Keep children away from the flue terminal outside.", "kind": "warning"}
+{"id": "warn.007", "lang": "en", "text": "The gas tap should be left exactly where it is.", "kind": "warning"}
+{"id": "warn.008", "lang": "en", "text": "If the wiring behind the socket looks scorched, switch off and call an electrician.", "kind": "warning"}
+{"id": "warn.009", "lang": "en", "text": "Only a qualified technician should remove the rear panel.", "kind": "warning"}
+{"id": "warn.010", "lang": "en", "text": "That casing stays on; the pump is reached through the front hatch instead.", "kind": "warning"}
+{"id": "warn.011", "lang": "en", "text": "Don't try to bleed the expansion vessel; your installer will check it at the service.", "kind": "warning"}
+{"id": "warn.012", "lang": "en", "text": "You must never unscrew the socket faceplate while it's live, and really that's one for an electrician.", "kind": "warning"}
+{"id": "warn.013", "lang": "en", "text": "Leave the side panel where it is.", "kind": "warning"}
+{"id": "warn.014", "lang": "en", "text": "The kick plate is held on for a reason, so leave it on.", "kind": "warning"}
+{"id": "warn.015", "lang": "en", "text": "An engineer will look at the flue during the annual service.", "kind": "warning"}
+{"id": "warn.016", "lang": "en", "text": "Never cover or block the air intake pipe.", "kind": "warning"}
+{"id": "warn.017", "lang": "en", "text": "I won't guide you behind the back panel; that needs a technician.", "kind": "warning"}
+{"id": "warn.018", "lang": "en", "text": "Your landlord's electrician should be the one to look at the fuse box cover.", "kind": "warning"}
+{"id": "warn.019", "lang": "en", "text": "The terminal block is for an electrician only.", "kind": "warning"}
+{"id": "warn.020", "lang": "en", "text": "Don't loosen anything on the gas supply pipe.", "kind": "warning"}
+{"id": "warn.021", "lang": "en", "text": "Keep your hands off the burner.", "kind": "warning"}
+{"id": "warn.022", "lang": "en", "text": "The heat exchanger is behind a sealed cover that must stay closed.", "kind": "warning"}
+{"id": "warn.023", "lang": "en", "text": "Please leave the meter seal alone.", "kind": "warning"}
+{"id": "warn.024", "lang": "en", "text": "If the safety valve is dripping, don't touch it and call your installer.", "kind": "warning"}
+{"id": "warn.025", "lang": "en", "text": "Leave the outer casing on the dryer.", "kind": "warning"}
+{"id": "warn.026", "lang": "en", "text": "Behind the top panel there is mains wiring, so it's best left to a technician.", "kind": "warning"}
+{"id": "warn.027", "lang": "en", "text": "The busbar inside the consumer unit is live and should never be touched.", "kind": "warning"}
+{"id": "warn.028", "lang": "en", "text": "Don't move the yellow tap; that's the gas.", "kind": "warning"}
+{"id": "warn.029", "lang": "en", "text": "Your engineer can replace the condensate pipe if it's damaged.", "kind": "warning"}
+{"id": "warn.030", "lang": "en", "text": "Never remove the housing of the AquaStop valve.", "kind": "warning"}
+{"id": "warn.031", "lang": "nl", "text": "Haal de achterwand er nooit zelf af.", "kind": "warning"}
+{"id": "warn.032", "lang": "nl", "text": "Laat de ketelmantel zitten, dat is werk voor de installateur.", "kind": "warning"}
+{"id": "warn.033", "lang": "nl", "text": "Kom niet aan de kale draad.", "kind": "warning"}
+{"id": "warn.034", "lang": "nl", "text": "De gaskraan laat je met rust.", "kind": "warning"}
+{"id": "warn.035", "lang": "nl", "text": "Het overstortventiel is niet iets om zelf aan te draaien.", "kind": "warning"}
+{"id": "warn.036", "lang": "nl", "text": "Schroef de kap van de groepenkast niet los; bel een elektricien.", "kind": "warning"}
+{"id": "warn.037", "lang": "nl", "text": "De rookgasafvoer mag nooit afgedekt worden.", "kind": "warning"}
+{"id": "warn.038", "lang": "nl", "text": "Het achterpaneel blijft erop, want daarachter zit netspanning.", "kind": "warning"}
+{"id": "warn.039", "lang": "nl", "text": "Laat het zijpaneel aan een monteur over.", "kind": "warning"}
+{"id": "warn.040", "lang": "nl", "text": "Je installateur kijkt bij het onderhoud naar het expansievat.", "kind": "warning"}
+{"id": "warn.041", "lang": "nl", "text": "Raak de kroonsteen niet aan.", "kind": "warning"}
+{"id": "warn.042", "lang": "nl", "text": "Verwijder nooit de behuizing van de vaatwasser.", "kind": "warning"}
+{"id": "warn.043", "lang": "nl", "text": "De buitenmantel moet erop blijven.", "kind": "warning"}
+{"id": "warn.044", "lang": "nl", "text": "Als de bedrading zwart ziet, zet de groep uit en bel een elektricien.", "kind": "warning"}
+{"id": "warn.045", "lang": "nl", "text": "Draai niet aan de gele kraan; dat is de gasleiding.", "kind": "warning"}
+{"id": "warn.046", "lang": "nl", "text": "Alleen een erkende monteur mag de ketelmantel openmaken.", "kind": "warning"}
+{"id": "warn.047", "lang": "nl", "text": "Het zegel van de meter laat je zitten.", "kind": "warning"}
+{"id": "warn.048", "lang": "nl", "text": "Ga niet met je handen achter de achterwand.", "kind": "warning"}
+{"id": "warn.049", "lang": "nl", "text": "Dat is iets voor een monteur, niet voor ons vandaag.", "kind": "warning"}
+{"id": "warn.050", "lang": "nl", "text": "Hou kinderen weg bij de rookgasafvoer.", "kind": "warning"}

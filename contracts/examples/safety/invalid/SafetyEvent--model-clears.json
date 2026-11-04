@@ -1,0 +1,9 @@
+{
+  "t_ms": 1300,
+  "source": "model",
+  "kind": "clear",
+  "to": {
+    "state": "OK"
+  },
+  "reason": "model says it is fine"
+}

@@ -1,0 +1,179 @@
+# The jobs a dishwasher manual usually gives, by name only (no manual text), from the
+# eval checklists (eval/checklists, derived from the gold cards). The builder asks the reader about each
+# user item; it never writes a step from one. evidence: how many of the `of` gold manuals hold the item.
+appliance_kind: dishwasher
+of: 1
+items:
+- id: dishwasher.filters
+  names:
+    en: Clean the filters
+    nl: Zeven reinigen
+  kind: upkeep
+  who: user
+  evidence: 1
+  note: the headline job
+- id: dishwasher.spray_arms
+  names:
+    en: Clean the spray arms
+    nl: Sproeiarmen reinigen
+  kind: upkeep
+  who: user
+  evidence: 1
+- id: dishwasher.drain_pump
+  names:
+    en: Clean the drain pump
+    nl: Afvoerpomp reinigen
+  kind: fix
+  who: user
+  evidence: 1
+- id: dishwasher.inlet_filter
+  names:
+    en: Clean the water inlet filter
+    nl: Zeef in de watertoevoer reinigen
+  kind: fix
+  who: user
+  evidence: 1
+- id: dishwasher.salt
+  names:
+    en: Refill dishwasher salt
+    nl: Zout bijvullen
+  kind: upkeep
+  who: user
+  evidence: 1
+- id: dishwasher.rinse_aid
+  names:
+    en: Refill rinse aid
+    nl: Naspoelmiddel bijvullen
+  kind: upkeep
+  who: user
+  evidence: 1
+- id: dishwasher.dosing_refill
+  names:
+    en: Replace the automatic dosing cartridge
+    nl: Doseercartridge vervangen
+  kind: upkeep
+  who: user
+  evidence: 1
+  note: only on models with automatic dosing
+- id: dishwasher.dosing_clean
+  names:
+    en: Clean the automatic dosing unit
+    nl: Automatische dosering reinigen
+  kind: upkeep
+  who: user
+  evidence: 1
+- id: dishwasher.dosing_fault
+  names:
+    en: Automatic dosing fault
+    nl: Storing in de automatische dosering
+  kind: fix
+  who: user
+  evidence: 1
+- id: dishwasher.hot_cleaning_cycle
+  names:
+    en: Run a hot or machine-cleaning cycle
+    nl: Heet programma of machinereiniging draaien
+  kind: upkeep
+  who: user
+  evidence: 1
+- id: dishwasher.door_seals
+  names:
+    en: Clean the door seals and door edges
+    nl: Deurafdichting en deurranden reinigen
+  kind: upkeep
+  who: user
+  evidence: 1
+- id: dishwasher.clean_exterior
+  names:
+    en: Clean the front and control panel
+    nl: Front en bedieningspaneel reinigen
+  kind: upkeep
+  who: user
+  evidence: 1
+- id: dishwasher.general_check
+  names:
+    en: Check the general condition
+    nl: Algemene toestand controleren
+  kind: upkeep
+  who: user
+  evidence: 1
+- id: dishwasher.tap_closed
+  names:
+    en: Water tap closed
+    nl: Waterkraan dicht
+  kind: fix
+  who: user
+  evidence: 1
+- id: dishwasher.drain_hose_kink
+  names:
+    en: Kinked drain hose
+    nl: Geknikte afvoerslang
+  kind: fix
+  who: user
+  evidence: 1
+- id: dishwasher.reset_after_fault
+  names:
+    en: Reset after a fault code
+    nl: Resetten na een foutcode
+  kind: fix
+  who: user
+  evidence: 1
+- id: dishwasher.door_fault
+  names:
+    en: Door fault
+    nl: Storing deur
+  kind: fix
+  who: user
+  evidence: 1
+- id: dishwasher.wont_start
+  names:
+    en: Dishwasher will not start
+    nl: Vaatwasser start niet
+  kind: fix
+  who: user
+  evidence: 1
+- id: dishwasher.pro.repair
+  names:
+    en: Repairs
+    maintenance beyond the user jobs: null
+    nl: Reparaties en onderhoud buiten de eigen taken
+  who: professional
+  evidence: 1
+- id: dishwasher.pro.fault_recurs
+  names:
+    en: A fault that comes back after the user fix
+    nl: Een storing die terugkomt na de eigen oplossing
+  who: professional
+  evidence: 1
+- id: dishwasher.pro.water_protection
+  names:
+    en: Water protection system triggered
+    nl: Waterbeveiliging aangesproken
+  who: professional
+  evidence: 1
+- id: dishwasher.pro.mains_cable
+  names:
+    en: Replace a damaged mains cable
+    nl: Beschadigd netsnoer vervangen
+  who: professional
+  evidence: 1
+- id: dishwasher.pro.installation
+  names:
+    en: Electrical and water installation
+    water pressure: null
+    nl: Elektrische en waterinstallatie
+    waterdruk: null
+  who: professional
+  evidence: 1
+- id: dishwasher.pro.lighting
+  names:
+    en: Replace the interior lighting
+    nl: Binnenverlichting vervangen
+  who: professional
+  evidence: 1
+- id: dishwasher.pro.door_springs
+  names:
+    en: Adjust the door springs
+    nl: Deurveren afstellen
+  who: professional
+  evidence: 1

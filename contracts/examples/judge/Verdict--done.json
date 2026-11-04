@@ -1,0 +1,16 @@
+{
+  "step_id": "refit_filter",
+  "check_id": "c1",
+  "attempt": 1,
+  "result": "done",
+  "clause_ids": [
+    "arrows_aligned"
+  ],
+  "witnesses": {
+    "judge": "done",
+    "sam": "frame",
+    "sam_result": "done"
+  },
+  "latency_ms": 2900,
+  "ask_for": null
+}

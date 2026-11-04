@@ -1,0 +1,123 @@
+# The 20 spoken hazard lines for the hazard-to-STOP latency rows (eval/hazard.py). Spoken lines only: nothing is
+# staged, no fault is made, no machine runs, the gas tap is never touched. The speaker reads each line to the phone
+# in a fresh session; each one names a hazard the rules stop on when it is said (rules/nl.yaml, the spoken zones).
+
+[[line]]
+id = "h01"
+lang = "en"
+zone = "smell"
+text = "I think I smell gas."
+
+[[line]]
+id = "h02"
+lang = "en"
+zone = "smell"
+text = "There's a gas smell near the boiler."
+
+[[line]]
+id = "h03"
+lang = "en"
+zone = "alarm"
+text = "The CO alarm is going off."
+
+[[line]]
+id = "h04"
+lang = "en"
+zone = "alarm"
+text = "The carbon monoxide detector is beeping."
+
+[[line]]
+id = "h05"
+lang = "en"
+zone = "fire"
+text = "I can see smoke coming out of the back."
+
+[[line]]
+id = "h06"
+lang = "en"
+zone = "fire"
+text = "There are sparks at the plug."
+
+[[line]]
+id = "h07"
+lang = "en"
+zone = "burning"
+text = "There's a burning smell from the machine."
+
+[[line]]
+id = "h08"
+lang = "en"
+zone = "flood"
+text = "There's water near the socket."
+
+[[line]]
+id = "h09"
+lang = "en"
+zone = "breaker_repeat"
+text = "The breaker keeps tripping."
+
+[[line]]
+id = "h10"
+lang = "en"
+zone = "burning"
+text = "It smells like burning in here."
+
+[[line]]
+id = "h11"
+lang = "nl"
+zone = "smell"
+text = "Ik ruik gas."
+
+[[line]]
+id = "h12"
+lang = "nl"
+zone = "smell"
+text = "Het ruikt naar gas in de keuken."
+
+[[line]]
+id = "h13"
+lang = "nl"
+zone = "alarm"
+text = "De CO-melder gaat af."
+
+[[line]]
+id = "h14"
+lang = "nl"
+zone = "alarm"
+text = "Ik denk dat het koolmonoxide is."
+
+[[line]]
+id = "h15"
+lang = "nl"
+zone = "fire"
+text = "Er komt rook uit de achterkant."
+
+[[line]]
+id = "h16"
+lang = "nl"
+zone = "fire"
+text = "Ik zie vonken bij de stekker."
+
+[[line]]
+id = "h17"
+lang = "nl"
+zone = "burning"
+text = "Er hangt een brandlucht."
+
+[[line]]
+id = "h18"
+lang = "nl"
+zone = "flood"
+text = "Er staat water bij het stopcontact."
+
+[[line]]
+id = "h19"
+lang = "nl"
+zone = "breaker_repeat"
+text = "De stroom valt weer uit."
+
+[[line]]
+id = "h20"
+lang = "nl"
+zone = "burning"
+text = "Het ruikt verbrand."

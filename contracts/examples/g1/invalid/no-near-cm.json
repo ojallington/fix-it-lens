@@ -1,0 +1,187 @@
+{
+  "version": "0.1.0",
+  "constants": {
+    "ttc_ms": 400,
+    "dist_cm": 20,
+    "ring_floor_cm": 3,
+    "frame_max_age_ms": 200,
+    "stop_p95_ms": 150
+  },
+  "vectors": [
+    {
+      "id": "still_hand_far",
+      "description": "A still hand 50 cm away never stops",
+      "frames": [
+        {
+          "t_ms": 0,
+          "fingertips": [
+            {
+              "x": 0,
+              "y": 350
+            }
+          ],
+          "zone": {
+            "polygon": [
+              {
+                "x": 400,
+                "y": 300
+              },
+              {
+                "x": 500,
+                "y": 300
+              },
+              {
+                "x": 500,
+                "y": 400
+              },
+              {
+                "x": 400,
+                "y": 400
+              }
+            ],
+            "ring_cm": 3,
+            "scale_cm_per_px": 0.1
+          },
+          "tool_len_cm": 0
+        },
+        {
+          "t_ms": 33,
+          "fingertips": [
+            {
+              "x": 0,
+              "y": 350
+            }
+          ],
+          "zone": {
+            "polygon": [
+              {
+                "x": 400,
+                "y": 300
+              },
+              {
+                "x": 500,
+                "y": 300
+              },
+              {
+                "x": 500,
+                "y": 400
+              },
+              {
+                "x": 400,
+                "y": 400
+              }
+            ],
+            "ring_cm": 3,
+            "scale_cm_per_px": 0.1
+          },
+          "tool_len_cm": 0
+        },
+        {
+          "t_ms": 66,
+          "fingertips": [
+            {
+              "x": 0,
+              "y": 350
+            }
+          ],
+          "zone": {
+            "polygon": [
+              {
+                "x": 400,
+                "y": 300
+              },
+              {
+                "x": 500,
+                "y": 300
+              },
+              {
+                "x": 500,
+                "y": 400
+              },
+              {
+                "x": 400,
+                "y": 400
+              }
+            ],
+            "ring_cm": 3,
+            "scale_cm_per_px": 0.1
+          },
+          "tool_len_cm": 0
+        }
+      ],
+      "expect": {
+        "stop_at_t_ms": null,
+        "kind": null
+      }
+    },
+    {
+      "id": "hand_lost",
+      "description": "Losing the hand near a zone pauses",
+      "frames": [
+        {
+          "t_ms": 0,
+          "fingertips": [
+            {
+              "x": 300,
+              "y": 350
+            }
+          ],
+          "zone": {
+            "polygon": [
+              {
+                "x": 400,
+                "y": 300
+              },
+              {
+                "x": 500,
+                "y": 300
+              },
+              {
+                "x": 500,
+                "y": 400
+              },
+              {
+                "x": 400,
+                "y": 400
+              }
+            ],
+            "ring_cm": 3,
+            "scale_cm_per_px": 0.1
+          },
+          "tool_len_cm": 0
+        },
+        {
+          "t_ms": 33,
+          "fingertips": [],
+          "zone": {
+            "polygon": [
+              {
+                "x": 400,
+                "y": 300
+              },
+              {
+                "x": 500,
+                "y": 300
+              },
+              {
+                "x": 500,
+                "y": 400
+              },
+              {
+                "x": 400,
+                "y": 400
+              }
+            ],
+            "ring_cm": 3,
+            "scale_cm_per_px": 0.1
+          },
+          "tool_len_cm": 0
+        }
+      ],
+      "expect": {
+        "stop_at_t_ms": 33,
+        "kind": "pause"
+      }
+    }
+  ]
+}

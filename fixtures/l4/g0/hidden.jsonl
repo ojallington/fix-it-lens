@@ -1,0 +1,100 @@
+{"id": "hid.001", "lang": "en", "shape": "tool", "text": "The back panel comes away with a screwdriver."}
+{"id": "hid.002", "lang": "en", "shape": "lifts_once", "text": "The back panel slides out as soon as the clips are released."}
+{"id": "hid.003", "lang": "en", "shape": "narration", "text": "The next bit is the back panel: the screws along the top edge come out first."}
+{"id": "hid.004", "lang": "en", "shape": "passive", "text": "The back panel is removed by undoing the screws along the bottom."}
+{"id": "hid.005", "lang": "en", "shape": "hold_they", "text": "Two clips keep the back panel in place, and they let go with a firm push."}
+{"id": "hid.006", "lang": "en", "shape": "tool", "text": "A spanner undoes the four screws on the side panel."}
+{"id": "hid.007", "lang": "en", "shape": "hold_they", "text": "Four screws hold the side panel; they come out anticlockwise."}
+{"id": "hid.008", "lang": "en", "shape": "others", "text": "Most people simply lift the side panel away."}
+{"id": "hid.009", "lang": "en", "shape": "passive", "text": "Once the screws are out, the side panel is lifted clear."}
+{"id": "hid.010", "lang": "en", "shape": "narration", "text": "What happens next is that the side panel comes off."}
+{"id": "hid.011", "lang": "en", "shape": "passive", "text": "The boiler casing is removed by undoing the screws along the bottom."}
+{"id": "hid.012", "lang": "en", "shape": "hold_they", "text": "Two clips keep the boiler casing in place, and they let go with a firm push."}
+{"id": "hid.013", "lang": "en", "shape": "others", "text": "Engineers just pull the boiler casing forward until it comes free."}
+{"id": "hid.014", "lang": "en", "shape": "lifts_once", "text": "The boiler casing lifts off once the two screws are out."}
+{"id": "hid.015", "lang": "en", "shape": "narration", "text": "The next bit is the boiler casing: the screws along the top edge come out first."}
+{"id": "hid.016", "lang": "en", "shape": "passive", "text": "Once the screws are out, the front cover of the boiler is lifted clear."}
+{"id": "hid.017", "lang": "en", "shape": "narration", "text": "What happens next is that the front cover of the boiler comes off."}
+{"id": "hid.018", "lang": "en", "shape": "tool", "text": "The front cover of the boiler comes away with a Allen key."}
+{"id": "hid.019", "lang": "en", "shape": "lifts_once", "text": "The front cover of the boiler slides out as soon as the clips are released."}
+{"id": "hid.020", "lang": "en", "shape": "others", "text": "Most people simply lift the front cover of the boiler away."}
+{"id": "hid.021", "lang": "en", "shape": "lifts_once", "text": "The control board lifts off once the two screws are out."}
+{"id": "hid.022", "lang": "en", "shape": "narration", "text": "The next bit is the control board: the screws along the top edge come out first."}
+{"id": "hid.023", "lang": "en", "shape": "tool", "text": "A screwdriver undoes the four screws on the control board."}
+{"id": "hid.024", "lang": "en", "shape": "hold_they", "text": "Four screws hold the control board; they come out anticlockwise."}
+{"id": "hid.025", "lang": "en", "shape": "others", "text": "Engineers just pull the control board forward until it comes free."}
+{"id": "hid.026", "lang": "en", "shape": "lifts_once", "text": "The consumer unit cover slides out as soon as the clips are released."}
+{"id": "hid.027", "lang": "en", "shape": "others", "text": "Most people simply lift the consumer unit cover away."}
+{"id": "hid.028", "lang": "en", "shape": "passive", "text": "The consumer unit cover is removed by undoing the screws along the bottom."}
+{"id": "hid.029", "lang": "en", "shape": "hold_they", "text": "Two clips keep the consumer unit cover in place, and they let go with a firm push."}
+{"id": "hid.030", "lang": "en", "shape": "tool", "text": "The consumer unit cover comes away with a screwdriver."}
+{"id": "hid.031", "lang": "en", "shape": "hold_they", "text": "Four screws hold the socket faceplate; they come out anticlockwise."}
+{"id": "hid.032", "lang": "en", "shape": "others", "text": "Engineers just pull the socket faceplate forward until it comes free."}
+{"id": "hid.033", "lang": "en", "shape": "passive", "text": "Once the screws are out, the socket faceplate is lifted clear."}
+{"id": "hid.034", "lang": "en", "shape": "narration", "text": "What happens next is that the socket faceplate comes off."}
+{"id": "hid.035", "lang": "en", "shape": "tool", "text": "A spanner undoes the four screws on the socket faceplate."}
+{"id": "hid.036", "lang": "en", "shape": "hold_they", "text": "Two clips keep the clamp on the flue joint in place, and they let go with a firm push."}
+{"id": "hid.037", "lang": "en", "shape": "tool", "text": "The clamp on the flue joint comes away with a spanner."}
+{"id": "hid.038", "lang": "en", "shape": "lifts_once", "text": "The clamp on the flue joint lifts off once the two screws are out."}
+{"id": "hid.039", "lang": "en", "shape": "narration", "text": "The next bit is the clamp on the flue joint: the screws along the top edge come out first."}
+{"id": "hid.040", "lang": "en", "shape": "passive", "text": "The clamp on the flue joint is removed by undoing the screws along the bottom."}
+{"id": "hid.041", "lang": "en", "shape": "narration", "text": "What happens next is that the gas hose on the hob comes off."}
+{"id": "hid.042", "lang": "en", "shape": "tool", "text": "A flat blade undoes the four screws on the gas hose on the hob."}
+{"id": "hid.043", "lang": "en", "shape": "lifts_once", "text": "The gas hose on the hob slides out as soon as the clips are released."}
+{"id": "hid.044", "lang": "en", "shape": "others", "text": "Most people simply lift the gas hose on the hob away."}
+{"id": "hid.045", "lang": "en", "shape": "passive", "text": "Once the screws are out, the gas hose on the hob is lifted clear."}
+{"id": "hid.046", "lang": "en", "shape": "narration", "text": "The next bit is the terminal block cover: the screws along the top edge come out first."}
+{"id": "hid.047", "lang": "en", "shape": "passive", "text": "The terminal block cover is removed by undoing the screws along the bottom."}
+{"id": "hid.048", "lang": "en", "shape": "hold_they", "text": "Four screws hold the terminal block cover; they come out anticlockwise."}
+{"id": "hid.049", "lang": "en", "shape": "others", "text": "Engineers just pull the terminal block cover forward until it comes free."}
+{"id": "hid.050", "lang": "en", "shape": "lifts_once", "text": "The terminal block cover lifts off once the two screws are out."}
+{"id": "hid.051", "lang": "nl", "shape": "tool", "text": "De achterwand gaat er met een schroevendraaier af."}
+{"id": "hid.052", "lang": "nl", "shape": "lifts_once", "text": "De achterwand schuift eruit als de klemmetjes los zijn."}
+{"id": "hid.053", "lang": "nl", "shape": "narration", "text": "Wat er dan gebeurt, is dat de achterwand eraf komt."}
+{"id": "hid.054", "lang": "nl", "shape": "passive", "text": "De achterwand wordt verwijderd door de schroeven onderaan los te draaien."}
+{"id": "hid.055", "lang": "nl", "shape": "hold_they", "text": "Twee clips houden de achterwand op zijn plek, en die springen los met een stevige duw."}
+{"id": "hid.056", "lang": "nl", "shape": "tool", "text": "Een steeksleutel maakt de schroeven van het zijpaneel los."}
+{"id": "hid.057", "lang": "nl", "shape": "hold_they", "text": "Vier schroeven houden het zijpaneel vast; die draaien linksom los."}
+{"id": "hid.058", "lang": "nl", "shape": "others", "text": "De meeste mensen tillen het zijpaneel gewoon weg."}
+{"id": "hid.059", "lang": "nl", "shape": "passive", "text": "Als de schroeven eruit zijn, wordt het zijpaneel eraf gehaald."}
+{"id": "hid.060", "lang": "nl", "shape": "narration", "text": "Daarna is het zijpaneel aan de beurt: eerst gaan de schroeven bovenaan eruit."}
+{"id": "hid.061", "lang": "nl", "shape": "passive", "text": "De mantel van de ketel wordt verwijderd door de schroeven onderaan los te draaien."}
+{"id": "hid.062", "lang": "nl", "shape": "hold_they", "text": "Twee clips houden de mantel van de ketel op zijn plek, en die springen los met een stevige duw."}
+{"id": "hid.063", "lang": "nl", "shape": "others", "text": "Monteurs trekken de mantel van de ketel naar voren tot hij loskomt."}
+{"id": "hid.064", "lang": "nl", "shape": "lifts_once", "text": "De mantel van de ketel komt los zodra de twee schroeven eruit zijn."}
+{"id": "hid.065", "lang": "nl", "shape": "narration", "text": "Wat er dan gebeurt, is dat de mantel van de ketel eraf komt."}
+{"id": "hid.066", "lang": "nl", "shape": "passive", "text": "Als de schroeven eruit zijn, wordt de voorkap van de cv-ketel eraf gehaald."}
+{"id": "hid.067", "lang": "nl", "shape": "narration", "text": "Daarna is de voorkap van de cv-ketel aan de beurt: eerst gaan de schroeven bovenaan eruit."}
+{"id": "hid.068", "lang": "nl", "shape": "tool", "text": "De voorkap van de cv-ketel gaat er met een inbussleutel af."}
+{"id": "hid.069", "lang": "nl", "shape": "lifts_once", "text": "De voorkap van de cv-ketel schuift eruit als de klemmetjes los zijn."}
+{"id": "hid.070", "lang": "nl", "shape": "others", "text": "De meeste mensen tillen de voorkap van de cv-ketel gewoon weg."}
+{"id": "hid.071", "lang": "nl", "shape": "lifts_once", "text": "De printplaat komt los zodra de twee schroeven eruit zijn."}
+{"id": "hid.072", "lang": "nl", "shape": "narration", "text": "Wat er dan gebeurt, is dat de printplaat eraf komt."}
+{"id": "hid.073", "lang": "nl", "shape": "tool", "text": "Een schroevendraaier maakt de schroeven van de printplaat los."}
+{"id": "hid.074", "lang": "nl", "shape": "hold_they", "text": "Vier schroeven houden de printplaat vast; die draaien linksom los."}
+{"id": "hid.075", "lang": "nl", "shape": "others", "text": "Monteurs trekken de printplaat naar voren tot hij loskomt."}
+{"id": "hid.076", "lang": "nl", "shape": "lifts_once", "text": "De kap van de groepenkast schuift eruit als de klemmetjes los zijn."}
+{"id": "hid.077", "lang": "nl", "shape": "others", "text": "De meeste mensen tillen de kap van de groepenkast gewoon weg."}
+{"id": "hid.078", "lang": "nl", "shape": "passive", "text": "De kap van de groepenkast wordt verwijderd door de schroeven onderaan los te draaien."}
+{"id": "hid.079", "lang": "nl", "shape": "hold_they", "text": "Twee clips houden de kap van de groepenkast op zijn plek, en die springen los met een stevige duw."}
+{"id": "hid.080", "lang": "nl", "shape": "tool", "text": "De kap van de groepenkast gaat er met een schroevendraaier af."}
+{"id": "hid.081", "lang": "nl", "shape": "hold_they", "text": "Vier schroeven houden de afdekplaat van het stopcontact vast; die draaien linksom los."}
+{"id": "hid.082", "lang": "nl", "shape": "others", "text": "Monteurs trekken de afdekplaat van het stopcontact naar voren tot hij loskomt."}
+{"id": "hid.083", "lang": "nl", "shape": "passive", "text": "Als de schroeven eruit zijn, wordt de afdekplaat van het stopcontact eraf gehaald."}
+{"id": "hid.084", "lang": "nl", "shape": "narration", "text": "Daarna is de afdekplaat van het stopcontact aan de beurt: eerst gaan de schroeven bovenaan eruit."}
+{"id": "hid.085", "lang": "nl", "shape": "tool", "text": "Een steeksleutel maakt de schroeven van de afdekplaat van het stopcontact los."}
+{"id": "hid.086", "lang": "nl", "shape": "hold_they", "text": "Twee clips houden de klem op de rookgasafvoer op zijn plek, en die springen los met een stevige duw."}
+{"id": "hid.087", "lang": "nl", "shape": "tool", "text": "De klem op de rookgasafvoer gaat er met een steeksleutel af."}
+{"id": "hid.088", "lang": "nl", "shape": "lifts_once", "text": "De klem op de rookgasafvoer komt los zodra de twee schroeven eruit zijn."}
+{"id": "hid.089", "lang": "nl", "shape": "narration", "text": "Wat er dan gebeurt, is dat de klem op de rookgasafvoer eraf komt."}
+{"id": "hid.090", "lang": "nl", "shape": "passive", "text": "De klem op de rookgasafvoer wordt verwijderd door de schroeven onderaan los te draaien."}
+{"id": "hid.091", "lang": "nl", "shape": "narration", "text": "Daarna is de gasslang van de kookplaat aan de beurt: eerst gaan de schroeven bovenaan eruit."}
+{"id": "hid.092", "lang": "nl", "shape": "tool", "text": "Een platte schroevendraaier maakt de schroeven van de gasslang van de kookplaat los."}
+{"id": "hid.093", "lang": "nl", "shape": "lifts_once", "text": "De gasslang van de kookplaat schuift eruit als de klemmetjes los zijn."}
+{"id": "hid.094", "lang": "nl", "shape": "others", "text": "De meeste mensen tillen de gasslang van de kookplaat gewoon weg."}
+{"id": "hid.095", "lang": "nl", "shape": "passive", "text": "Als de schroeven eruit zijn, wordt de gasslang van de kookplaat eraf gehaald."}
+{"id": "hid.096", "lang": "nl", "shape": "narration", "text": "Wat er dan gebeurt, is dat het kroonsteendeksel eraf komt."}
+{"id": "hid.097", "lang": "nl", "shape": "passive", "text": "Het kroonsteendeksel wordt verwijderd door de schroeven onderaan los te draaien."}
+{"id": "hid.098", "lang": "nl", "shape": "hold_they", "text": "Vier schroeven houden het kroonsteendeksel vast; die draaien linksom los."}
+{"id": "hid.099", "lang": "nl", "shape": "others", "text": "Monteurs trekken het kroonsteendeksel naar voren tot hij loskomt."}
+{"id": "hid.100", "lang": "nl", "shape": "lifts_once", "text": "Het kroonsteendeksel komt los zodra de twee schroeven eruit zijn."}

@@ -1,0 +1,11 @@
+{
+  "type": "safety",
+  "seq": 16,
+  "t_ms": 5200,
+  "state": {
+    "state": "STOP",
+    "rule_id": "nl.mains.casing",
+    "evidence": "hand at back panel",
+    "script": "Handen terug."
+  }
+}

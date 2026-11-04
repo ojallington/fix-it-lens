@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fix-It Lens — system check</title>
+<style>
+  :root { --bg: #fff; --fg: #111; --card: #f4f4f2; --ok: #0a7d32; --bad: #c0261c; --off: #8a8a86; --muted: #5d5d5a;
+          --line: #0001; color-scheme: light dark; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111; --fg: #eee; --card: #1c1c1b; --ok: #4cc86e; --bad: #ff6b5e; --off: #8d8d88; --muted: #a3a3a0;
+            --line: #fff1; }
+  }
+  body { background: var(--bg); color: var(--fg); font: 17px/1.45 system-ui, sans-serif; margin: 0; }
+  main { max-width: 36rem; margin: 0 auto; padding: 20px 16px 32px; }
+  header { margin-bottom: 16px; }
+  .brand { font-size: 14px; font-weight: 600; letter-spacing: .02em; color: var(--muted); margin: 0; }
+  h1 { font-size: 26px; margin: 2px 0 6px; }
+  #sum { margin: 0; font-size: 17px; }
+  #sum.ok { color: var(--ok); } #sum.bad { color: var(--bad); }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 22px 0 6px; }
+  ul { padding: 0; margin: 0; background: var(--card); border-radius: 14px; }
+  li { list-style: none; padding: 12px 14px; display: flex; gap: 12px; border-top: 1px solid var(--line); }
+  li:first-child { border-top: 0; }
+  .mark { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+          font-weight: 700; font-size: 15px; color: #fff; margin-top: 1px; }
+  .ok .mark { background: var(--ok); } .bad .mark { background: var(--bad); } .off .mark { background: var(--off); }
+  .label { font-weight: 600; }
+  .state { font-weight: 400; font-size: 14px; margin-left: 6px; }
+  .ok .state { color: var(--ok); } .bad .state { color: var(--bad); } .off .state { color: var(--off); }
+  .plain { color: var(--muted); font-size: 15px; }
+  details { font-size: 13px; color: var(--muted); margin: -6px 0 -12px; }
+  details[open] { margin-bottom: 0; }  /* an open line's detail keeps clear of the divider below */
+  summary { cursor: pointer; min-height: 48px; padding: 12px 0; box-sizing: border-box; }  /* a 48 px target */
+  .tech { font-family: ui-monospace, monospace; overflow-wrap: anywhere; padding-bottom: 16px; }  /* clear of the divider */
+  .actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  button { font: inherit; min-height: 48px; padding: 0 20px; border-radius: 12px; border: 1px solid var(--line);
+           background: var(--card); color: var(--fg); }
+  button.primary { background: var(--fg); color: var(--bg); border-color: transparent; }
+  .ops { margin-top: 26px; }
+  .ops summary { font-size: 15px; }
+  .ops p { font-size: 14px; }
+  .ops button { font-size: 16px; }  /* not the 13px of the details it sits in */
+</style>
+</head>
+<body>
+<main>
+<header>
+  <p class="brand">Fix-It Lens</p>
+  <h1>System check</h1>
+  <p id="sum" aria-live="polite">Checking…</p>
+</header>
+<h2>Server</h2>
+<ul id="server"></ul>
+<h2>This phone</h2>
+<ul id="phone"></ul>
+<div class="actions"><button class="primary" onclick="go()">Check again</button></div>
+<details class="ops">
+  <summary>For the operator</summary>
+  <p>Load the local model ahead of a session. It takes up to 2 minutes and holds the GPU while it is loaded.</p>
+  <button id="warm" onclick="warm()">Load the local model</button>
+  <p id="warmed" class="plain"></p>
+</details>
+</main>
+<script>
+const MAX_RTT_MS = 150, MIN_BATTERY = 0.5;
+// Lines a fresh install cannot pass until it has its own data: shown grey ("not set up here"), not red.
+const NEEDS_DATA = { "manuals": true, "last replay": true };
+// Lines that replay mode does not use: the server says "replay: …" and they are shown grey, not green or red.
+const NOT_USED_IN_REPLAY = { "models": true, "local": true, "credits": true };
+const LABELS = {
+  "models": "Meta AI models", "local": "Local model", "credits": "Free credits", "calls": "Mode", "ledger": "Spending cap",
+  "manuals": "Manuals", "last replay": "Recordings", "home assistant": "Home Assistant",
+  "phone rtt": "Connection", "phone battery": "Battery", "camera": "Camera", "service worker": "Offline app",
+};
+function label(check) {
+  if (check.startsWith("certificate")) return "HTTPS certificate";
+  return LABELS[check] || check.charAt(0).toUpperCase() + check.slice(1);
+}
+// Plain words for each line; the server's own detail stays under "Details".
+function plain(l) {
+  const d = l.detail || "", c = l.check;
+  if (c === "models") return d.startsWith("replay") ? "Not needed in replay mode." :
+    l.ok ? "Meta's AI models answer." : "Meta's AI models don't answer: check the key and the network.";
+  // The local model takes over when Meta's models fail twice; what it says depends on what the server found
+  if (c === "local") return d.startsWith("replay") ? "Recordings play without it." :
+    d.includes("loaded and ready") ? "Loaded, ready to take over if Meta's models fail." :
+    l.ok ? "Ready to take over if Meta's models fail; it loads on first use." :
+    d.includes("not installed") ? "Not installed on the GPU computer, so a session can't switch to it." :
+    "Doesn't answer, so a session can't switch to it.";
+  if (c === "credits") {
+    if (d.startsWith("replay")) return "Recordings play without them.";
+    if (d.startsWith("Off")) return "Off: every public session runs on Meta.";
+    if (d.startsWith("On, but full")) return "Full: new public sessions are turned away.";
+    return l.ok ? "On: a new public session fits." : "Can't read the credit figures.";
+  }
+  if (c === "calls") {
+    if (d.startsWith("replay")) return "Replay: plays recordings, uses no key, spends nothing.";
+    const m = d.match(/ledger (\$[\d.]+) of (\$\d+)/);
+    return l.ok ? `Live${m ? `: ${m[1]} of ${m[2]} spent so far` : ""}.` : "Not set to live, record or replay.";
+  }
+  if (c === "ledger") return d.startsWith("replay") ? "Nothing is spent in replay mode." :
+    l.ok ? d.replace(/^./, s => s.toUpperCase()) + "." : "Too little budget left: " + d;
+  if (c === "manuals") return l.ok ? "The manuals are in place." : "Add your appliance's manual to show its pages.";
+  if (c === "last replay") {
+    const n = d.match(/(\d+) events/);
+    return l.ok ? `The last recording plays back${n ? ` (${n[1]} events)` : ""}.` : "No recordings here yet.";
+  }
+  if (c === "home assistant") return d.includes("not set up") ? "Not connected (optional)." :
+    l.ok ? "Connected, read-only." : "Doesn't answer.";
+  if (c.startsWith("certificate")) {
+    if (d.startsWith("not opened over HTTPS")) return "Open this page on the HTTPS address to check it.";
+    const n = d.match(/valid (\d+) more days/);
+    return l.ok && n ? `Valid for ${n[1]} more days.` : d;
+  }
+  if (c === "phone rtt") return d === "no answer" ? "The server doesn't answer." :
+    (l.ok ? "Fast " : "Slow ") + `(${d.replace(" median", "")}).`;
+  if (c === "phone battery") return d.startsWith("not readable") ? "This browser doesn't show it." :
+    l.ok ? `${d}.` : `${d}: charge it before a session.`;
+  if (c === "camera") return l.ok ? "Can be used." : "Needs the HTTPS address.";
+  if (c === "service worker") return l.ok ? "Installed; it opens without a network." :
+    l.off ? "Open the app once, then check again." : "This browser can't keep the app offline.";
+  return d;
+}
+// Grey lines are not faults: why each is grey is its state text ("Not set up here" unless the line says otherwise).
+function offText(l) {
+  if (NOT_USED_IN_REPLAY[l.check] && (l.detail || "").startsWith("replay")) return "Not used in replay mode";
+  if (l.check === "credits" && (l.detail || "").startsWith("Off")) return "Turned off";
+  return typeof l.off === "string" ? l.off : "Not set up here";
+}
+function state(l) {
+  if (NOT_USED_IN_REPLAY[l.check] && (l.detail || "").startsWith("replay")) return "off";
+  if (l.check === "home assistant" && (l.detail || "").includes("not set up")) return "off";
+  if (l.check === "credits" && (l.detail || "").startsWith("Off")) return "off";
+  if (l.ok) return "ok";
+  if (NEEDS_DATA[l.check] || l.off) return "off";
+  if (l.check.startsWith("certificate") && (l.detail || "").startsWith("not opened over HTTPS")) return "off";
+  return "bad";
+}
+// "All set", or how many need attention; then each kind of grey line, counted.
+function summary(all) {
+  const bad = all.filter(l => state(l) === "bad").length, greys = {};
+  all.filter(l => state(l) === "off").forEach(l => { const t = offText(l).toLowerCase(); greys[t] = (greys[t] || 0) + 1; });
+  return {bad, text: (bad ? `${bad} ${bad === 1 ? "thing needs" : "things need"} attention` : "All set") +
+    Object.entries(greys).map(([t, n]) => ` · ${n} ${t}`).join("")};
+}
+function li(l) {
+  const s = state(l), e = document.createElement("li");
+  e.className = s;
+  e.innerHTML = '<span class="mark" aria-hidden="true"></span><div><div><span class="label"></span><span class="state">' +
+    '</span></div><div class="plain"></div><details><summary>Details</summary><div class="tech"></div></details></div>';
+  e.querySelector(".mark").textContent = s === "ok" ? "✓" : s === "bad" ? "✗" : "–";
+  e.querySelector(".label").textContent = label(l.check);
+  e.querySelector(".state").textContent = s === "ok" ? "OK" : s === "bad" ? "Needs attention" : offText(l);
+  e.querySelector(".plain").textContent = plain(l);
+  e.querySelector(".tech").textContent = `${l.check}: ${l.detail}`;
+  return e;
+}
+async function phone() {
+  const out = [], t = [];
+  for (let i = 0; i < 5; i++) {
+    const s = performance.now();
+    try { await fetch("/sw.js", {cache: "no-store"}); t.push(performance.now() - s); } catch {}
+  }
+  t.sort((a, b) => a - b);
+  const rtt = t.length ? Math.round(t[Math.floor(t.length / 2)]) : null;
+  out.push({check: "phone rtt", ok: rtt !== null && rtt <= MAX_RTT_MS, detail: rtt === null ? "no answer" : `${rtt} ms median`});
+  try {
+    const b = await navigator.getBattery();
+    out.push({check: "phone battery", ok: b.charging || b.level >= MIN_BATTERY,
+              detail: `${Math.round(b.level * 100)}%${b.charging ? ", charging" : ""}`});
+  } catch { out.push({check: "phone battery", ok: false, off: true, detail: "not readable in this browser"}); }
+  out.push({check: "camera", ok: !!navigator.mediaDevices && isSecureContext, detail: isSecureContext ? "secure context" : "not HTTPS"});
+  // Installed once the app has registered it (it need not control this page); grey until then, red only when this
+  // browser has no service workers at all.
+  let reg = null;
+  try {  // a browser may never settle it: a second at most
+    reg = await Promise.race([navigator.serviceWorker?.getRegistration("/"), new Promise(r => setTimeout(r, 1000))]);
+  } catch {}
+  const has = !!navigator.serviceWorker, sw = !!navigator.serviceWorker?.controller || !!reg?.active;
+  out.push({check: "service worker", ok: sw, off: !sw && has && "Not checked yet",
+            detail: navigator.serviceWorker?.controller ? "controls this page" : sw ? "installed" :
+              has ? "not installed yet (open the app once)" : "not available in this browser"});
+  return out;
+}
+async function go() {
+  const ss = document.getElementById("server"), ps = document.getElementById("phone"), sum = document.getElementById("sum");
+  ss.replaceChildren(); ps.replaceChildren(); sum.className = ""; sum.textContent = "Checking…";
+  let server;
+  try { server = await (await fetch("/api/v1/preflight", {cache: "no-store"})).json(); }
+  catch (e) { server = [{check: "server", ok: false, detail: String(e)}]; }
+  const mine = await phone();
+  server.forEach(l => ss.append(li(l)));
+  mine.forEach(l => ps.append(li(l)));
+  const {bad, text} = summary([...server, ...mine]);
+  sum.className = bad ? "bad" : "ok";
+  sum.textContent = text;
+}
+async function warm() {
+  const b = document.getElementById("warm"), out = document.getElementById("warmed");
+  if (!confirm("Load the local model now? Up to 2 minutes.")) return;
+  b.disabled = true; out.textContent = "Loading the local model (up to 2 minutes)…";
+  try {
+    const r = await fetch("/api/v1/preflight/warm-up", {method: "POST"});
+    const l = r.ok ? await r.json() : {ok: false, detail: (await r.json().catch(() => ({}))).detail || r.statusText};
+    out.textContent = (l.ok ? "Loaded: " : "Not loaded: ") + l.detail;
+  } catch (e) { out.textContent = "Not loaded: " + e; }
+  b.disabled = false;
+  go();
+}
+go();
+</script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+# The jobs a boiler manual usually gives, by name only (no manual text), from the
+# eval checklists (eval/checklists, derived from the gold cards). The builder asks the reader about each
+# user item; it never writes a step from one. evidence: how many of the `of` gold manuals hold the item.
+appliance_kind: boiler
+of: 2
+items:
+- id: boiler.top_up_pressure
+  names:
+    en: Top up the system pressure
+    nl: Cv-installatie bijvullen
+  kind: upkeep
+  who: user
+  evidence: 2
+  note: the headline job; some manuals fold the radiator bleed into it
+- id: boiler.top_up_with_filler
+  names:
+    en: Top up with the built-in filling unit
+    nl: Bijvullen met de (bij)vulinrichting
+  kind: upkeep
+  who: user
+  evidence: 1
+  note: only on boilers with a filling unit
+- id: boiler.bleed_radiators
+  names:
+    en: Bleed the radiators
+    nl: Radiatoren ontluchten
+  kind: upkeep
+  who: user
+  evidence: 1
+- id: boiler.clean_casing
+  names:
+    en: Clean the outside of the boiler
+    nl: Buitenkant van de ketel reinigen
+  kind: upkeep
+  who: user
+  evidence: 2
+- id: boiler.frost_protection
+  names:
+    en: Protect the system against frost
+    nl: Installatie vorstvrij houden
+  kind: upkeep
+  who: user
+  evidence: 1
+- id: boiler.drain_system
+  names:
+    en: Drain the heating system
+    nl: Cv-installatie aftappen
+  kind: fix
+  who: user
+  evidence: 1
+  note: a renter leaves this to the landlord
+- id: boiler.reset_lockout
+  names:
+    en: Reset the boiler after a lockout code
+    nl: Ketel resetten na een blokkerende storing
+  kind: fix
+  who: user
+  evidence: 2
+- id: boiler.filler_fault
+  names:
+    en: Topping up takes too long
+    nl: Bijvullen duurt te lang
+  kind: fix
+  who: user
+  evidence: 1
+- id: boiler.no_heating
+  names:
+    en: Heating does not get warm
+    nl: Verwarming wordt niet warm
+  kind: fix
+  who: user
+  evidence: 1
+- id: boiler.no_hot_water
+  names:
+    en: Hot water does not get warm
+    nl: Warm water wordt niet warm
+  kind: fix
+  who: user
+  evidence: 1
+- id: boiler.pro.service
+  names:
+    en: Periodic service of boiler and system
+    nl: Periodiek onderhoud van ketel en installatie
+  who: professional
+  evidence: 2
+- id: boiler.pro.flue
+  names:
+    en: Check the flue and air supply
+    nl: Rookgasafvoer en luchttoevoer controleren
+  who: professional
+  evidence: 2
+- id: boiler.pro.fault_recurs
+  names:
+    en: A fault that comes back after a reset
+    nl: Een storing die na een reset terugkomt
+  who: professional
+  evidence: 2
+- id: boiler.pro.frequent_top_ups
+  names:
+    en: Pressure keeps dropping
+    find the leak: null
+    nl: Druk zakt steeds weg
+    lek zoeken: null
+  who: professional
+  evidence: 1
+- id: boiler.pro.internal_parts
+  names:
+    en: 'Internal parts: burner, electrode, expansion vessel, siphon, heat exchanger'
+    nl: 'Inwendige delen: brander, elektrode, expansievat, sifon, warmtewisselaar'
+  who: professional
+  evidence: 1
+- id: boiler.pro.gas
+  names:
+    en: Gas work
+    gas conversion: null
+    gas smell: null
+    nl: Gaswerk
+    ombouw naar ander gas: null
+    gaslucht: null
+  who: professional
+  evidence: 1
+- id: boiler.pro.installation
+  names:
+    en: Installation
+    commissioning and electrical connection: null
+    nl: Installatie
+    inbedrijfstelling en elektrische aansluiting: null
+  who: professional
+  evidence: 1
+- id: boiler.pro.mains_cable
+  names:
+    en: Replace a damaged mains cable
+    nl: Beschadigd netsnoer vervangen
+  who: professional
+  evidence: 1
+- id: boiler.pro.notifications
+  names:
+    en: Service notifications that keep coming back
+    nl: Servicemeldingen die terugkomen
+  who: professional
+  evidence: 1

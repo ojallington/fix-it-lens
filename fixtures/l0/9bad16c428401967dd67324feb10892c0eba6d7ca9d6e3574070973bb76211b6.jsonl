@@ -1,0 +1,2 @@
+{"fixture": 1, "request_sha256": "9bad16c428401967dd67324feb10892c0eba6d7ca9d6e3574070973bb76211b6", "kind": "count_tokens", "role": "guide", "params": {"model": "muse-spark-1.3", "store": false, "stream": false, "n_images": 1, "image_px": 768}, "recorded_at": "2026-10-26T22:21:08+00:00", "response_model": null, "latency_ms": 4874.658465996617, "usd": 0.0, "http_status": 200}
+{"t_ms": 4874.7, "event": {"type": "input_tokens.response", "body": {"object": "response.input_tokens", "input_tokens": 758}}}

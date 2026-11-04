@@ -1,0 +1,17 @@
+{
+  "type": "verdict",
+  "seq": 15,
+  "t_ms": 5100,
+  "verdict": {
+    "result": "done",
+    "clause_ids": [
+      "arrows_aligned"
+    ],
+    "witnesses": {
+      "judge": "done",
+      "sam": "frame",
+      "sam_result": "done"
+    },
+    "latency_ms": 2900
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "hello",
+  "seq": 0,
+  "t_ms": 0,
+  "session_id": "s_20261028_a",
+  "last_seq": 41,
+  "client": "phone",
+  "lang": "nl",
+  "household": null,
+  "replay_id": null
+}

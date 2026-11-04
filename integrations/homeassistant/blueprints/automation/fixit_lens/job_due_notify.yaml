@@ -1,0 +1,116 @@
+blueprint:
+  name: Fix-It Lens job due, with a Done button
+  description: >-
+    When a Fix-It Lens job falls due, send a notification to a phone with the Home Assistant app, with three buttons:
+    Done (marks it done today), a snooze (moves it later by the days you pick) and Open (the job in Fix-It Lens,
+    where a repair starts). A job that falls due in your quiet hours is sent when they end. Needs the Fix-It Lens
+    integration with a token that can write.
+  domain: automation
+  input:
+    phone:
+      name: Phone
+      description: The phone to notify (the Home Assistant app).
+      selector:
+        device:
+          integration: mobile_app
+    snooze_days:
+      name: Snooze by
+      description: How many days the snooze button moves the job later.
+      default: 7
+      selector:
+        number:
+          min: 1
+          max: 60
+          unit_of_measurement: days
+    quiet_start:
+      name: Quiet from
+      description: No notification from this time; one due then is sent when the quiet hours end.
+      default: "22:00:00"
+      selector:
+        time:
+    quiet_end:
+      name: Quiet until
+      description: The end of the quiet hours. The same time as "Quiet from" means no quiet hours.
+      default: "08:00:00"
+      selector:
+        time:
+    wait_hours:
+      name: Keep the buttons for
+      description: How long the buttons work after the notification is sent.
+      default: 24
+      selector:
+        number:
+          min: 1
+          max: 168
+          unit_of_measurement: hours
+
+mode: parallel
+max: 20
+
+triggers:
+  - trigger: event
+    event_type: fixit_lens_job_due
+
+variables:
+  snooze_days: !input snooze_days
+  quiet_start: !input quiet_start
+  quiet_end: !input quiet_end
+  job: "{{ trigger.event.data.job }}"
+  tag: "{{ 'fixit_lens_' ~ (job | replace(':', '_')) }}"
+  run: "{{ tag ~ '_' ~ (as_timestamp(now()) * 1000) | int }}"
+  done_action: "{{ 'FIXIT_DONE_' ~ run }}"
+  later_action: "{{ 'FIXIT_LATER_' ~ run }}"
+
+actions:
+  - if:  # in the quiet hours (they may run past midnight): hold the notification until they end
+      - "{{ quiet_start != quiet_end }}"
+      - condition: time
+        after: !input quiet_start
+        before: !input quiet_end
+    then:
+      - wait_for_trigger:
+          - trigger: time
+            at: !input quiet_end
+  - domain: mobile_app
+    type: notify
+    device_id: !input phone
+    title: "{{ trigger.event.data.appliance }}: {{ trigger.event.data.title }}"
+    message: >-
+      {{ 'Overdue' if trigger.event.data.status == 'overdue' else 'Due now' }}.
+      {{ trigger.event.data.interval }}{{ ' (p. ' ~ trigger.event.data.page ~ ')' if trigger.event.data.page else '' }}
+    data:
+      tag: "{{ tag }}"
+      url: "{{ trigger.event.data.link }}"
+      clickAction: "{{ trigger.event.data.link }}"
+      actions:
+        - action: "{{ done_action }}"
+          title: Done
+        - action: "{{ later_action }}"
+          title: "In {{ snooze_days }} days"
+        - action: URI
+          title: Open
+          uri: "{{ trigger.event.data.link }}"
+  - wait_for_trigger:
+      - trigger: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: "{{ done_action }}"
+      - trigger: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: "{{ later_action }}"
+    timeout:
+      hours: !input wait_hours
+    continue_on_timeout: false
+  - choose:
+      - conditions: "{{ wait.trigger.event.data.action == done_action }}"
+        sequence:
+          - action: fixit_lens.mark_done
+            data:
+              job: "{{ job }}"
+      - conditions: "{{ wait.trigger.event.data.action == later_action }}"
+        sequence:
+          - action: fixit_lens.snooze
+            data:
+              job: "{{ job }}"
+              days: "{{ snooze_days | int }}"

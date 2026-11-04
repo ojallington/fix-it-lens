@@ -1,0 +1,131 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Fix-It Lens",
+        "description": "Het adres van je Fix-It Lens en een sleutel die je huis voor Home Assistant heeft gemaakt. Maak er een die mag schrijven, dan werkt afvinken.",
+        "data": {
+          "url": "Adres",
+          "token": "Sleutel voor Home Assistant"
+        }
+      },
+      "hassio_confirm": {
+        "title": "Fix-It Lens",
+        "description": "De Fix-It Lens-add-on heeft een sleutel gemaakt voor een van zijn huizen. Voeg hem toe om de onderhoudsklussen van dat huis hier te zien, af te vinken en uit te stellen."
+      },
+      "reauth_confirm": {
+        "title": "Fix-It Lens",
+        "description": "Fix-It Lens weigerde de sleutel (ingetrokken, of het huis is verwijderd). Maak een nieuwe en plak die hier.",
+        "data": {
+          "token": "Sleutel voor Home Assistant"
+        }
+      },
+      "discover": {
+        "title": "Apparaten die Home Assistant kent",
+        "description": "Vink aan welke je aan je Fix-It Lens-huis wilt toevoegen. Van elk aangevinkt apparaat gaan alleen het merk, het model, de soort en de naam mee. Een model waar Fix-It Lens een gecontroleerde kaart van heeft, krijgt die meteen; een ander krijgt de pagina's van de handleiding, en de kaart wordt op verzoek gemaakt. Vink niets aan om niets toe te voegen.",
+        "data": {
+          "devices": "Apparaten"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Die sleutel werd geweigerd.",
+      "cannot_connect": "Fix-It Lens antwoordde niet op dat adres.",
+      "read_only": "Deze sleutel kan alleen lezen en dus geen apparaten toevoegen. Maak er een die kan schrijven, of vink niets aan.",
+      "refused": "Fix-It Lens heeft niet toegevoegd: {refused}"
+    },
+    "abort": {
+      "already_configured": "Dit huis is al ingesteld.",
+      "reauth_successful": "De nieuwe sleutel werkt.",
+      "invalid_auth": "Fix-It Lens weigerde de sleutel die de add-on stuurde. Druk nog eens op Verbinden in het paneel van de add-on.",
+      "cannot_connect": "De Fix-It Lens-add-on antwoordde niet. Kijk of hij draait."
+    }
+  },
+  "services": {
+    "mark_done": {
+      "name": "Gedaan",
+      "description": "Markeert een Fix-It Lens-klus als gedaan, vandaag of op een eerdere dag. De volgende datum volgt uit de handleiding of je eigen schema.",
+      "fields": {
+        "job": {
+          "name": "Klus",
+          "description": "De klus, zoals het attribuut `job` van zijn sensor of het event fixit_lens_job_due hem geeft."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "De dag waarop hij gedaan is. Leeg laten voor vandaag."
+        }
+      }
+    },
+    "snooze": {
+      "name": "Uitstellen",
+      "description": "Schuift de datum van een Fix-It Lens-klus op naar later. Hij schuift nooit naar eerder.",
+      "fields": {
+        "job": {
+          "name": "Klus",
+          "description": "De klus, zoals het attribuut `job` van zijn sensor of het event fixit_lens_job_due hem geeft."
+        },
+        "until": {
+          "name": "Tot",
+          "description": "De nieuwe datum, na de datum die hij nu heeft."
+        },
+        "days": {
+          "name": "Dagen",
+          "description": "Of: zoveel dagen na de datum waarop hij nu moet (of na vandaag, als hij te laat is)."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "job_due": {
+        "name": "{job} gepland"
+      },
+      "next_job": {
+        "name": "Volgende klus",
+        "state_attributes": {
+          "due_on": {
+            "name": "Gepland op"
+          },
+          "status": {
+            "name": "Status"
+          }
+        }
+      },
+      "overdue": {
+        "name": "Te late klussen"
+      },
+      "due_now": {
+        "name": "Klussen nu aan de beurt"
+      }
+    },
+    "todo": {
+      "upkeep": {
+        "name": "Onderhoud"
+      }
+    },
+    "calendar": {
+      "upkeep": {
+        "name": "Onderhoud"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "discover": {
+        "title": "Apparaten die Home Assistant kent",
+        "description": "Vink aan welke je aan je Fix-It Lens-huis wilt toevoegen. Van elk aangevinkt apparaat gaan alleen het merk, het model, de soort en de naam mee. Een model waar Fix-It Lens een gecontroleerde kaart van heeft, krijgt die meteen; een ander krijgt de pagina's van de handleiding, en de kaart wordt op verzoek gemaakt. Vink niets aan om niets toe te voegen.",
+        "data": {
+          "devices": "Apparaten"
+        }
+      }
+    },
+    "error": {
+      "read_only": "Deze sleutel kan alleen lezen en dus geen apparaten toevoegen. Maak er een die kan schrijven, of vink niets aan.",
+      "refused": "Fix-It Lens heeft niet toegevoegd: {refused}",
+      "cannot_connect": "Fix-It Lens antwoordde niet op dat adres."
+    },
+    "abort": {
+      "nothing_found": "Home Assistant kent geen apparaat dat je Fix-It Lens-huis nog niet heeft."
+    }
+  }
+}

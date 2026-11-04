@@ -1,0 +1,37 @@
+# The SAM 3.1 server's own env, on the GPU host only (an RTX 5090): Python 3.12, torch cu128, sam3 from source.
+# The main repo env never installs torch; local/sam_server/encode.py and server.py are tested there with a fake model.
+[project]
+name = "fixit-sam-local"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "torch==2.10.0",
+  "torchvision",
+  "sam3 @ git+https://github.com/facebookresearch/sam3",
+  "huggingface_hub>=0.30",
+  "fastapi>=0.115",
+  "uvicorn>=0.32",
+  "pillow>=11",
+  "numpy",
+  "av>=13",
+  "meta-sam-parser==0.1.0",
+  "setuptools<81",
+  # sam3 imports these at module level but declares them only in its notebooks/dev extras
+  "einops",
+  "opencv-python-headless",
+  "pycocotools",
+  "scipy",
+  "psutil",  # sam3.model_builder imports pkg_resources, which setuptools 81 removed
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+torchvision = { index = "pytorch-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

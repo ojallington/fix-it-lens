@@ -1,0 +1,74 @@
+{
+  "type": "job_preview",
+  "seq": 6,
+  "t_ms": 41200,
+  "job_id": "clean_debris_filter",
+  "title": "Clean the debris filter",
+  "needs": [
+    {
+      "id": "towel",
+      "what": "A towel to catch the water",
+      "kind": "tool",
+      "page": 4,
+      "quote": "Put a towel under the filter flap, since some water will run out."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "unplug",
+      "text": "Unplug the machine from the socket.",
+      "page": 4,
+      "quote": "Unplug the machine from the socket before you start.",
+      "power": "off",
+      "camera": "check",
+      "warnings": [
+        {
+          "kind": "power",
+          "text": "Unplug it first; the camera checks the plug is out."
+        }
+      ]
+    },
+    {
+      "step_id": "open_flap",
+      "text": "Open the filter flap, bottom right.",
+      "page": 4,
+      "quote": "Open the filter flap at the bottom right of the front panel.",
+      "power": "off",
+      "camera": "find",
+      "warnings": [
+        {
+          "kind": "power",
+          "text": "Unplug it first; the camera checks the plug is out."
+        }
+      ]
+    },
+    {
+      "step_id": "refit_filter",
+      "text": "Screw the filter back in until the arrows line up.",
+      "page": 4,
+      "quote": "Screw the filter back in clockwise until the arrow marks line up.",
+      "power": "off",
+      "camera": "check",
+      "warnings": [
+        {
+          "kind": "power",
+          "text": "Unplug it first; the camera checks the plug is out."
+        },
+        {
+          "kind": "zone",
+          "text": "Do not open the casing. Behind the back panel is mains power.",
+          "rule_id": "xx.mains.casing"
+        }
+      ]
+    },
+    {
+      "step_id": "replug",
+      "text": "Plug it back in.",
+      "origin": "fixit",
+      "power": "any",
+      "camera": "none",
+      "warnings": [],
+      "page": 4
+    }
+  ]
+}

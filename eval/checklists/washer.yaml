@@ -1,0 +1,304 @@
+# What a washing-machine manual usually gives, derived from the gold cards (eval/gold.py). Names only, no quotes.
+# who: user (the manual gives the user a procedure) or professional (the manual sends it to a technician).
+# gold: <card>:<job id> for a user item, <card> for a professional one. Format and checks: eval/checklist.py.
+appliance_kind: washer
+gold_cards: [aeg__LR7696UD4, beko__BM1WT3921W, beko__BM3WFT3941B, bosch__WAU28S01NL, miele__WQ_1200_WPS,
+             siemens__WMN16T3471_20, whirlpool__FFB_7458_WV_UK]
+items:
+  # upkeep the user does
+  - id: washer.drain_pump_filter
+    names: {en: Clean the drain pump filter, nl: Pompfilter van de afvoerpomp reinigen}
+    kind: upkeep
+    who: user
+    evidence: 7
+    note: the headline job; it usually holds the emergency drain of the water left in the machine
+    gold: [aeg__LR7696UD4:clean_drain_pump_filter, beko__BM1WT3921W:clean_pump_filter,
+           beko__BM3WFT3941B:clean_pump_filter, bosch__WAU28S01NL:clean_drain_pump,
+           miele__WQ_1200_WPS:clean_drain_filters, siemens__WMN16T3471_20:clean_drain_pump,
+           whirlpool__FFB_7458_WV_UK:clean_water_filter]
+  - id: washer.emergency_drain
+    names: {en: Drain the water left in the machine, nl: Restwater aftappen (noodafvoer)}
+    kind: fix
+    who: user
+    evidence: 1
+    note: a job of its own in some manuals, otherwise the first half of washer.drain_pump_filter
+    gold: [aeg__LR7696UD4:emergency_drain]
+  - id: washer.inlet_filters
+    names: {en: Clean the water inlet filters, nl: Zeven in de watertoevoer reinigen}
+    kind: upkeep
+    who: user
+    evidence: 6
+    gold: [aeg__LR7696UD4:clean_inlet_filters, beko__BM1WT3921W:clean_inlet_filters,
+           beko__BM3WFT3941B:clean_inlet_filters, bosch__WAU28S01NL:clean_inlet_filters,
+           miele__WQ_1200_WPS:clean_inlet_filter, siemens__WMN16T3471_20:clean_inlet_filter]
+  - id: washer.inlet_hose_check
+    names: {en: Check the water inlet hose, nl: Watertoevoerslang controleren}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [whirlpool__FFB_7458_WV_UK:check_inlet_hose]
+  - id: washer.drain_hose_siphon
+    names: {en: Clear the drain hose at the siphon, nl: Afvoerslang bij de sifon reinigen}
+    kind: fix
+    who: user
+    evidence: 2
+    gold: [bosch__WAU28S01NL:clean_drain_hose, siemens__WMN16T3471_20:clean_drain_hose_siphon]
+  - id: washer.detergent_drawer
+    names: {en: Clean the detergent drawer, nl: Wasmiddellade reinigen}
+    kind: upkeep
+    who: user
+    evidence: 7
+    gold: [aeg__LR7696UD4:clean_detergent_dispenser, beko__BM1WT3921W:clean_detergent_drawer,
+           beko__BM3WFT3941B:clean_detergent_drawer, bosch__WAU28S01NL:clean_detergent_drawer,
+           miele__WQ_1200_WPS:clean_detergent_drawer, siemens__WMN16T3471_20:clean_detergent_drawer,
+           whirlpool__FFB_7458_WV_UK:clean_detergent_dispenser]
+  - id: washer.dosing_refill
+    names: {en: Refill or replace the automatic dosing reservoir, nl: Doseerreservoir bijvullen of vervangen}
+    kind: upkeep
+    who: user
+    evidence: 2
+    note: only on models with automatic dosing (i-DOS, TwinDos)
+    gold: [bosch__WAU28S01NL:fill_dosing_reservoirs, miele__WQ_1200_WPS:replace_twindos_dispenser]
+  - id: washer.dosing_clean
+    names: {en: Clean the automatic dosing system, nl: Automatische dosering reinigen}
+    kind: upkeep
+    who: user
+    evidence: 3
+    note: only on models with automatic or liquid dosing
+    gold: [bosch__WAU28S01NL:reservoir_detergent_problem, bosch__WAU28S01NL:idos_pump_blocked,
+           miele__WQ_1200_WPS:twindos_clean, miele__WQ_1200_WPS:clean_twindos_compartment,
+           beko__BM3WFT3941B:clean_liquid_detergent_apparatus]
+  - id: washer.drum_clean
+    names: {en: Run the drum or machine cleaning programme, nl: Trommel- of machinereinigingsprogramma draaien}
+    kind: upkeep
+    who: user
+    evidence: 6
+    gold: [aeg__LR7696UD4:maintenance_wash, aeg__LR7696UD4:clean_drum, beko__BM1WT3921W:drum_clean,
+           beko__BM3WFT3941B:drum_clean, bosch__WAU28S01NL:clean_drum, miele__WQ_1200_WPS:drum_clean,
+           miele__WQ_1200_WPS:machine_clean, siemens__WMN16T3471_20:clean_drum]
+  - id: washer.door_seal
+    names: {en: Clean the door seal, nl: Deurrubber reinigen}
+    kind: upkeep
+    who: user
+    evidence: 3
+    gold: [aeg__LR7696UD4:clean_door_seal, beko__BM1WT3921W:clean_door_drum, beko__BM3WFT3941B:clean_door_and_drum]
+  - id: washer.door_seal_nozzle
+    names: {en: Clean the nozzle in the door seal, nl: Mondstuk in de dichtring reinigen}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [miele__WQ_1200_WPS:clean_door_seal_nozzle]
+  - id: washer.air_after_wash
+    names: {en: Leave the door and drawer ajar after washing, nl: Deur en lade na het wassen op een kier laten}
+    kind: upkeep
+    who: user
+    evidence: 3
+    gold: [aeg__LR7696UD4:air_out_after_wash, bosch__WAU28S01NL:after_use_care, siemens__WMN16T3471_20:prevent_odour]
+  - id: washer.descale
+    names: {en: Descale the machine, nl: Ontkalken}
+    kind: upkeep
+    who: user
+    evidence: 4
+    gold: [aeg__LR7696UD4:descale, bosch__WAU28S01NL:descale, miele__WQ_1200_WPS:descale,
+           siemens__WMN16T3471_20:descale]
+  - id: washer.clean_exterior
+    names: {en: Clean the outside and control panel, nl: Buitenkant en bedieningspaneel reinigen}
+    kind: upkeep
+    who: user
+    evidence: 7
+    gold: [aeg__LR7696UD4:clean_exterior, beko__BM1WT3921W:clean_body_panel, beko__BM3WFT3941B:clean_body_and_panel,
+           bosch__WAU28S01NL:clean_exterior, miele__WQ_1200_WPS:clean_casing, siemens__WMN16T3471_20:clean_exterior,
+           whirlpool__FFB_7458_WV_UK:clean_outside]
+  - id: washer.frost_protection
+    names: {en: Protect the machine against frost, nl: Machine beschermen tegen vorst}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [aeg__LR7696UD4:frost_precautions]
+  # faults the user fixes
+  - id: washer.emergency_door_release
+    names: {en: Open the door with the emergency release, nl: Deur openen met de noodontgrendeling}
+    kind: fix
+    who: user
+    evidence: 6
+    gold: [aeg__LR7696UD4:emergency_door_opening, beko__BM1WT3921W:emergency_door_open,
+           beko__BM3WFT3941B:emergency_door_open, bosch__WAU28S01NL:emergency_door_release,
+           miele__WQ_1200_WPS:emergency_door_release, siemens__WMN16T3471_20:emergency_door_release]
+  - id: washer.door_wont_open
+    names: {en: Door stays locked, nl: Deur blijft vergrendeld}
+    kind: fix
+    who: user
+    evidence: 7
+    gold: [aeg__LR7696UD4:door_wont_open, beko__BM1WT3921W:door_wont_open, beko__BM3WFT3941B:door_wont_open,
+           bosch__WAU28S01NL:door_wont_open, miele__WQ_1200_WPS:door_lock_blocked, siemens__WMN16T3471_20:door_locked,
+           whirlpool__FFB_7458_WV_UK:door_locked]
+  - id: washer.door_not_closed
+    names: {en: Door not closed properly, nl: Deur niet goed gesloten}
+    kind: fix
+    who: user
+    evidence: 4
+    gold: [aeg__LR7696UD4:door_not_closed, bosch__WAU28S01NL:laundry_caught_in_door,
+           miele__WQ_1200_WPS:door_not_locked, siemens__WMN16T3471_20:door_not_closed]
+  - id: washer.no_water_intake
+    names: {en: Machine does not fill with water, nl: Machine neemt geen water in}
+    kind: fix
+    who: user
+    evidence: 6
+    gold: [aeg__LR7696UD4:no_water_intake, beko__BM1WT3921W:no_water_intake, beko__BM3WFT3941B:no_water_intake,
+           miele__WQ_1200_WPS:water_inlet_fault, siemens__WMN16T3471_20:water_supply,
+           whirlpool__FFB_7458_WV_UK:no_water_h2o]
+  - id: washer.not_draining
+    names: {en: Machine does not drain, nl: Machine pompt niet af}
+    kind: fix
+    who: user
+    evidence: 4
+    note: where the manual has no separate entry, the fault code points to washer.drain_pump_filter
+    gold: [aeg__LR7696UD4:not_draining, beko__BM1WT3921W:not_draining, beko__BM3WFT3941B:no_drain,
+           whirlpool__FFB_7458_WV_UK:not_draining]
+  - id: washer.fills_and_drains
+    names: {en: Fills and drains at the same time, nl: Vult en pompt tegelijk af}
+    kind: fix
+    who: user
+    evidence: 2
+    gold: [aeg__LR7696UD4:fills_and_drains, whirlpool__FFB_7458_WV_UK:fills_and_drains]
+  - id: washer.unbalanced_load
+    names: {en: Will not spin, unbalanced load, nl: Centrifugeert niet door onbalans}
+    kind: fix
+    who: user
+    evidence: 5
+    gold: [aeg__LR7696UD4:no_spin, beko__BM1WT3921W:unbalanced_load, beko__BM3WFT3941B:unbalanced_load,
+           bosch__WAU28S01NL:redistribute_load, siemens__WMN16T3471_20:redistribute_laundry]
+  - id: washer.overload
+    names: {en: Machine overloaded, nl: Machine te vol geladen}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [aeg__LR7696UD4:overload]
+  - id: washer.level_machine
+    names: {en: Level the machine against noise and vibration, nl: Machine waterpas stellen tegen geluid en trillen}
+    kind: fix
+    who: user
+    evidence: 7
+    gold: [aeg__LR7696UD4:noise_vibration, beko__BM1WT3921W:vibration_noise, beko__BM3WFT3941B:level_feet,
+           bosch__WAU28S01NL:level_appliance, miele__WQ_1200_WPS:level_feet, siemens__WMN16T3471_20:level_machine,
+           whirlpool__FFB_7458_WV_UK:vibrates_on_spin]
+  - id: washer.too_much_foam
+    names: {en: Too much foam, nl: Te veel schuim}
+    kind: fix
+    who: user
+    evidence: 6
+    gold: [aeg__LR7696UD4:too_much_foam, beko__BM1WT3921W:foam_overflow, beko__BM3WFT3941B:foam_overflow,
+           bosch__WAU28S01NL:too_much_foam, siemens__WMN16T3471_20:too_much_foam,
+           whirlpool__FFB_7458_WV_UK:too_much_foam]
+  - id: washer.leak
+    names: {en: Water leaking, nl: Water lekt}
+    kind: fix
+    who: user
+    evidence: 5
+    gold: [aeg__LR7696UD4:water_on_floor, bosch__WAU28S01NL:inlet_hose_leak, miele__WQ_1200_WPS:drain_filter_leak,
+           siemens__WMN16T3471_20:fix_leak, whirlpool__FFB_7458_WV_UK:leaks_water]
+  - id: washer.water_stop_tripped
+    names: {en: Water-stop or anti-flood device tripped, nl: Waterstop of overstromingsbeveiliging aangesproken}
+    kind: fix
+    who: user
+    evidence: 1
+    note: the user closes the tap and checks; replacing the hose is professional (washer.pro.water_protection)
+    gold: [aeg__LR7696UD4:anti_flood, aeg__LR7696UD4:waterstop_tripped]
+  - id: washer.reset_after_fault
+    names: {en: Reset after a fault code, nl: Resetten na een foutcode}
+    kind: fix
+    who: user
+    evidence: 4
+    gold: [aeg__LR7696UD4:alarm_restart, miele__WQ_1200_WPS:reset_fault, siemens__WMN16T3471_20:reset,
+           whirlpool__FFB_7458_WV_UK:reset_error_code]
+  - id: washer.wont_start
+    names: {en: Programme will not start, nl: Programma start niet}
+    kind: fix
+    who: user
+    evidence: 4
+    gold: [aeg__LR7696UD4:programme_wont_start, beko__BM1WT3921W:cancel_programme,
+           beko__BM3WFT3941B:programme_wont_start, whirlpool__FFB_7458_WV_UK:cycle_does_not_start]
+  - id: washer.no_power
+    names: {en: Machine will not switch on, nl: Machine gaat niet aan}
+    kind: fix
+    who: user
+    evidence: 2
+    gold: [miele__WQ_1200_WPS:no_power, whirlpool__FFB_7458_WV_UK:does_not_turn_on]
+  - id: washer.child_lock_off
+    names: {en: Switch the child lock off, nl: Kinderslot uitschakelen}
+    kind: fix
+    who: user
+    evidence: 2
+    gold: [bosch__WAU28S01NL:child_lock_off, siemens__WMN16T3471_20:child_lock_off]
+  - id: washer.poor_wash_results
+    names: {en: Poor washing results, nl: Slechte wasresultaten}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [aeg__LR7696UD4:poor_wash_results]
+  - id: washer.detergent_residue
+    names: {en: Detergent left in the drawer, nl: Wasmiddelresten in de lade}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [aeg__LR7696UD4:detergent_residue]
+  - id: washer.demo_mode_off
+    names: {en: Switch demo mode off, nl: Demomodus uitschakelen}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [whirlpool__FFB_7458_WV_UK:demo_mode_off]
+  # professional only
+  - id: washer.pro.mains_cable
+    names: {en: Replace a damaged mains cable, nl: Beschadigd netsnoer vervangen}
+    who: professional
+    evidence: 6
+    gold: [aeg__LR7696UD4, beko__BM1WT3921W, beko__BM3WFT3941B, bosch__WAU28S01NL, miele__WQ_1200_WPS,
+           siemens__WMN16T3471_20]
+  - id: washer.pro.repair
+    names: {en: Repairs to the machine, nl: Reparaties aan de machine}
+    who: professional
+    evidence: 7
+    gold: [aeg__LR7696UD4, beko__BM1WT3921W, beko__BM3WFT3941B, bosch__WAU28S01NL, miele__WQ_1200_WPS,
+           siemens__WMN16T3471_20, whirlpool__FFB_7458_WV_UK]
+  - id: washer.pro.fault_recurs
+    names: {en: A fault that comes back after the user fix, nl: Een storing die terugkomt na de eigen oplossing}
+    who: professional
+    evidence: 7
+    gold: [aeg__LR7696UD4, beko__BM1WT3921W, beko__BM3WFT3941B, bosch__WAU28S01NL, miele__WQ_1200_WPS,
+           siemens__WMN16T3471_20, whirlpool__FFB_7458_WV_UK]
+  - id: washer.pro.installation
+    names: {en: Installation, electrical and water connection, nl: Installatie, elektrische en wateraansluiting}
+    who: professional
+    evidence: 5
+    gold: [aeg__LR7696UD4, beko__BM1WT3921W, beko__BM3WFT3941B, miele__WQ_1200_WPS, siemens__WMN16T3471_20]
+  - id: washer.pro.water_protection
+    names: {en: Water protection triggered or water in the base, nl: Waterbeveiliging aangesproken of water in de bodem}
+    who: professional
+    evidence: 3
+    gold: [aeg__LR7696UD4, miele__WQ_1200_WPS, siemens__WMN16T3471_20]
+  - id: washer.pro.internal_parts
+    names: {en: 'Internal parts: pump, motor, boards, top cover', nl: 'Inwendige delen: pomp, motor, printplaten, bovenblad'}
+    who: professional
+    evidence: 3
+    gold: [aeg__LR7696UD4, beko__BM1WT3921W, beko__BM3WFT3941B]
+  - id: washer.pro.door_lock_failure
+    names: {en: Door locked by an appliance failure, nl: Deur vergrendeld door een defect}
+    who: professional
+    evidence: 2
+    gold: [aeg__LR7696UD4, miele__WQ_1200_WPS]
+  - id: washer.pro.dosing_fault
+    names: {en: Dosing system fault that persists, nl: Blijvende storing in de dosering}
+    who: professional
+    evidence: 4
+    gold: [beko__BM1WT3921W, beko__BM3WFT3941B, bosch__WAU28S01NL, miele__WQ_1200_WPS]
+  - id: washer.pro.hoses
+    names: {en: Replace or extend the water hoses, nl: Waterslangen vervangen of verlengen}
+    who: professional
+    evidence: 1
+    gold: [aeg__LR7696UD4]
+  - id: washer.pro.lamp
+    names: {en: Replace the drum light, nl: Trommelverlichting vervangen}
+    who: professional
+    evidence: 1
+    gold: [miele__WQ_1200_WPS]

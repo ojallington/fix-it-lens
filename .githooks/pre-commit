@@ -1,0 +1,3 @@
+#!/bin/sh
+# The repo guard (tools/guard.py). Installed by `make hooks` (git config core.hooksPath .githooks).
+exec uv run --quiet python tools/guard.py --staged

@@ -1,0 +1,14 @@
+{
+  "type": "step",
+  "seq": 14,
+  "t_ms": 2200,
+  "job_id": "clean_debris_filter",
+  "step_id": "refit_filter",
+  "index": 2,
+  "of": 3,
+  "text": "Screw the filter back in until the arrows line up.",
+  "page": 4,
+  "quote": "Screw the filter back in clockwise until the arrow marks line up.",
+  "view": "front",
+  "power": "off"
+}

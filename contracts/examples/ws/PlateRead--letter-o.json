@@ -1,0 +1,23 @@
+{
+  "type": "plate_read",
+  "seq": 12,
+  "t_ms": 48210,
+  "photo_id": "p1",
+  "brand": "acme",
+  "model": "WM-0000",
+  "fields": [
+    {
+      "name": "model",
+      "value": "WM-0000",
+      "uncertain": [
+        {
+          "index": 3,
+          "options": [
+            "0",
+            "O"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,213 @@
+# The 20 checkable steps of the step-check eval, from the manuals' own steps. Each step is filmed
+# three ways (done, planted not-done, can't-see) in two takes: 120 clips. The shot list (eval/shot-list.md) and the
+# pre-registered plan (eval/labels/stepcheck.plan.jsonl) are generated from this file by `python -m eval.shotlist`.
+#
+# guarded = a stop or hold in rules/ guards this step (the "never on a step the stops guard" figure): power off,
+# a zone or ring on the step, or a boiler fill job. Interim hand list until the cards land;
+# then it is computed from the card by the fixit-rules CLI.
+#
+# Planted not-done states are realistic near-misses. Nothing is ever planted on the gas side: the gas tap is
+# never touched, and no clip is filmed of a running machine.
+
+[take]
+t1 = "front view, room light, phone at about 40 cm"
+t2 = "about 30° to one side, other light (torch off / lamp on), phone at about 60 cm"
+
+[cant_see]
+# One can't-see condition per step, rotated so every kind appears; take 2 uses the next one in the list.
+kinds = ["hand covers the part", "too dark (lights off, no torch)", "part out of frame", "motion blur (pan fast)"]
+
+# --- Bosch dishwasher: filter system (p42-43) and lower spray arm (p44) ---
+
+[[step]]
+id = "dw.filter_out"
+appliance = "dishwasher"
+part = "filter system"
+done = "Filter system lifted out of the sump; empty sump visible"
+not_done = "Coarse filter turned anticlockwise but left sitting in the sump"
+guarded = false
+card = "cards/bosch/SMV4HAX40N.yaml"
+card_step = "remove_filter_system"
+
+[[step]]
+id = "dw.micro_off"
+appliance = "dishwasher"
+part = "micro filter"
+done = "Micro filter pulled down and off, held apart from the coarse filter"
+not_done = "Micro filter pulled half off, still hooked on"
+guarded = false
+card = "cards/bosch/SMV4HAX40N.yaml"
+card_step = "remove_micro_filter"
+
+[[step]]
+id = "dw.coarse_out"
+appliance = "dishwasher"
+part = "coarse filter"
+done = "Coarse filter lifted out of the fine filter, two parts separate"
+not_done = "Locking tabs squeezed but coarse filter still inside the fine filter"
+guarded = false
+card = "cards/bosch/SMV4HAX40N.yaml"
+card_step = "remove_coarse_filter"
+
+[[step]]
+id = "dw.reassembled"
+appliance = "dishwasher"
+part = "coarse filter"
+done = "Coarse filter back in the fine filter, both locking lugs clicked in"
+not_done = "Coarse filter pushed in with one lug not clicked (sits proud on one side)"
+guarded = false
+card = "cards/bosch/SMV4HAX40N.yaml"
+card_step = "reassemble_filter_system"
+
+[[step]]
+id = "dw.seated_arrows"
+appliance = "dishwasher"
+part = "filter system"
+done = "Filter system refitted and turned clockwise; the arrow markings face each other"
+not_done = "Filter system refitted but turned about 20° short; arrows not aligned"
+guarded = false
+card = "cards/bosch/SMV4HAX40N.yaml"
+card_step = "check_arrow_marks"
+
+[[step]]
+id = "dw.arm_out"
+appliance = "dishwasher"
+part = "lower spray arm"
+done = "Lower spray arm pulled up and off its hub"
+not_done = "Lower spray arm lifted a little but still on its hub"
+guarded = false
+card = "cards/bosch/SMV4HAX40N.yaml"
+card_step = "remove_lower_spray_arm"
+
+[[step]]
+id = "dw.arm_refit"
+appliance = "dishwasher"
+part = "lower spray arm"
+done = "Lower spray arm pressed down onto its hub and seated (spins level)"
+not_done = "Lower spray arm resting on the hub, tilted, not pressed down"
+guarded = false
+card = "cards/bosch/SMV4HAX40N.yaml"
+card_step = "refit_lower_spray_arm"
+
+# --- Samsung washer: emergency drain and debris filter (p49, p51). Washer unplugged and idle throughout. ---
+
+[[step]]
+id = "wm.cover_open"
+appliance = "washer"
+part = "filter cover"
+done = "Filter cover open; drain tube and filter knob visible"
+not_done = "Filter cover pressed but still closed (latch not released)"
+guarded = true
+
+[[step]]
+id = "wm.tube_cap_off"
+appliance = "washer"
+part = "emergency drain tube"
+done = "Drain tube pulled out over a container with its cap off"
+not_done = "Drain tube pulled out over the container, cap still on"
+guarded = true
+
+[[step]]
+id = "wm.tube_back"
+appliance = "washer"
+part = "emergency drain tube"
+done = "Cap back on the tube and the tube clipped back in its holder"
+not_done = "Cap back on, tube left hanging out of its holder"
+guarded = true
+
+[[step]]
+id = "wm.filter_out"
+appliance = "washer"
+part = "debris filter"
+done = "Knob turned left and the debris filter pulled out"
+not_done = "Knob turned left a quarter, filter still in place"
+guarded = true
+
+[[step]]
+id = "wm.filter_in"
+appliance = "washer"
+part = "debris filter"
+done = "Filter reinserted and the knob turned fully right (knob line upright)"
+not_done = "Filter reinserted, knob turned only half way right"
+guarded = true
+
+[[step]]
+id = "wm.cover_closed"
+appliance = "washer"
+part = "filter cover"
+done = "Filter cover closed flush"
+not_done = "Filter cover pushed to but not latched (gap on one side)"
+guarded = true
+
+# --- Intergas boiler: top-up and bleed. Dry, except one real top-up. Gas tap never touched. ---
+
+[[step]]
+id = "bo.rad_valve_open"
+appliance = "boiler"
+part = "radiator valve"
+done = "Radiator valve turned fully open (setting at max)"
+not_done = "Radiator valve left at 0 / closed"
+guarded = false
+
+[[step]]
+id = "bo.cap_off"
+appliance = "boiler"
+part = "fill and drain tap"
+done = "Cap removed from the fill and drain tap"
+not_done = "Cap loosened but still on the tap"
+guarded = true
+
+[[step]]
+id = "bo.hose_on"
+appliance = "boiler"
+part = "filling hose"
+done = "Filling hose screwed onto the fill and drain tap"
+not_done = "Filling hose held against the tap, not screwed on"
+guarded = true
+
+[[step]]
+id = "bo.tap_open"
+appliance = "boiler"
+part = "fill and drain tap"
+done = "Fill and drain tap opened a quarter turn"
+not_done = "Fill and drain tap still closed, hand near it"
+guarded = true
+
+[[step]]
+id = "bo.read_target"
+appliance = "boiler"
+part = "pressure display"
+done = "Pressure at 1.5-2.0 bar (the one real top-up, or the system as it is if already in range)"
+not_done = "Pressure below 1.0 bar (before topping up)"
+guarded = true
+
+[[step]]
+id = "bo.tap_closed"
+appliance = "boiler"
+part = "fill and drain tap"
+done = "Fill and drain tap closed, cap back on"
+not_done = "Fill and drain tap closed, cap not refitted"
+guarded = true
+
+[[step]]
+id = "bo.bleed_closed"
+appliance = "boiler"
+part = "radiator bleed valve"
+done = "Bleed valve closed after bleeding (key out, screw home)"
+not_done = "Bleed key in the valve, valve still open a turn"
+guarded = false
+
+# --- Power steps: their own clip set ("power"), scored as their own row, not in the 120 ---
+# A no-part step: check_clip grounds the judge on SAM's plug and socket boxes, with plug-out as the second witness,
+# as Session.check does. The washer's unplug joins when its card exists.
+
+[[step]]
+id = "dw.unplug"
+appliance = "dishwasher"
+part = "plug and socket"
+done = "Plug out of the socket and held beside it; plug and socket both in view"
+not_done = "Plug still in the socket (appliance off); plug and socket both in view"
+guarded = true
+card = "cards/bosch/SMV4HAX40N.yaml"
+card_step = "unplug_appliance"
+set = "power"

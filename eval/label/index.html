@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clip labels</title>
+<style>
+  :root { --bg: #fafaf7; --fg: #1d1d1b; --mute: #6b6b66; --line: #d9d8d2; --accent: #1f6feb; --warn: #b42318;
+          --ok: #157f3b; --card: #ffffff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #161615; --fg: #ecebe6; --mute: #9a9993; --line: #34332f; --accent: #6ea8fe; --warn: #ff8b7e;
+            --ok: #6fd28f; --card: #1f1f1d; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+  header { padding: 10px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 16px; align-items: baseline; }
+  header h1 { font-size: 16px; margin: 0; }
+  #progress { color: var(--mute); }
+  main { display: grid; grid-template-columns: 260px 1fr 320px; height: calc(100vh - 44px); }
+  aside, section { overflow: auto; padding: 12px 16px; }
+  aside { border-right: 1px solid var(--line); }
+  #form { border-left: 1px solid var(--line); }
+  .sess { padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+  .sess:hover, .sess.sel { background: var(--card); outline: 1px solid var(--line); }
+  .sess small { color: var(--mute); display: block; }
+  .done { color: var(--ok); }
+  #viewer img { max-width: 100%; max-height: 52vh; display: block; margin: 0 auto; border-radius: 6px; }
+  #strip { display: flex; gap: 3px; overflow-x: auto; padding: 8px 0; }
+  #strip img { height: 54px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; }
+  #strip img.cur { border-color: var(--fg); }
+  #strip img.before { border-color: var(--accent); }
+  #strip img.win { border-color: var(--ok); }
+  .hint { color: var(--mute); font-size: 12px; }
+  label { display: block; margin: 10px 0 4px; font-weight: 600; }
+  select, input[type=text] { width: 100%; padding: 6px; background: var(--card); color: var(--fg);
+                             border: 1px solid var(--line); border-radius: 6px; }
+  .radios label { display: inline; font-weight: normal; margin-right: 10px; }
+  button { margin-top: 14px; padding: 8px 14px; border: 0; border-radius: 6px; background: var(--accent);
+           color: #fff; font-weight: 600; cursor: pointer; }
+  #msg { margin-top: 10px; }
+  .err { color: var(--warn); }
+  #planned { padding: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; margin-top: 6px; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; height: auto; } }
+</style>
+</head>
+<body>
+<header><h1>Step-check clip labels</h1><span id="progress"></span></header>
+<main>
+  <aside><div class="hint">Capture sessions</div><div id="sessions"></div></aside>
+  <section>
+    <div id="viewer"><p class="hint">Pick a capture session.</p></div>
+    <div id="strip"></div>
+    <p class="hint">← → step through frames · <b>b</b> set BEFORE · <b>s</b> window start · <b>e</b> window end.
+      The window is the last 3–6 s, the state the judge sees.</p>
+    <p id="marks" class="hint"></p>
+  </section>
+  <section id="form">
+    <label for="clip">Clip (from the shot list)</label>
+    <select id="clip"></select>
+    <div id="planned" class="hint"></div>
+    <label>Truth</label>
+    <div class="radios">
+      <label><input type="radio" name="truth" value="done"> done</label>
+      <label><input type="radio" name="truth" value="not_done"> not done</label>
+      <label><input type="radio" name="truth" value="cant_see"> can't see</label>
+    </div>
+    <label for="reason">Reason, if the truth differs from the plan</label>
+    <input id="reason" type="text" placeholder="e.g. the lug clicked in after all">
+    <label for="consent">Consent form(s) on file</label>
+    <input id="consent" type="text" placeholder="e.g. clip-2026-10-29-p01">
+    <label><input id="scanned" type="checkbox"> I scanned every frame: no face, no plate serial, nothing that
+      identifies the house</label>
+    <label for="note">Note</label>
+    <input id="note" type="text">
+    <button id="save">Save label</button>
+    <div id="msg"></div>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let S = null, session = null, frames = [], cur = 0, marks = { before: null, start: null, end: null };
+
+async function load() {
+  S = await (await fetch('/api/state')).json();
+  const n = Object.keys(S.labels).length;
+  $('progress').textContent = `${n} of ${S.plan.length} clips labelled`;
+  $('sessions').innerHTML = '';
+  for (const s of S.sessions) {
+    const d = document.createElement('div');
+    d.className = 'sess' + (session === s.session_id ? ' sel' : '');
+    d.innerHTML = `${s.session_id}<small>${s.started_at || ''} · ${s.frames} frames` +
+      (s.clip_id ? ` · <span class="done">${s.clip_id}</span>` : '') + '</small>';
+    d.onclick = () => openSession(s);
+    $('sessions').appendChild(d);
+  }
+  const sel = $('clip'), keep = sel.value;
+  sel.innerHTML = '';
+  for (const c of S.plan) {
+    const o = document.createElement('option');
+    o.value = c.clip_id;
+    o.textContent = (S.labels[c.clip_id] ? '✓ ' : '   ') + c.clip_id;
+    sel.appendChild(o);
+  }
+  if (keep) sel.value = keep;
+  showPlanned();
+}
+
+function showPlanned() {
+  const c = S.plan.find((x) => x.clip_id === $('clip').value);
+  if (!c) return;
+  $('planned').textContent = `Planned: ${c.truth}. ${c.shows}` + (c.guarded ? ' (stop-guarded step)' : '');
+  const l = S.labels[c.clip_id];
+  const t = l ? l.truth : c.truth;
+  document.querySelectorAll('input[name=truth]').forEach((r) => (r.checked = r.value === t));
+  $('reason').value = l?.relabel_reason || '';
+  $('note').value = l?.note || '';
+  if (l?.consent) $('consent').value = l.consent;
+}
+
+async function openSession(s) {
+  session = s.session_id;
+  frames = await (await fetch(`/api/${encodeURIComponent(session)}/frames`)).json();
+  marks = { before: 0, start: Math.max(0, frames.length - 1), end: frames.length - 1 };
+  if (s.clip_id) $('clip').value = s.clip_id;
+  showPlanned();
+  $('strip').innerHTML = '';
+  frames.forEach((f, i) => {
+    const im = document.createElement('img');
+    im.loading = 'lazy';
+    im.src = `/frame/${encodeURIComponent(session)}/${encodeURIComponent(f.frame_id)}`;
+    im.onclick = () => go(i);
+    $('strip').appendChild(im);
+  });
+  go(frames.length - 1);
+  load();
+}
+
+function go(i) {
+  if (!frames.length) return;
+  cur = Math.max(0, Math.min(frames.length - 1, i));
+  const f = frames[cur];
+  $('viewer').innerHTML = `<img src="/frame/${encodeURIComponent(session)}/${encodeURIComponent(f.frame_id)}">` +
+    `<p class="hint">frame ${cur + 1} of ${frames.length} · ${((f.t_ms ?? 0) / 1000).toFixed(2)} s</p>`;
+  paint();
+}
+
+function paint() {
+  [...$('strip').children].forEach((im, i) => {
+    im.className = (i === cur ? 'cur ' : '') + (i === marks.before ? 'before ' : '') +
+      (i >= marks.start && i <= marks.end ? 'win' : '');
+  });
+  const t = (i) => (frames[i] ? (frames[i].t_ms / 1000).toFixed(2) + ' s' : '—');
+  const span = frames[marks.end] && frames[marks.start] ?
+    ((frames[marks.end].t_ms - frames[marks.start].t_ms) / 1000).toFixed(1) : '?';
+  $('marks').textContent = `BEFORE ${t(marks.before)} · window ${t(marks.start)} → ${t(marks.end)} (${span} s)`;
+  $('strip').children[cur]?.scrollIntoView({ block: 'nearest', inline: 'center' });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') go(cur + 1);
+  else if (e.key === 'ArrowLeft') go(cur - 1);
+  else if (e.key === 'b') { marks.before = cur; paint(); }
+  else if (e.key === 's') { marks.start = cur; if (marks.end < cur) marks.end = cur; paint(); }
+  else if (e.key === 'e') { marks.end = cur; if (marks.start > cur) marks.start = cur; paint(); }
+});
+
+$('clip').onchange = showPlanned;
+$('save').onclick = async () => {
+  if (!session) { $('msg').innerHTML = '<span class="err">Pick a session first.</span>'; return; }
+  const truth = document.querySelector('input[name=truth]:checked')?.value;
+  const body = {
+    clip_id: $('clip').value, session_id: session, truth, relabel_reason: $('reason').value,
+    consent: $('consent').value.trim(), scanned: $('scanned').checked, note: $('note').value,
+    before: frames[marks.before]?.frame_id, start: frames[marks.start]?.frame_id, end: frames[marks.end]?.frame_id,
+  };
+  const r = await fetch('/api/label', { method: 'POST', body: JSON.stringify(body) });
+  const j = await r.json();
+  $('msg').innerHTML = r.ok ? `<span class="done">Saved ${j.clip_id} (${j.frames.length} frames).</span>`
+                            : `<span class="err">${j.error}</span>`;
+  if (r.ok) { $('scanned').checked = false; load(); }
+};
+load();
+</script>
+</body>
+</html>

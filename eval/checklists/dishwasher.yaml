@@ -1,0 +1,151 @@
+# What a dishwasher manual usually gives, derived from the gold cards (eval/gold.py). Names only.
+# One gold card so far: every item has evidence 1, a weak prompt, and the list is not complete.
+# Format and checks: eval/checklist.py.
+appliance_kind: dishwasher
+gold_cards: [miele__G_7793]
+items:
+  - id: dishwasher.filters
+    names: {en: Clean the filters, nl: Zeven reinigen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    note: the headline job
+    gold: [miele__G_7793:clean_filter]
+  - id: dishwasher.spray_arms
+    names: {en: Clean the spray arms, nl: Sproeiarmen reinigen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:clean_spray_arms, miele__G_7793:spray_arm_fault]
+  - id: dishwasher.drain_pump
+    names: {en: Clean the drain pump, nl: Afvoerpomp reinigen}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:clean_drain_pump]
+  - id: dishwasher.inlet_filter
+    names: {en: Clean the water inlet filter, nl: Zeef in de watertoevoer reinigen}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:clean_inlet_filter]
+  - id: dishwasher.salt
+    names: {en: Refill dishwasher salt, nl: Zout bijvullen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:refill_salt]
+  - id: dishwasher.rinse_aid
+    names: {en: Refill rinse aid, nl: Naspoelmiddel bijvullen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:refill_rinse_aid]
+  - id: dishwasher.dosing_refill
+    names: {en: Replace the automatic dosing cartridge, nl: Doseercartridge vervangen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    note: only on models with automatic dosing
+    gold: [miele__G_7793:replace_powerdisk]
+  - id: dishwasher.dosing_clean
+    names: {en: Clean the automatic dosing unit, nl: Automatische dosering reinigen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:clean_autodos, miele__G_7793:autodos_maintenance]
+  - id: dishwasher.dosing_fault
+    names: {en: Automatic dosing fault, nl: Storing in de automatische dosering}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:autodos_lid_open, miele__G_7793:autodos_f601]
+  - id: dishwasher.hot_cleaning_cycle
+    names: {en: Run a hot or machine-cleaning cycle, nl: Heet programma of machinereiniging draaien}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:run_intensive_monthly, miele__G_7793:machine_clean]
+  - id: dishwasher.door_seals
+    names: {en: Clean the door seals and door edges, nl: Deurafdichting en deurranden reinigen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:clean_door_seals]
+  - id: dishwasher.clean_exterior
+    names: {en: Clean the front and control panel, nl: Front en bedieningspaneel reinigen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:clean_front, miele__G_7793:clean_control_panel, miele__G_7793:clean_light_guide]
+  - id: dishwasher.general_check
+    names: {en: Check the general condition, nl: Algemene toestand controleren}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:general_check]
+  - id: dishwasher.tap_closed
+    names: {en: Water tap closed, nl: Waterkraan dicht}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:open_tap]
+  - id: dishwasher.drain_hose_kink
+    names: {en: Kinked drain hose, nl: Geknikte afvoerslang}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:fix_drain_hose_kink]
+  - id: dishwasher.reset_after_fault
+    names: {en: Reset after a fault code, nl: Resetten na een foutcode}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:reset_fault_f]
+  - id: dishwasher.door_fault
+    names: {en: Door fault, nl: Storing deur}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:door_fault]
+  - id: dishwasher.wont_start
+    names: {en: Dishwasher will not start, nl: Vaatwasser start niet}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [miele__G_7793:wont_start]
+  - id: dishwasher.pro.repair
+    names: {en: Repairs, maintenance beyond the user jobs, nl: Reparaties en onderhoud buiten de eigen taken}
+    who: professional
+    evidence: 1
+    gold: [miele__G_7793]
+  - id: dishwasher.pro.fault_recurs
+    names: {en: A fault that comes back after the user fix, nl: Een storing die terugkomt na de eigen oplossing}
+    who: professional
+    evidence: 1
+    gold: [miele__G_7793]
+  - id: dishwasher.pro.water_protection
+    names: {en: Water protection system triggered, nl: Waterbeveiliging aangesproken}
+    who: professional
+    evidence: 1
+    gold: [miele__G_7793]
+  - id: dishwasher.pro.mains_cable
+    names: {en: Replace a damaged mains cable, nl: Beschadigd netsnoer vervangen}
+    who: professional
+    evidence: 1
+    gold: [miele__G_7793]
+  - id: dishwasher.pro.installation
+    names: {en: Electrical and water installation, water pressure, nl: Elektrische en waterinstallatie, waterdruk}
+    who: professional
+    evidence: 1
+    gold: [miele__G_7793]
+  - id: dishwasher.pro.lighting
+    names: {en: Replace the interior lighting, nl: Binnenverlichting vervangen}
+    who: professional
+    evidence: 1
+    gold: [miele__G_7793]
+  - id: dishwasher.pro.door_springs
+    names: {en: Adjust the door springs, nl: Deurveren afstellen}
+    who: professional
+    evidence: 1
+    gold: [miele__G_7793]

@@ -1,0 +1,73 @@
+[project]
+name = "fix-it-lens"
+version = "0.1.0"
+description = "Tells you before it breaks, shows you how, and stops what its rules catch, in code."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "pydantic>=2.9,<3",
+  "jsonschema>=4.23",
+  "pyyaml>=6",
+  "httpx>=0.27",
+  "openai>=1.60",
+  "meta-sam-parser==0.1.0",
+  "pillow>=11",
+  "fastapi>=0.115",
+  "uvicorn>=0.32",
+  "pypdf>=6.21.2",
+  "rapidfuzz>=3.10",
+  "pypdfium2>=4.30",
+  "pywebpush>=2.5.0",
+  "icalendar>=7.3.0",
+  "websockets>=17.3",
+  "opencv-python-headless>=4.10",
+  "segno>=1.6",
+  "mcp>=2.3.0",
+]
+
+[project.scripts]
+fixit = "ingest.cli:main"         # fixit ingest [--pr], fixit check-pr
+fixit-rules = "rules.cli:main"   # the eval shells out to it
+
+[dependency-groups]
+dev = [
+  "ruff>=0.8",
+  "mypy>=1.13",
+  "pytest>=8",
+  "pytest-asyncio>=0.24",
+  "datamodel-code-generator>=0.26",
+  "types-PyYAML",
+  "types-jsonschema",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["contracts", "calls", "app", "rules", "ingest", "eval", "local"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["contracts/models", "phone", "contracts/ts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["contracts", "calls", "rules"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["meta_sam_parser.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = ["live: calls the live Meta API; run by hand only, never in CI"]
+addopts = "-m 'not live'"

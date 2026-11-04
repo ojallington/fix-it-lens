@@ -1,0 +1,6 @@
+{
+  "state": "HOLD",
+  "precondition": "side_view",
+  "rule_id": "nl.gas.tap",
+  "detail": "Step near the gas tap needs the side view"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "fb-0123456789ab",
+  "household": "h_demo",
+  "at": "2026-10-28T19:05:00+00:00",
+  "source": "app",
+  "lang": "nl",
+  "form_version": 1,
+  "answers": {
+    "would_use": "yes",
+    "would_use_why": "Ik wist niet dat het filter eruit kon.",
+    "practical": "partly",
+    "hard": null,
+    "unsafe": "no",
+    "unsafe_which": null,
+    "monthly": null,
+    "friend": "Ja, voor de vaatwasser."
+  },
+  "quote": "named",
+  "quote_name": null,
+  "withdrawn_at": null
+}

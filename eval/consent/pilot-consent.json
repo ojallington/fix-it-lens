@@ -1,0 +1,8 @@
+{
+  "form": "eval/consent/pilot-consent.md",
+  "form_version": 1,
+  "signed": true,
+  "en": "I have signed the pilot form. While I do a job, camera pictures go to Meta's AI service to see the appliance and check each step. Meta does not train its AI on them, but may keep them to check for misuse. My appliances, job dates and recordings stay on the Fix-It Lens computer and nowhere else, and are deleted when I ask. The serial number is not recorded; a type plate photo that shows it is kept privately and deleted with the rest. Repair cards made from a maker's manual are shared with homes that have the same model, with nothing about my home on them; a manual I upload stays private. Only totals across all homes are published.",
+  "nl": "Ik heb het formulier voor de proef getekend. Terwijl ik een taak doe, gaan camerabeelden naar de AI-dienst van Meta om het apparaat te zien en elke stap te controleren. Meta traint zijn AI er niet mee, maar mag ze bewaren om op misbruik te controleren. Mijn apparaten, taakdatums en opnames blijven op de computer van Fix-It Lens en nergens anders, en worden gewist als ik dat vraag. Het serienummer wordt niet vastgelegd; een foto van het typeplaatje waarop het staat, wordt privé bewaard en met de rest gewist. Reparatiekaarten uit de handleiding van de fabrikant worden gedeeld met huishoudens die hetzelfde typenummer hebben, zonder iets over mijn huishouden; een handleiding die ik zelf upload, blijft privé. Alleen totalen over alle huishoudens worden gepubliceerd.",
+  "sources": "eval/consent/pilot-consent.md#sources-for-what-leaves-your-phone-read-27-oct-2026-not-part-of-the-signed-form"
+}

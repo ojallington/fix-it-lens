@@ -1,0 +1,26 @@
+{
+  "name": "@fix-it-lens/phone",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Fix-It Lens phone PWA: camera, hands, tracking, G1 on the device, the screens, speech, replay.",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "npm run assets && vite",
+    "build": "npm run assets && tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "assets": "node scripts/assets.mjs"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "0.10.21",
+    "@techstark/opencv-js": "4.10.0-release.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "jsdom": "25.0.1",
+    "typescript": "5.7.2",
+    "vite": "6.0.7",
+    "vitest": "2.1.8"
+  }
+}

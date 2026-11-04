@@ -1,0 +1,17 @@
+# The way in, for the README's top "Try it" block and the site's Start button (the website's build reads this
+# file too), so both change in one place. Two switches: `open`, and `repo_public` below.
+#
+#   open = true   Once the app's public door at `url` answers: the README links `url` and
+#                 shows its QR (docs/readme/try-qr-*.svg); the site shows its QR and Start goes there.
+#   open = false  The door stays shut: no QR and no try link anywhere; the README names only the film (once `video`
+#                 is set), and the site's Start plays the demo.
+#
+# After changing it: uv run python tools/make_try_block.py (rewrites the README block and writes or removes the QR).
+open = false
+# Is the repository public? While false, nothing public calls the code open
+# source or asks for a PR (the video's end card, the site); a missing key counts as false.
+repo_public = true
+url = "https://app.craftycast.com/try"
+watch = "https://watch.craftycast.com/"  # for the site's build; the README links no hosted page
+# The film's public URL; empty until it has one, and the block then stays empty.
+video = ""

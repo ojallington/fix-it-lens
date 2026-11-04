@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hazard read-off</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { --bg: #fafaf7; --fg: #1d1d1b; --mute: #6b6b66; --line: #d9d8d2; --accent: #1f6feb; --warn: #b42318;
+          --ok: #157f3b; --card: #ffffff; --wave: #8a8984; --on-accent: #ffffff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #161615; --fg: #ecebe6; --mute: #9a9993; --line: #34332f; --accent: #6ea8fe; --warn: #ff8b7e;
+            --ok: #6fd28f; --card: #1f1f1d; --wave: #75746f; --on-accent: #0d1117; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+  header { padding: 10px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 16px; align-items: baseline; }
+  header h1 { font-size: 16px; margin: 0; }
+  #progress { color: var(--mute); }
+  main { display: grid; grid-template-columns: 1fr 320px; min-height: calc(100vh - 44px); }
+  section { padding: 12px 16px; overflow: auto; }
+  #form { border-left: 1px solid var(--line); }
+  video:not([src]) { display: none; }
+  video { display: block; max-width: 100%; max-height: 56vh; margin: 0 auto; background: #000; border-radius: 6px; }
+  canvas { display: block; width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 6px;
+           margin-top: 8px; cursor: crosshair; }
+  #zoom { height: 136px; }
+  #overview { height: 60px; }
+  .hint { color: var(--mute); font-size: 12px; }
+  #now { font-variant-numeric: tabular-nums; font-size: 15px; margin-top: 8px; }
+  label { display: block; margin: 10px 0 4px; font-weight: 600; }
+  select, input[type=text] { width: 100%; padding: 6px; background: var(--card); color: var(--fg);
+                             border: 1px solid var(--line); border-radius: 6px; }
+  .marks { font-variant-numeric: tabular-nums; margin-top: 8px; padding: 8px; background: var(--card);
+           border: 1px solid var(--line); border-radius: 6px; }
+  .marks { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; }
+  .marks > div { display: contents; }
+  button { margin-top: 12px; padding: 8px 14px; border: 0; border-radius: 6px; background: var(--accent);
+           color: var(--on-accent); font-weight: 600; cursor: pointer; }
+  button.plain { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+  #msg { margin-top: 10px; }
+  .err { color: var(--warn); }
+  .ok { color: var(--ok); }
+  #lines { margin-top: 14px; }
+  #lines div { padding: 2px 0; font-variant-numeric: tabular-nums; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } #form { border-left: 0; } }
+</style>
+</head>
+<body>
+<header><h1>Hazard to STOP: read-off</h1><span id="progress"></span></header>
+<main>
+  <section>
+    <video id="video" preload="auto" muted playsinline></video>
+    <div id="now" class="hint">Pick a clip.</div>
+    <canvas id="zoom"></canvas>
+    <canvas id="overview"></canvas>
+    <p class="hint">← → one frame · Shift+← → ten frames · Space play/pause (sound on) · click the waveform to seek ·
+      <b>e</b> the spoken line ends here · <b>s</b> first frame that shows STOP · <b>n</b> no STOP in this clip ·
+      Enter save. The top waveform is the 4 s around the cursor; the bottom one is the whole clip; times are from the clip's start. Both are scaled to
+      the clip's loudest moment.</p>
+  </section>
+  <section id="form">
+    <label for="clip">Clip (clips-raw/hazard/)</label>
+    <select id="clip"></select>
+    <label for="line">Line</label>
+    <select id="line"></select>
+    <div id="said" class="hint"></div>
+    <div class="marks">
+      <div><b>Line ends</b> <span id="m-end">–</span></div>
+      <div><b>STOP shows</b> <span id="m-stop">–</span></div>
+      <div><b>Latency</b> <span id="m-lat">–</span></div>
+    </div>
+    <label for="phone">Phone (model only)</label>
+    <input id="phone" type="text" maxlength="60" placeholder="e.g. Pixel 8">
+    <label for="network">Network</label>
+    <input id="network" type="text" maxlength="60" placeholder="e.g. home wifi">
+    <button id="save">Save reading</button>
+    <button id="clear" class="plain">Clear marks</button>
+    <div id="msg"></div>
+    <div id="lines"></div>
+  </section>
+</main>
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const video = $("video");
+let S = { lines: [], clips: [], readings: [], fps: 60 };
+let fps = 60, audio = null, peaks = null, marks = { end: null, stop: null, none: false };
+
+const frameOf = (t) => Math.floor(t * fps + 0.01);  // frame i covers [i/fps, (i+1)/fps); +0.01 absorbs ms rounding
+const msOfFrame = (f) => Math.round((f / fps) * 10000) / 10;
+const fmt = (ms) => (ms == null ? "–" : `${(ms / 1000).toFixed(3)} s (frame ${frameOf(ms / 1000)})`);
+
+async function load() {
+  S = await (await fetch("/api/latency/state")).json();
+  fps = S.fps;
+  $("clip").innerHTML = S.clips.length
+    ? S.clips.map((c) => `<option value="${c.clip_id}">${c.name}</option>`).join("")
+    : `<option value="">no clips in clips-raw/hazard/ yet</option>`;
+  const done = new Set(S.readings.map((r) => r.line_id));
+  $("line").innerHTML = S.lines.map((l) =>
+    `<option value="${l.id}">${done.has(l.id) ? "✓ " : ""}${l.id} (${l.lang})</option>`).join("");
+  const next = S.lines.find((l) => !done.has(l.id));
+  if (next) $("line").value = next.id;
+  const last = S.readings[S.readings.length - 1];
+  if (last) { $("phone").value ||= last.phone; $("network").value ||= last.network; }
+  $("progress").textContent = `${done.size} of ${S.lines.length} lines read`;
+  $("lines").innerHTML = S.readings.map((r) => {
+    const lat = r.stop_shown_ms == null ? "no STOP" : `${Math.round(r.stop_shown_ms - r.speech_end_ms)} ms`;
+    return `<div class="hint">${r.line_id} · ${lat} · ${r.clip_id}</div>`;
+  }).join("");
+  showLine();
+  if (S.clips.length && !video.src) openClip($("clip").value);
+  draw();
+}
+
+function showLine() {
+  const l = S.lines.find((x) => x.id === $("line").value);
+  $("said").textContent = l ? `“${l.text}”` : "";
+}
+
+async function openClip(id) {
+  if (!id) return;
+  video.src = `/clip/hazard/${encodeURIComponent(id)}`;
+  peaks = null; draw();
+  $("msg").textContent = "Reading the sound…";
+  try {
+    const buf = await (await fetch(video.src)).arrayBuffer();
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    audio = await ctx.decodeAudioData(buf);
+    const ch = audio.getChannelData(0), per = Math.max(1, Math.floor(audio.sampleRate / 1000));
+    peaks = new Float32Array(Math.ceil(ch.length / per));  // peak per millisecond
+    for (let i = 0; i < peaks.length; i++) {
+      let m = 0;
+      for (let j = i * per, e = Math.min(ch.length, j + per); j < e; j++) m = Math.max(m, Math.abs(ch[j]));
+      peaks[i] = m;
+    }
+    const loudest = peaks.reduce((a, b) => Math.max(a, b), 0);  // a quiet phone recording still fills the strip
+    if (loudest > 0) for (let i = 0; i < peaks.length; i++) peaks[i] /= loudest;
+    $("msg").textContent = "";
+  } catch (e) {
+    $("msg").innerHTML = `<span class="err">No waveform (${e.message}); frames still step.</span>`;
+  }
+  draw();
+}
+
+const STEPS_S = [0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300];
+const AXIS = 16;  // px under the waveform for the time labels
+
+function wave(canvas, fromMs, toMs) {
+  const dpr = window.devicePixelRatio || 1, w = canvas.clientWidth, h = canvas.clientHeight, wh = h - AXIS;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  const g = canvas.getContext("2d"); g.scale(dpr, dpr); g.clearRect(0, 0, w, h);
+  const css = getComputedStyle(document.documentElement);
+  const x = (ms) => ((ms - fromMs) / (toMs - fromMs)) * w;
+  if (peaks) {
+    g.fillStyle = css.getPropertyValue("--wave");
+    for (let px = 0; px < w; px++) {
+      const a = Math.floor(fromMs + (px / w) * (toMs - fromMs)), b = Math.floor(fromMs + ((px + 1) / w) * (toMs - fromMs));
+      let m = 0;
+      for (let i = Math.max(0, a); i <= Math.min(peaks.length - 1, b); i++) m = Math.max(m, peaks[i]);
+      g.fillRect(px, wh / 2 - (m * wh) / 2, 1, Math.max(1, m * wh));
+    }
+  }
+  // time axis: the smallest round step that keeps labels about 70 px apart; nothing before 0 or past the clip
+  const step = (STEPS_S.find((s) => (s * 1000 / (toMs - fromMs)) * w >= 70) ?? STEPS_S.at(-1)) * 1000;
+  const end = Math.min(toMs, (video.duration || 0) * 1000), dec = step < 1000 ? 1 : 0;
+  g.fillStyle = css.getPropertyValue("--line"); g.fillRect(0, wh, w, 1);
+  g.font = "11px system-ui, sans-serif"; g.textBaseline = "top";
+  for (let t = Math.max(0, Math.ceil(fromMs / step) * step); t <= end; t += step) {
+    const px = Math.round(x(t));
+    g.fillStyle = css.getPropertyValue("--mute"); g.fillRect(px, wh, 1, 3);
+    const label = `${(t / 1000).toFixed(dec)} s`, tw = g.measureText(label).width;
+    g.fillText(label, Math.min(Math.max(px - tw / 2, 2), w - tw - 2), wh + 5);
+  }
+  const line = (ms, color, width) => {
+    if (ms == null || ms < fromMs || ms > toMs) return;
+    g.fillStyle = color; g.fillRect(x(ms) - width / 2, 0, width, wh);
+  };
+  line(marks.end, css.getPropertyValue("--accent"), 2);
+  line(marks.stop, css.getPropertyValue("--warn"), 2);
+  line(video.currentTime * 1000, css.getPropertyValue("--fg"), 1);
+  return x;
+}
+
+function draw() {
+  const now = video.currentTime * 1000, dur = (video.duration || 0) * 1000;
+  if (video.src) wave($("zoom"), now - 2000, now + 2000);
+  if (dur) wave($("overview"), 0, dur);
+  $("now").textContent = video.src ? `${fmt(msOfFrame(frameOf(video.currentTime)))} of ${(dur / 1000).toFixed(1)} s` : S.clips.length ? "Pick a clip."
+    : "No clips yet: copy the take into FIXIT_PRIVATE/clips-raw/hazard/ and reload.";
+  $("m-end").textContent = fmt(marks.end);
+  $("m-stop").textContent = marks.none ? "no STOP in this clip" : fmt(marks.stop);
+  $("m-lat").textContent = marks.end != null && marks.stop != null ? `${Math.round(marks.stop - marks.end)} ms` : "–";
+}
+
+function seekFrame(f) {
+  video.pause();
+  video.currentTime = Math.max(0, (f + 0.5) / fps);  // the middle of the frame, so the decoder shows that frame
+}
+
+function clickSeek(canvas, ev, fromMs, toMs) {
+  const r = canvas.getBoundingClientRect();
+  seekFrame(frameOf((fromMs + ((ev.clientX - r.left) / r.width) * (toMs - fromMs)) / 1000));
+}
+
+async function save() {
+  const body = { clip_id: $("clip").value, line_id: $("line").value, speech_end_ms: marks.end,
+                 stop_shown_ms: marks.none ? null : marks.stop, fps, phone: $("phone").value, network: $("network").value };
+  if (marks.end == null || (!marks.none && marks.stop == null)) {
+    $("msg").innerHTML = `<span class="err">Mark where the line ends (e) and where STOP shows (s), or n for no STOP.</span>`;
+    return;
+  }
+  const r = await fetch("/api/latency/reading", { method: "POST", headers: { "Content-Type": "application/json" },
+                                                  body: JSON.stringify(body) });
+  const out = await r.json();
+  if (!r.ok) { $("msg").innerHTML = `<span class="err">${out.error}</span>`; return; }
+  $("msg").innerHTML = `<span class="ok">Saved ${out.line_id}.</span>`;
+  marks = { end: null, stop: null, none: false };
+  await load(); draw();
+}
+
+$("clip").addEventListener("change", (e) => openClip(e.target.value));
+$("line").addEventListener("change", showLine);
+$("save").addEventListener("click", save);
+$("clear").addEventListener("click", () => { marks = { end: null, stop: null, none: false }; draw(); });
+$("zoom").addEventListener("click", (e) => { const n = video.currentTime * 1000; clickSeek($("zoom"), e, n - 2000, n + 2000); });
+$("overview").addEventListener("click", (e) => clickSeek($("overview"), e, 0, (video.duration || 0) * 1000));
+video.addEventListener("seeked", draw);
+video.addEventListener("loadedmetadata", draw);
+video.addEventListener("timeupdate", draw);
+window.addEventListener("resize", draw);
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  const f = frameOf(video.currentTime), step = e.shiftKey ? 10 : 1;
+  if (e.key === "ArrowRight") seekFrame(f + step);
+  else if (e.key === "ArrowLeft") seekFrame(f - step);
+  else if (e.key === " ") { video.muted = false; video.paused ? video.play() : video.pause(); }
+  else if (e.key === "e") marks.end = msOfFrame(f);
+  else if (e.key === "s") { marks.stop = msOfFrame(f); marks.none = false; }
+  else if (e.key === "n") { marks.stop = null; marks.none = true; }
+  else if (e.key === "Enter") save();
+  else return;
+  e.preventDefault(); draw();
+});
+load();
+</script>
+</body>
+</html>

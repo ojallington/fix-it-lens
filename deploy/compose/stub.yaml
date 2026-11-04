@@ -1,0 +1,13 @@
+# Test override: the tailscale sidecar stubbed (no auth key, no tailnet), so the stack runs anywhere.
+#   docker compose -f compose.yaml -f deploy/compose/stub.yaml up -d
+# The stub only holds the network namespace; the app still binds 127.0.0.1 and no port is published.
+services:
+  tailscale:
+    image: fixit-lens:local
+    entrypoint: ["sleep", "infinity"]
+    environment: !reset {}
+    secrets: !reset []
+    volumes: !reset []
+  app:
+    environment:
+      FIXIT_URL: https://fixit.example.ts.net

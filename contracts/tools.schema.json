@@ -1,0 +1,489 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fixit.invalid/contracts/tools.schema.json",
+  "title": "GuideTools",
+  "description": "The guide's eight tools, with the design's names: arguments (strict subset: every key required, optional values nullable) and results. Code validates every argument set anyway: tool arguments are not schema-guaranteed. Every failure returns ToolError. There is no tool that clears a hazard.",
+  "$defs": {
+    "Box": {
+      "type": "array",
+      "description": "[x_min, y_min, x_max, y_max] on the 0-1000 grid of the named frame",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1000
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "RuleId": {
+      "type": "string",
+      "pattern": "^[a-z]{2}\\.[a-z]+\\.[a-z_]+$"
+    },
+    "ToolName": {
+      "type": "string",
+      "enum": [
+        "lookup_manual",
+        "locate",
+        "segment",
+        "cite",
+        "check_step",
+        "report_hazard",
+        "ask_for_view",
+        "ha_state"
+      ]
+    },
+    "LookupManualArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Search this appliance's manual pages for a query; returns page numbers and short snippets.",
+      "required": [
+        "query"
+      ],
+      "properties": {
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        }
+      }
+    },
+    "ManualHit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "page",
+        "snippet"
+      ],
+      "properties": {
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "snippet": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    },
+    "LookupManualResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hits"
+      ],
+      "properties": {
+        "hits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ManualHit"
+          }
+        }
+      }
+    },
+    "LocateArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Find a card part on a frame; Spark grounds it and returns a box on the 0-1000 grid.",
+      "required": [
+        "part_id",
+        "frame_id"
+      ],
+      "properties": {
+        "part_id": {
+          "type": "string"
+        },
+        "frame_id": {
+          "type": "string"
+        }
+      }
+    },
+    "LocateResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "found",
+        "box",
+        "frame_id"
+      ],
+      "properties": {
+        "found": {
+          "type": "boolean"
+        },
+        "box": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/Box"
+            }
+          ]
+        },
+        "frame_id": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "SegmentArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Outline one part with SAM 3.1: by card part_id or by a short noun phrase, optionally from a box.",
+      "required": [
+        "part_id",
+        "text",
+        "frame_id",
+        "box"
+      ],
+      "properties": {
+        "part_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 40
+        },
+        "frame_id": {
+          "type": "string"
+        },
+        "box": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/Box"
+            }
+          ]
+        }
+      }
+    },
+    "Mask": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "found",
+        "count",
+        "mask_svg",
+        "box",
+        "conf",
+        "frame_id"
+      ],
+      "properties": {
+        "found": {
+          "type": "boolean"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mask_svg": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "SVG path in frame pixels"
+        },
+        "box": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/Box"
+            }
+          ]
+        },
+        "conf": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "area_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "frame_id": {
+          "type": "string"
+        },
+        "cached": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "CiteArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Cite a card step by step_id, or the manual by page and its exact words.",
+      "$comment": "Exactly one shape: {step_id} with page and quote null, or {page, quote} with step_id null. Strict function calling allows no root oneOf, so contracts.cite_args_invariants (and validate('tools', x, 'CiteArgs')) checks it.",
+      "required": [
+        "step_id",
+        "page",
+        "quote"
+      ],
+      "properties": {
+        "step_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "page": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "quote": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    },
+    "Citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_id",
+        "verified",
+        "page",
+        "quote"
+      ],
+      "properties": {
+        "step_id": {
+          "type": "string"
+        },
+        "verified": {
+          "type": "boolean"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "quote": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "CheckStepArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Ask the independent checker whether the step is visibly done. Async: the verdict arrives as an event. The guide can never mark a step done itself.",
+      "required": [
+        "step_id"
+      ],
+      "properties": {
+        "step_id": {
+          "type": "string"
+        }
+      }
+    },
+    "CheckStepResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Immediate result; the verdict follows (judge.schema.json Verdict)",
+      "required": [
+        "step_id",
+        "pending"
+      ],
+      "properties": {
+        "step_id": {
+          "type": "string"
+        },
+        "pending": {
+          "type": "boolean"
+        },
+        "check_id": {
+          "type": "string"
+        }
+      }
+    },
+    "ReportHazardArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Report a hazard. It can only stop or pause the repair, never resume it.",
+      "required": [
+        "rule_id",
+        "evidence"
+      ],
+      "properties": {
+        "rule_id": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/RuleId"
+            }
+          ],
+          "description": "null when no rule fits; code then picks the family's STOP"
+        },
+        "evidence": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "ReportHazardResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accepted",
+        "state"
+      ],
+      "properties": {
+        "accepted": {
+          "type": "boolean"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "HOLD",
+            "STOP"
+          ]
+        }
+      }
+    },
+    "AskForViewArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Ask the user for a different view.",
+      "required": [
+        "kind",
+        "reason"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "closer",
+            "side",
+            "light"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 120
+        }
+      }
+    },
+    "AskForViewResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "new_frame",
+        "waited_s"
+      ],
+      "properties": {
+        "new_frame": {
+          "type": "boolean"
+        },
+        "waited_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "frame_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "HaStateArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Read-only state of a household appliance from Home Assistant, by the household's alias.",
+      "required": [
+        "alias"
+      ],
+      "properties": {
+        "alias": {
+          "type": "string",
+          "maxLength": 40
+        }
+      }
+    },
+    "HaStateResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "alias",
+        "available",
+        "entities"
+      ],
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "entity_id",
+              "state"
+            ],
+            "properties": {
+              "entity_id": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "last_changed": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "ToolError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "error",
+        "retry"
+      ],
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "retry": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

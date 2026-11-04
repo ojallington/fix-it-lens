@@ -1,0 +1,8 @@
+data: {"id":"chatcmpl-429","object":"chat.completion.chunk","created":1793052973,"model":"muse-glimmer:30b","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"","tool_calls":[{"id":"call_ohwi4y90","index":0,"type":"function","function":{"name":"segment","arguments":"{\"concept\":\"dishwasher filter\"}"}}]},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-429","object":"chat.completion.chunk","created":1793052973,"model":"muse-glimmer:30b","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"id":"chatcmpl-429","object":"chat.completion.chunk","created":1793052973,"model":"muse-glimmer:30b","system_fingerprint":"fp_ollama","choices":[],"usage":{"prompt_tokens":376,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":67,"total_tokens":443}}
+
+data: [DONE]
+

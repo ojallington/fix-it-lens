@@ -1,0 +1,12 @@
+{
+ "session_id": "demo",
+ "household": null,
+ "appliance_id": null,
+ "card": null,
+ "job_id": "clean_debris_filter",
+ "started_at": "2026-10-27T09:00:00Z",
+ "mode": "api",
+ "lang": "en",
+ "country": "nl",
+ "contracts_version": "1.10.0"
+}

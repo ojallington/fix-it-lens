@@ -1,0 +1,104 @@
+# What an oven manual usually gives, derived from the gold cards (eval/gold.py). Names only.
+# One gold card so far: every item has evidence 1, a weak prompt, and the list is not complete. No hob manual is in the gold set yet.
+# Format and checks: eval/checklist.py.
+appliance_kind: oven
+gold_cards: [aeg__OS6PB52WAB]
+items:
+  - id: oven.self_clean
+    names: {en: Run the self-cleaning programme, nl: Zelfreinigingsprogramma draaien}
+    kind: upkeep
+    who: user
+    evidence: 1
+    note: the headline job on a pyrolytic oven
+    gold: [aeg__OS6PB52WAB:pyrolytic_clean]
+  - id: oven.clean_after_use
+    names: {en: Clean and dry the oven after use, nl: Oven na gebruik reinigen en drogen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [aeg__OS6PB52WAB:clean_after_use]
+  - id: oven.door_glass
+    names: {en: Take the door off and clean the door glass, nl: Deur afnemen en deurglas reinigen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [aeg__OS6PB52WAB:clean_door_glass]
+  - id: oven.shelf_supports
+    names: {en: Remove and refit the shelf supports, nl: Inschuifrails verwijderen en terugplaatsen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [aeg__OS6PB52WAB:remove_shelf_supports]
+  - id: oven.door_gasket
+    names: {en: Clean the door gasket, nl: Deurrubber reinigen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [aeg__OS6PB52WAB:clean_door_gasket]
+  - id: oven.replace_lamp
+    names: {en: Replace the oven lamp, nl: Ovenlampje vervangen}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [aeg__OS6PB52WAB:replace_lamp]
+  - id: oven.reset_at_fuse
+    names: {en: Restart the oven at the fuse, nl: Oven herstarten via de zekering}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [aeg__OS6PB52WAB:restart_fuse]
+  - id: oven.door_lock_error
+    names: {en: Door or door lock error, nl: Foutcode deur of deurvergrendeling}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [aeg__OS6PB52WAB:fix_err_c3, aeg__OS6PB52WAB:fix_err_f102]
+  - id: oven.food_sensor
+    names: {en: Food sensor not working, nl: Voedselsensor werkt niet}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [aeg__OS6PB52WAB:fix_food_sensor]
+  - id: oven.no_heat
+    names: {en: Oven does not heat up, nl: Oven warmt niet op}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [aeg__OS6PB52WAB:fix_no_heat]
+  - id: oven.clock_reset
+    names: {en: Display reset, set the time, nl: Display gereset, tijd instellen}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [aeg__OS6PB52WAB:fix_clock_reset]
+  - id: oven.no_power
+    names: {en: Oven will not switch on, nl: Oven gaat niet aan}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [aeg__OS6PB52WAB:fix_no_power]
+  - id: oven.pro.installation
+    names: {en: Installation and electrical connection, nl: Installatie en elektrische aansluiting}
+    who: professional
+    evidence: 1
+    gold: [aeg__OS6PB52WAB]
+  - id: oven.pro.mains_cable
+    names: {en: Replace the mains cable or plug, nl: Netsnoer of stekker vervangen}
+    who: professional
+    evidence: 1
+    gold: [aeg__OS6PB52WAB]
+  - id: oven.pro.door_glass_damaged
+    names: {en: Replace damaged door glass, nl: Beschadigd deurglas vervangen}
+    who: professional
+    evidence: 1
+    gold: [aeg__OS6PB52WAB]
+  - id: oven.pro.repair
+    names: {en: Repairs to the oven, nl: Reparaties aan de oven}
+    who: professional
+    evidence: 1
+    gold: [aeg__OS6PB52WAB]
+  - id: oven.pro.fault_recurs
+    names: {en: An error code that comes back, nl: Een foutcode die terugkomt}
+    who: professional
+    evidence: 1
+    gold: [aeg__OS6PB52WAB]

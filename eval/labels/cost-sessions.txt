@@ -1,0 +1,3 @@
+# Our own filmed repair sessions whose calls make the cost.repair_session row (one session id a line).
+# Each runs in our own household (is_own in the store); eval/cost.py collect keeps their calls without it.
+P1b1l7jpVBxb

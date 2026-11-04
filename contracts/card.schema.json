@@ -1,0 +1,1306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fixit.invalid/contracts/card.schema.json",
+  "title": "Card",
+  "description": "A checked card: cards/<brand>/<model>.yaml. It cites manual pages with short verbatim quotes and page-text hashes; it never holds the manual's text. In words: schema/card.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "brand",
+    "model",
+    "aliases",
+    "appliance_file_model",
+    "manual",
+    "parts",
+    "red_zones",
+    "quotes",
+    "jobs",
+    "keywords"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "brand": {
+      "$ref": "#/$defs/Slug",
+      "description": "Lower-case maker slug, e.g. bosch"
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60,
+      "description": "The public model code, as on the plate (never the serial)"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 60
+      }
+    },
+    "appliance_kind": {
+      "type": "string",
+      "enum": [
+        "dishwasher",
+        "washer",
+        "dryer",
+        "boiler",
+        "fridge",
+        "oven",
+        "hob",
+        "hood",
+        "other"
+      ]
+    },
+    "appliance_file_model": {
+      "type": "string",
+      "description": "The model ID that built the appliance file, e.g. muse-wonder-1.0"
+    },
+    "manual": {
+      "$ref": "#/$defs/Manual"
+    },
+    "parts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Part"
+      }
+    },
+    "red_zones": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/RedZone"
+      }
+    },
+    "quotes": {
+      "type": "array",
+      "description": "Quotes referred to by quote_ref",
+      "items": {
+        "$ref": "#/$defs/RefQuote"
+      }
+    },
+    "jobs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/Job"
+      }
+    },
+    "troubleshooting": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/TroubleshootingRow"
+      },
+      "description": "The manual's fault, indicator and symptom table; absent on cards built before it"
+    },
+    "refused": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/RefusedJob"
+      },
+      "description": "Jobs refused at build, by reason; absent on cards built before 1.23"
+    },
+    "keywords": {
+      "type": "array",
+      "description": "Words that bias speech recognition",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      }
+    },
+    "checks": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/Checks"
+        }
+      ],
+      "description": "Filled by the card loader at load time; absent on disk"
+    }
+  },
+  "$defs": {
+    "Slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]*$",
+      "maxLength": 60
+    },
+    "Lang": {
+      "type": "string",
+      "pattern": "^[a-z]{2}$",
+      "description": "ISO 639-1"
+    },
+    "LangText": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z]{2}$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "Sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "Quote": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Verbatim from the manual, in the manual's language, at most 2 sentences and at least 20 characters",
+      "required": [
+        "text",
+        "lang",
+        "page"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 400
+        },
+        "lang": {
+          "$ref": "#/$defs/Lang"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "en": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 400,
+          "description": "An English translation of text, shown in grey under it. Never citation-checked, never replaces text; it is manual text on screen, so it goes through G0 like step text."
+        }
+      }
+    },
+    "RefQuote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text",
+        "lang",
+        "page"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Slug"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 400
+        },
+        "lang": {
+          "$ref": "#/$defs/Lang"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "en": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 400,
+          "description": "An English translation of text, shown in grey under it. Never citation-checked, never replaces text; it is manual text on screen, so it goes through G0 like step text."
+        }
+      }
+    },
+    "Manual": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_url",
+        "lang",
+        "page_count",
+        "page_text_sha256"
+      ],
+      "properties": {
+        "source_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "maker_site: the PDF's https URL on the maker's site. household_upload: urn:fixit:upload:<pdf_sha256>, never a local path"
+        },
+        "title": {
+          "type": "string"
+        },
+        "doc_id": {
+          "type": "string",
+          "description": "The maker's document number, if printed"
+        },
+        "lang": {
+          "$ref": "#/$defs/Lang"
+        },
+        "page_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pdf_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "page_text_sha256": {
+          "type": "array",
+          "description": "sha256 of each page's extracted text, in page order (index 0 = page 1)",
+          "items": {
+            "$ref": "#/$defs/Sha256"
+          }
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "maker_site",
+            "household_upload"
+          ],
+          "description": "Where the PDF came from: the maker's public support site, fetched on a user's request, or a household's own upload. A household_upload card is never shared. Absent on cards built before 1.23, which were all fetched from the maker's site"
+        },
+        "models": {
+          "type": "array",
+          "maxItems": 60,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "description": "The model codes the manual itself prints, as printed, including its own placeholder patterns ('WMN...', 'SMV4HA*'); code checks each against models_page at ingest. A plate's model links to this card only when it matches one of them after the plate read's normalisation. Empty: the manual prints none, and the card stays private to the home that built it. Absent on cards built before 1.23"
+        },
+        "models_page": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The page that lists the models; required when models is not empty"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "required": [
+              "pdf_sha256",
+              "models"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "models"
+            ],
+            "properties": {
+              "models": {
+                "minItems": 1
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "models_page"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "source"
+            ],
+            "properties": {
+              "source": {
+                "const": "household_upload"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_url": {
+                "pattern": "^urn:fixit:upload:[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "source"
+            ],
+            "properties": {
+              "source": {
+                "const": "maker_site"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_url": {
+                "pattern": "^https://"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "names",
+        "locate",
+        "cue",
+        "sam_text",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Slug"
+        },
+        "names": {
+          "$ref": "#/$defs/LangText"
+        },
+        "locate": {
+          "type": "string",
+          "enum": [
+            "function",
+            "appearance"
+          ],
+          "description": "How Spark is asked to find it: by what it does, or by how it looks"
+        },
+        "cue": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "What to look for, e.g. 'round grey cylinder with a twist handle, bottom centre'"
+        },
+        "sam_text": {
+          "type": "string",
+          "maxLength": 40,
+          "description": "A short noun phrase for SAM (one concept, no verbs or 'and')"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "allowed",
+            "red_zone"
+          ]
+        }
+      }
+    },
+    "RedZone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "part_id",
+        "rule_id",
+        "page",
+        "quote",
+        "ring_cm"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Slug"
+        },
+        "part_id": {
+          "$ref": "#/$defs/Slug"
+        },
+        "rule_id": {
+          "$ref": "#/$defs/RuleId"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "quote": {
+          "$ref": "#/$defs/Quote"
+        },
+        "ring_cm": {
+          "type": "number",
+          "minimum": 3,
+          "description": "3 cm is a floor, enforced again in code"
+        }
+      }
+    },
+    "RuleId": {
+      "type": "string",
+      "pattern": "^[a-z]{2}\\.[a-z]+\\.[a-z_]+$"
+    },
+    "Interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "every",
+        "unit",
+        "quote_ref"
+      ],
+      "properties": {
+        "every": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "year",
+            "cycle"
+          ]
+        },
+        "quote_ref": {
+          "$ref": "#/$defs/Slug"
+        }
+      }
+    },
+    "Duration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "source"
+      ],
+      "properties": {
+        "value": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "manual_quote",
+            "session_log"
+          ]
+        },
+        "ref": {
+          "type": "string",
+          "description": "quote id (manual_quote) or session id (session_log)"
+        }
+      }
+    },
+    "DoneWhen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text",
+        "quote_ref"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Slug"
+        },
+        "text": {
+          "$ref": "#/$defs/LangText"
+        },
+        "quote_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/Slug"
+            }
+          ]
+        }
+      }
+    },
+    "ZoneRing": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A step-level zone override (e.g. the boiler's 3 cm ring beside the fill valve); needs safety review",
+      "required": [
+        "zone_id",
+        "ring_cm"
+      ],
+      "properties": {
+        "zone_id": {
+          "$ref": "#/$defs/Slug"
+        },
+        "ring_cm": {
+          "type": "number",
+          "minimum": 3
+        }
+      }
+    },
+    "Witness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "part",
+        "expect"
+      ],
+      "description": "What the SAM witness checks for this step: the part present or absent in the NOW frame, near its anchor",
+      "properties": {
+        "part": {
+          "$ref": "#/$defs/Slug",
+          "description": "A part id of this card"
+        },
+        "expect": {
+          "type": "string",
+          "enum": [
+            "present",
+            "absent"
+          ]
+        },
+        "anchor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Slug"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The part it sits on or in (a drain cap's drain); null if none"
+        }
+      }
+    },
+    "Step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text",
+        "page",
+        "quote",
+        "done_when",
+        "parts",
+        "power",
+        "zones",
+        "view",
+        "look_only_lines"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Slug"
+        },
+        "text": {
+          "$ref": "#/$defs/LangText"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "fixit"
+          ],
+          "default": "manual",
+          "description": "manual (absent means manual): the maker's step, cited. fixit: our own step, only to undo what an earlier power-off step of the same job left undone, which the manual never undoes: plug it back in, switch it back on, turn the water back on, or put a part it took out back in place. A person writes it in a reviewed card, or ingest appends a fixed one (added_by); never a model. The phone marks it as ours"
+        },
+        "page": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "description": "null only on a fixit step"
+        },
+        "quote": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quote"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "null only on a fixit step"
+        },
+        "done_when": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DoneWhen"
+          }
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Slug"
+          }
+        },
+        "power": {
+          "type": "string",
+          "enum": [
+            "on",
+            "off",
+            "any"
+          ]
+        },
+        "zones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Slug"
+          },
+          "description": "red_zones ids active on this step"
+        },
+        "zone_rings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ZoneRing"
+          }
+        },
+        "view": {
+          "type": "string",
+          "enum": [
+            "front",
+            "side"
+          ]
+        },
+        "look_only_lines": {
+          "type": "array",
+          "description": "Card lines that name a red-zone part only to look at it; their hashes are G0 exemptions",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "witness": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Witness"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Omitted or null: no visible part to witness; the judge and code decide alone"
+        },
+        "restores": {
+          "$ref": "#/$defs/Slug",
+          "description": "fixit only: the earlier power-off step of this job whose plug, switch, water or part this step puts back"
+        },
+        "added_by": {
+          "type": "string",
+          "enum": [
+            "person",
+            "ingest"
+          ],
+          "description": "Only on a fixit step: who added it; absent means person. person wrote it in a reviewed card; ingest is code that appends a fixed restore step"
+        },
+        "camera": {
+          "type": "string",
+          "enum": [
+            "check",
+            "find",
+            "none"
+          ],
+          "default": "check",
+          "description": "What the camera does on this step (absent means check). check: the step check confirms it done on camera. find: the camera helps locate the step's parts (outlines), no done check; the person confirms. none: no camera, the person confirms. Never none on a step with zones, zone rings, a red-zone part or power on or off; find needs at least one part. The mode never changes a safety gate: a power-off step still waits for the plug seen out"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "origin"
+            ],
+            "properties": {
+              "origin": {
+                "const": "fixit"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "restores"
+            ],
+            "properties": {
+              "page": {
+                "type": "null"
+              },
+              "quote": {
+                "type": "null"
+              },
+              "power": {
+                "const": "any"
+              },
+              "done_when": {
+                "maxItems": 0
+              },
+              "parts": {
+                "maxItems": 0
+              },
+              "zones": {
+                "maxItems": 0
+              },
+              "zone_rings": {
+                "maxItems": 0
+              },
+              "look_only_lines": {
+                "maxItems": 0
+              },
+              "witness": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "restores"
+                  ]
+                },
+                {
+                  "required": [
+                    "added_by"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "page": {
+                "type": "integer"
+              },
+              "quote": {
+                "$ref": "#/$defs/Quote"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "After": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "job_id",
+        "because",
+        "quote_ref"
+      ],
+      "description": "This job comes to mind early after job_id was done. It never moves a due date; it only adds the history clause to a reminder",
+      "properties": {
+        "job_id": {
+          "$ref": "#/$defs/Slug"
+        },
+        "because": {
+          "$ref": "#/$defs/LangText"
+        },
+        "quote_ref": {
+          "$ref": "#/$defs/Slug",
+          "description": "A quotes[] id; the citation check covers it"
+        }
+      }
+    },
+    "Job": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "kind",
+        "interval",
+        "fault_codes",
+        "landlord",
+        "duration_min",
+        "steps"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Slug"
+        },
+        "title": {
+          "$ref": "#/$defs/LangText"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "upkeep",
+            "fix"
+          ]
+        },
+        "interval": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/Interval"
+            }
+          ]
+        },
+        "fault_codes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FaultCode"
+          }
+        },
+        "landlord": {
+          "type": "boolean",
+          "description": "Default for renters; the country rules file can override"
+        },
+        "duration_min": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/Duration"
+            }
+          ]
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Step"
+          }
+        },
+        "due_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LangText"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The short noun a reminder names ('filter'); absent: derived from the title"
+        },
+        "after": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/After"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "needs": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Need"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional: what the person needs ready before the job starts, each cited to the manual. Absent, null or []: the job starts with no list"
+        }
+      }
+    },
+    "Need": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "One thing to have ready before a job starts (a product, a tool or a consumable), as the manual names it. Its quote (quote_ref, a quotes[] id) passes the citation check like a step's, so a card never invents a requirement; a need whose quote fails is dropped. Readiness is the person's word: it never clears a hold or a safety rule",
+      "required": [
+        "id",
+        "what",
+        "quote_ref"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Slug",
+          "description": "Unique within its job"
+        },
+        "what": {
+          "$ref": "#/$defs/LangText",
+          "description": "What to have ready, per language, in our short words from the quote ('machine cleaner'); it goes through G0 at load"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "product",
+            "tool",
+            "consumable"
+          ],
+          "description": "Optional: product (a named cleaner or agent), tool (kept and reused: a screwdriver, a towel), consumable (used up: salt, a new filter)"
+        },
+        "quote_ref": {
+          "$ref": "#/$defs/Slug",
+          "description": "A quotes[] id: the manual's words that call for it, with their page; the citation check covers it"
+        }
+      }
+    },
+    "CheckResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "failures"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "unchecked"
+          ]
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rule_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RuleId"
+          }
+        }
+      }
+    },
+    "Checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "citation",
+        "rules"
+      ],
+      "properties": {
+        "citation": {
+          "$ref": "#/$defs/CheckResult"
+        },
+        "rules": {
+          "$ref": "#/$defs/CheckResult"
+        }
+      }
+    },
+    "FaultCode": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 12,
+      "description": "A code as the manual spells it, e.g. E:32-00 or E24"
+    },
+    "TroubleshootingRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "One row of the manual's fault, indicator or symptom table. Its quote is the table row (code, cause and remedy cells together) and passes the citation check like a step; meaning, cause and remedy are written from that quote only, in en plus the manual's language, and go through G0 at load. A row whose quote fails is dropped.",
+      "required": [
+        "id",
+        "codes",
+        "indicator",
+        "symbol",
+        "symptom",
+        "meaning",
+        "cause",
+        "remedy",
+        "remedy_kind",
+        "escalate_to",
+        "job_ref",
+        "prevented_by",
+        "repeat",
+        "page",
+        "quote_ref"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Slug"
+        },
+        "codes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FaultCode"
+          },
+          "description": "[] for a light or a symptom"
+        },
+        "indicator": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/LangText"
+            }
+          ],
+          "description": "e.g. 'the tap symbol lights up'"
+        },
+        "symbol": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "page",
+                "bbox"
+              ],
+              "properties": {
+                "page": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "bbox": {
+                  "type": "array",
+                  "minItems": 4,
+                  "maxItems": 4,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "description": "[x0, y0, x1, y1] as fractions of the page, origin top left, so the phone can crop any render of the page. Found by code (the drawing nearest the row's quote on that page), never by a model."
+                }
+              }
+            }
+          ],
+          "description": "Where the manual draws the indicator; null when there is no figure"
+        },
+        "symptom": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/LangText"
+            }
+          ]
+        },
+        "meaning": {
+          "$ref": "#/$defs/LangText"
+        },
+        "cause": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/LangText"
+            }
+          ]
+        },
+        "remedy": {
+          "$ref": "#/$defs/LangText",
+          "description": "The manual's remedy, e.g. 'call the service'"
+        },
+        "remedy_kind": {
+          "type": "string",
+          "enum": [
+            "user",
+            "technician",
+            "installer"
+          ],
+          "description": "Who acts, as the manual says. 'landlord' is never on a card: the server derives it from the household and the rules file."
+        },
+        "escalate_to": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "technician",
+            "installer",
+            null
+          ],
+          "description": "'Do X; if it persists, call the service': only with remedy_kind user"
+        },
+        "job_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/Slug"
+            }
+          ],
+          "description": "The kept fix job that carries out a user remedy; null when that job was dropped (the row stays, its remedy cited)"
+        },
+        "prevented_by": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "job_id",
+              "quote_ref"
+            ],
+            "properties": {
+              "job_id": {
+                "$ref": "#/$defs/Slug"
+              },
+              "quote_ref": {
+                "$ref": "#/$defs/Slug"
+              }
+            }
+          },
+          "description": "Upkeep jobs the manual ties to this fault, each tie cited"
+        },
+        "repeat": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "count",
+                "days",
+                "quote_ref"
+              ],
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 2
+                },
+                "days": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "quote_ref": {
+                  "$ref": "#/$defs/Slug"
+                }
+              }
+            }
+          ],
+          "description": "Only when the manual says it, e.g. a third top-up in a year: call the installer"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "quote_ref": {
+          "$ref": "#/$defs/Slug"
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "codes": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "indicator": {
+              "$ref": "#/$defs/LangText"
+            }
+          }
+        },
+        {
+          "properties": {
+            "symptom": {
+              "$ref": "#/$defs/LangText"
+            }
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "remedy_kind": {
+                "enum": [
+                  "technician",
+                  "installer"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "escalate_to": {
+                "type": "null"
+              },
+              "job_ref": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "RefusedJob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reason",
+        "page"
+      ],
+      "description": "A job the manual describes that the rule engine refused at build, kept as a name and a page so the app can say who to call, never as steps; or (reason not_built) a procedure the build could not turn into steps, kept as the manual's heading and page so the app can point at it",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Slug"
+        },
+        "title": {
+          "$ref": "#/$defs/LangText"
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "gas",
+            "mains",
+            "needs_professional",
+            "other",
+            "not_built"
+          ]
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "heading": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "description": "The procedure's heading as the manual prints it, in the manual's language; only with reason not_built"
+        }
+      },
+      "if": {
+        "properties": {
+          "reason": {
+            "const": "not_built"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "heading"
+        ],
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "id"
+              ]
+            },
+            {
+              "required": [
+                "title"
+              ]
+            }
+          ]
+        }
+      },
+      "else": {
+        "required": [
+          "id",
+          "title"
+        ],
+        "not": {
+          "required": [
+            "heading"
+          ]
+        }
+      }
+    }
+  }
+}

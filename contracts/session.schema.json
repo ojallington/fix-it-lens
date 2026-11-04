@@ -1,0 +1,451 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fixit.invalid/contracts/session.schema.json",
+  "title": "SessionRecording",
+  "description": "The recording format. A session is FIXIT_PRIVATE/sessions/<id>/ with meta.json, events.jsonl, frames/<frame_id>.jpg and audio/<utterance_id>.wav. Request bodies go only to FIXIT_PRIVATE/requests/<sha>.json. Fixtures (fixtures/<lane>/<request_sha256>.jsonl) hold a FixtureHeader line then FixtureEvent lines: responses only.",
+  "$defs": {
+    "Sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "SessionMeta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "session_id",
+        "started_at",
+        "mode",
+        "lang",
+        "contracts_version"
+      ],
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+$"
+        },
+        "household": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "appliance_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "card": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "cards/<brand>/<model>.yaml"
+        },
+        "job_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "api",
+            "local",
+            "capture"
+          ]
+        },
+        "lang": {
+          "type": "string",
+          "pattern": "^[a-z]{2}$"
+        },
+        "country": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-z]{2}$"
+        },
+        "contracts_version": {
+          "type": "string"
+        },
+        "commit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "ClientEvent": {
+      "type": "object",
+      "required": [
+        "t_ms",
+        "dir",
+        "kind"
+      ],
+      "additionalProperties": true,
+      "description": "dir c2s or s2c: the ws message itself (kind = its type), minus frame bytes (frames are files)",
+      "properties": {
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dir": {
+          "type": "string",
+          "enum": [
+            "c2s",
+            "s2c"
+          ]
+        },
+        "kind": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "object"
+        }
+      }
+    },
+    "StateEvent": {
+      "type": "object",
+      "required": [
+        "t_ms",
+        "dir",
+        "kind"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dir": {
+          "type": "string",
+          "const": "state"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      }
+    },
+    "StreamLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "t_ms",
+        "event"
+      ],
+      "properties": {
+        "t_ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Offset from the request start"
+        },
+        "event": {
+          "type": "object",
+          "description": "One SSE event as received (response.* types), with request echoes stripped"
+        }
+      }
+    },
+    "ApiEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "t_ms",
+        "dir",
+        "kind",
+        "call_id",
+        "role",
+        "request_sha256",
+        "params",
+        "model",
+        "response_model",
+        "stream",
+        "latency_ms",
+        "usd",
+        "status"
+      ],
+      "properties": {
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dir": {
+          "type": "string",
+          "const": "api"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "respond",
+            "sam_image",
+            "sam_video",
+            "transcribe",
+            "count_tokens"
+          ]
+        },
+        "call_id": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "request_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "params": {
+          "$ref": "#/$defs/CallParams"
+        },
+        "model": {
+          "type": "string"
+        },
+        "response_model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stream": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StreamLine"
+          }
+        },
+        "latency_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "ttft_ms": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "incomplete",
+            "failed",
+            "error",
+            "refused",
+            "cache_hit"
+          ]
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cache_hit": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CallParams": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Request parameters that are safe to log. Never input, instructions or tools.",
+      "required": [
+        "model",
+        "store"
+      ],
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "store": {
+          "type": "boolean",
+          "const": false
+        },
+        "stream": {
+          "type": "boolean"
+        },
+        "effort": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "minimal",
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max",
+            null
+          ]
+        },
+        "max_output_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 16
+        },
+        "format_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tool_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "n_images": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "image_px": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "prompt_cache_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mask_encoding": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "one_bit",
+            "lossless",
+            null
+          ]
+        },
+        "language_bias": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "reasoning_summary": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "auto",
+            "concise",
+            "detailed",
+            null
+          ],
+          "description": "reasoning.summary asked for (the guide asks for auto; the rail shows what comes back)"
+        }
+      }
+    },
+    "Event": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ApiEvent"
+        },
+        {
+          "$ref": "#/$defs/ClientEvent"
+        },
+        {
+          "$ref": "#/$defs/StateEvent"
+        }
+      ]
+    },
+    "FixtureHeader": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fixture",
+        "request_sha256",
+        "kind",
+        "role",
+        "params",
+        "recorded_at",
+        "response_model"
+      ],
+      "properties": {
+        "fixture": {
+          "type": "integer",
+          "const": 1
+        },
+        "request_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "respond",
+            "sam_image",
+            "sam_video",
+            "transcribe",
+            "count_tokens",
+            "upload"
+          ]
+        },
+        "role": {
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/CallParams"
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "response_model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "latency_ms": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "usd": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "http_status": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      }
+    },
+    "FixtureEvent": {
+      "$ref": "#/$defs/StreamLine"
+    }
+  }
+}

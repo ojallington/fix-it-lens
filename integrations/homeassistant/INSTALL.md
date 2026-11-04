@@ -1,0 +1,10 @@
+# Install in Home Assistant
+
+1. **Files:** copy `custom_components/fixit_lens/` (25 files with `brand/` and `translations/`, no requirements; skip any __pycache__) to HA's `config/custom_components/fixit_lens/`, then restart HA.
+2. **Config entry:** Add integration → Fix-It Lens; address: the app's HTTPS address, such as `https://fixit.<tailnet>.ts.net` (HA must be able to reach it).
+3. **Token:** a token for this Home Assistant, made on the server with `uv run python -m app.schedule.invites token <household_id> --kind ha` (add `--read-only` for one that only reads; `invites list` shows ids). It goes only into the HA form, never into a message, a log or the repo. Revoking it (DELETE /api/v1/household/tokens/<id>) cuts this HA off without touching the app.
+4. **What it touches:** it reads `/api/v1/due`, `/appliances` and `/household`, and POSTs a job's done or snooze only when someone ticks it, calls `fixit_lens.mark_done` / `fixit_lens.snooze`, or taps a notification's button. It calls no HA service.
+5. **Appliances HA knows (optional):** the end of setup and the integration's Configure list the appliances in HA's device registry that the home lacks; only a ticked one's maker, model, kind and name are POSTed to `/appliances` (a write token; a library card links at once, any other gets its manual's pages and no build).
+6. **Dashboard (optional):** `dashboards/fixit_lens.yaml` (the demo home's appliances), or Download diagnostics → its `dashboard` for this home's: paste into a new dashboard's raw configuration editor. Built-in cards only.
+7. **Done button (optional):** import `blueprints/automation/fixit_lens/job_due_notify.yaml` (the published repository's README has an Import button), make an automation from it, pick the phone and the quiet hours (22:00 to 08:00 by default; a job due in them is sent when they end).
+8. **Undo:** delete the automation and the dashboard, delete the Fix-It Lens config entry (its sensors, to-do list and calendar go with it), remove `config/custom_components/fixit_lens/` and the blueprint, restart HA, and revoke the token.

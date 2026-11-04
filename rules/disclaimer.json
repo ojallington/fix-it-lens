@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "first_run": {
+    "en": "Fix-It Lens is an AI assistant. It guides only the maintenance your appliance's own manual says you can do yourself, and it shows the manual page for each step. It stops and tells you who to call for gas, electrical work, opening casings and anything outside your manual. It can misread what it sees: if a step doesn't match what's in front of you, stop and check the page. You must be 18 or older. Not affiliated with Bosch, Samsung, the boiler makers or Meta.",
+    "nl": "Fix-It Lens is een AI-assistent. Hij begeleidt alleen onderhoud dat de handleiding van je apparaat je zelf laat doen, en laat bij elke stap de pagina zien. Bij gas, elektra, het openen van behuizingen en alles buiten je handleiding stopt hij en zegt hij wie je moet bellen. Hij kan zich vergissen in wat hij ziet: klopt een stap niet met wat je voor je hebt, stop dan en kijk de pagina na. Je moet 18 jaar of ouder zijn. Niet verbonden aan Bosch, Samsung, de ketelfabrikanten of Meta."
+  },
+  "spoken": {
+    "en": "I'm an AI guide: I keep to your manual's own steps and stop for anything risky.",
+    "nl": "Ik ben een AI-gids: ik volg alleen je handleiding en stop bij alles wat riskant is."
+  },
+  "step_citation": {
+    "en": "Manual p.{page}",
+    "nl": "Handleiding p.{page}"
+  },
+  "held_follow_on": {
+    "en": "I can't take you further with that part, but I can still help with what you can see or hear from outside it: tell me what you notice.",
+    "nl": "Met dat onderdeel kan ik je niet verder helpen, maar wel met wat je er van buitenaf aan ziet of hoort: vertel me wat je merkt."
+  },
+  "terms": {
+    "en": "Provided as is, without warranty. You are responsible for your actions; follow the safety instructions in your manufacturer's manual.",
+    "nl": "Geleverd zoals het is, zonder garantie. Je bent zelf verantwoordelijk voor wat je doet; volg de veiligheidsinstructies in de handleiding van je fabrikant."
+  }
+}

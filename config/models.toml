@@ -1,0 +1,131 @@
+# Pinned model IDs per role, and the per-role call settings (calls/ reads this; nothing else names a model).
+# Standard tier only. A -contributor ID is refused at load.
+# max_output_tokens is a floor-checked default: calls/ never sends less than 4000 (8000 at medium or higher),
+# because the cap includes reasoning.
+
+[backend.meta]
+base_url = "https://api.meta.ai/v1"
+key_path = "~/.config/fleet/meta-model-api.key"
+
+[images]
+max_px = 1024
+jpeg_quality = 85
+
+[roles.guide]
+model = "muse-spark-1.3"
+effort = "low"
+timeout_s = 6
+max_output_tokens = 4000
+include_reasoning = true
+reasoning_summary = "auto"   # fed to the agent trace rail (app/); not guaranteed to come back
+prompt_cache_key = "fixitlens-guide-v1"
+
+[roles.judge]
+model = "muse-spark-1.3"
+effort = "minimal"
+timeout_s = 10  # measured live on the Bosch card (16 checks): p90 6.0 s; 6 s cut 2 of 16, each a check that did not count
+max_output_tokens = 4000
+prompt_cache_key = "fixitlens-judge-v1"
+
+[roles.locate]
+model = "muse-spark-1.3"
+effort = "low"
+timeout_s = 6
+max_output_tokens = 4000
+prompt_cache_key = "fixitlens-locate-v1"
+
+[roles.plate]
+model = "muse-spark-1.3"
+effort = "low"
+timeout_s = 20
+max_output_tokens = 4000
+
+[roles.appliance_file]
+model = "muse-wonder-1.0"
+effort = "high"
+timeout_s = 900
+max_output_tokens = 30000
+
+[roles.transcribe]
+model = "muse-voice-transcribe-1.0"
+timeout_s = 10
+
+[roles.sam]
+model = "sam-3.1"
+timeout_s = 10  # measured live (24 calls): p90 4.8 s, max past 6 s on a box prompt the size of the frame
+mask_encoding = "one_bit"
+
+[roles.sam_video]
+model = "sam-3.1"
+timeout_s = 20
+mask_encoding = "one_bit"
+
+# ---- local mode (FIXIT_MODE=local) -------------------------------------------------------------------------------
+# Everything stays on the LAN: Glimmer through ollama's OpenAI door. Glimmer boxes the part (the outline is its box,
+# drawn larger) and the second witness is a Glimmer look plus optical-flow tracking: there is no SAM beside Glimmer,
+# since the two do not fit on the GPU together. FIXIT_LOCAL_URL points at the GPU host; the default is this machine.
+# A role here overrides its api row field by field. Speech-to-text has no local Meta model.
+
+[backend.local]
+base_url = "http://localhost:11434/v1"
+sam_url = "http://localhost:8088"
+
+# Who may switch to local mode when the API fails twice in a row (calls/breaker.py). Local mode runs on the machine
+# that serves Fix-It Lens, so on a shared server only the operator's own homes use it; a public session never does.
+[local_fallback]
+self_hosted = false  # true on your own computer with local mode set up: every home this instance serves may use it
+homes = []  # the operator's own household ids; they are private, so list them in FIXIT_PRIVATE/local_fallback.toml
+
+[local.roles.guide]
+model = "muse-glimmer:30b"
+timeout_s = 15  # measured 2.6-6.0 s a turn with tools
+
+[local.roles.judge]
+model = "muse-glimmer:30b"
+timeout_s = 8  # measured ~1.0 s a check with thinking off; the margin is the cold image prefill
+
+[local.roles.locate]
+model = "muse-glimmer:30b"
+timeout_s = 8
+
+[local.roles.plate]
+model = "muse-glimmer:30b"
+
+[local.roles.appliance_file]
+model = "muse-glimmer:30b"
+
+# Eval only, or a configuration without Glimmer: with FIXIT_LOCAL_SAM=1 the sam roles go to SAM 3.1's open weights
+# through local/sam_server at sam_url (FIXIT_LOCAL_SAM_URL). Without it a local client has no SAM to call.
+[local.roles.sam]
+model = "facebook/sam3.1"
+
+[local.roles.sam_video]
+model = "facebook/sam3.1"
+
+# ---- partner routing ----------------------------------------------------------------------------------
+# Public sessions only: their guide and judge turns go to Muse Spark Open on a partner, in `order`; every other
+# session, and SAM, voice and card builds, stay on Meta. With routing = false every session runs on Meta. A partner whose key file is missing (or not
+# 0600) is skipped and its calls fail closed, so nothing routes before the keys are in place.
+
+[partner]
+routing = false
+roles = ["guide", "judge"]  # locate and plate move only once their eval gate passes (row partner.parity)
+order = ["baseten", "fireworks", "modal"]
+
+[partner.baseten]  # Model APIs
+base_url = "https://inference.baseten.co/v1"
+model = "meta-models/muse-spark-open"
+key_path = "~/.config/fleet/baseten.key"
+enabled = true
+
+[partner.fireworks]  # serverless
+base_url = "https://api.fireworks.ai/inference/v1"
+model = "accounts/fireworks/models/muse-spark-open"
+key_path = "~/.config/fleet/fireworks.key"
+enabled = true
+
+[partner.modal]  # Shared Endpoint; off
+base_url = "https://inference.us-west.modal.direct/v1"  # unverified: the endpoint URL comes from Modal's dashboard
+model = "meta-models/Muse-Spark-Open-816B-A42B"  # unverified: the dashboard's model string
+key_path = "~/.config/fleet/modal.key"
+enabled = false

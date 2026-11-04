@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fixit.invalid/contracts/judge.schema.json",
+  "title": "Judge",
+  "description": "JudgeOutput is the judge's structured output (text.format, strict). Verdict is derived from it by code, with the SAM witness; the model never writes a Verdict.",
+  "$defs": {
+    "Clause": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clause_id",
+        "visible",
+        "state",
+        "evidence",
+        "point"
+      ],
+      "properties": {
+        "clause_id": {
+          "type": "string"
+        },
+        "visible": {
+          "type": "boolean"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "satisfied",
+            "not_satisfied",
+            "unclear"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "point": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          ],
+          "description": "[x, y] on the 0-1000 grid of NOW_1"
+        }
+      }
+    },
+    "JudgeOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clauses"
+      ],
+      "properties": {
+        "clauses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Clause"
+          }
+        }
+      }
+    },
+    "Result": {
+      "type": "string",
+      "enum": [
+        "done",
+        "not_done",
+        "cant_see"
+      ]
+    },
+    "Witnesses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sam"
+      ],
+      "properties": {
+        "judge": {
+          "$ref": "#/$defs/Result",
+          "description": "The judge's finding; absent only when by_person is true"
+        },
+        "sam": {
+          "type": "string",
+          "enum": [
+            "video",
+            "frame",
+            "none",
+            "track"
+          ],
+          "description": "Which second witness ran: SAM on video or a frame, none, or (local mode beside Glimmer) track = a separate Glimmer locate on NOW_2 plus the phone's motion track, no SAM"
+        },
+        "sam_result": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/Result"
+            }
+          ]
+        },
+        "by_person": {
+          "type": "boolean",
+          "const": true,
+          "description": "Absent means false. True only on a fixit step (ours, with nothing for a camera to check): the person ended it with a tap or by saying done, and no judge or witness ran. Never on a manual step"
+        }
+      },
+      "if": {
+        "required": [
+          "by_person"
+        ]
+      },
+      "then": {
+        "not": {
+          "required": [
+            "judge"
+          ]
+        },
+        "properties": {
+          "sam": {
+            "const": "none"
+          },
+          "sam_result": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "required": [
+          "judge"
+        ]
+      }
+    },
+    "Verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result",
+        "clause_ids",
+        "witnesses",
+        "latency_ms"
+      ],
+      "properties": {
+        "step_id": {
+          "type": "string"
+        },
+        "check_id": {
+          "type": "string"
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "result": {
+          "$ref": "#/$defs/Result"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The clauses that decided the result (missing or unclear ones for not_done / cant_see)"
+        },
+        "witnesses": {
+          "$ref": "#/$defs/Witnesses"
+        },
+        "latency_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "ask_for": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "closer",
+            "side",
+            "light",
+            null
+          ]
+        }
+      },
+      "if": {
+        "properties": {
+          "witnesses": {
+            "required": [
+              "by_person"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "result": {
+            "const": "done"
+          },
+          "clause_ids": {
+            "maxItems": 0
+          },
+          "ask_for": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  }
+}

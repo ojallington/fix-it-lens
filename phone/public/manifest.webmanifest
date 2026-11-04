@@ -1,0 +1,23 @@
+{
+  "name": "Fix-It Lens",
+  "short_name": "Fix-It Lens",
+  "description": "Tells you before it breaks, shows you how, and stops what its rules catch, in code.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "share_target": {
+    "action": "./share-pdf",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": { "files": [{ "name": "pdf", "accept": ["application/pdf", ".pdf"] }] }
+  },
+  "background_color": "#15130f",
+  "theme_color": "#15130f",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

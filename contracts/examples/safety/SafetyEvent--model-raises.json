@@ -1,0 +1,12 @@
+{
+  "t_ms": 1200,
+  "source": "model",
+  "kind": "raise",
+  "to": {
+    "state": "STOP",
+    "rule_id": "nl.gas.tap",
+    "evidence": "user says it smells of gas",
+    "script": "Bel 0800-9009."
+  },
+  "reason": "report_hazard"
+}

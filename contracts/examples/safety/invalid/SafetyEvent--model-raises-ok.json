@@ -1,0 +1,9 @@
+{
+  "t_ms": 1300,
+  "source": "model",
+  "kind": "raise",
+  "to": {
+    "state": "OK"
+  },
+  "reason": "sneaky"
+}

@@ -1,0 +1,14 @@
+{
+  "clauses": [
+    {
+      "clause_id": "arrows_aligned",
+      "visible": true,
+      "state": "satisfied",
+      "evidence": "both arrows point up and meet",
+      "point": [
+        690,
+        790
+      ]
+    }
+  ]
+}

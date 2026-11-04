@@ -1,0 +1,56 @@
+{
+  "description": "The MCP server's tools (E2), each the REST route it calls with the caller's token (and body, when the tool fixes one). write: needs a write-scope token. No tool reaches the WebSocket, a stop, a repair step or a card; tests/l0/test_contracts.py holds the list to that.",
+  "tools": [
+    {
+      "name": "whats_due",
+      "method": "GET",
+      "route": "/due",
+      "write": false
+    },
+    {
+      "name": "last_done",
+      "method": "GET",
+      "route": "/due",
+      "write": false
+    },
+    {
+      "name": "what_does_the_manual_say",
+      "method": "GET",
+      "route": "/appliances/{appliance_id}/card",
+      "write": false
+    },
+    {
+      "name": "mark_done",
+      "method": "POST",
+      "route": "/appliances/{appliance_id}/jobs/{job_id}/done",
+      "write": true
+    },
+    {
+      "name": "snooze",
+      "method": "PUT",
+      "route": "/appliances/{appliance_id}/jobs/{job_id}/snooze",
+      "write": true
+    },
+    {
+      "name": "set_schedule",
+      "method": "PUT",
+      "route": "/appliances/{appliance_id}/jobs/{job_id}/schedule",
+      "write": true
+    },
+    {
+      "name": "undo_my_change",
+      "method": "POST",
+      "route": "/appliances/{appliance_id}/jobs/{job_id}/undo",
+      "write": true,
+      "body": {
+        "own": true
+      }
+    },
+    {
+      "name": "start_repair",
+      "method": "GET",
+      "route": "/due",
+      "write": false
+    }
+  ]
+}

@@ -1,0 +1,532 @@
+# The Netherlands. In words: schema/rules.md. Written from public sources (TLoKB, Rijksoverheid,
+# Besluit kleine herstellingen, Liander, Enexis, co-wijzer, the Bosch, Samsung and Intergas user manuals).
+# Pages are never written here: they differ by manual variant and come from the card.
+# The Dutch strings are drafts until the maintainer checks them as a native speaker.
+#
+# How G0 reads this table: STOP rules are red-zone names, held whatever the verb; HOLD rules hold a part name paired
+# with one of their verbs; ALLOW rules blank their own phrases out first, so a broader rule cannot match inside them.
+# Zones smell, alarm, fire, burning, flood and breaker_repeat are also things the user says: on those the user's own
+# words stop the repair.
+country: nl
+version: 1.0.0
+languages: [nl, en]
+emergency:
+  nl: "Bij gevaar: bel 112. Ruik je gas? Ga naar buiten en bel 0800-9009 (gratis, dag en nacht)."
+  en: "In danger: call 112. Smell gas? Go outside and call 0800-9009 (free, day and night)."
+
+allow_lists:
+  sealed_boiler:
+    - id: read_pressure
+      names: {nl: de waterdruk aflezen, en: read the pressure}
+      sources: &boiler_user
+        - {title: "TLoKB: veelgestelde vragen over CO-vrij", url: "https://www.tlokb.nl/werkzaamheden-aan-gasverbrandingsinstallaties/veelgestelde-vragen-over-co-vrij"}
+        - {title: "Intergas Xtreme bedieningsvoorschrift", url: "https://intergas-verwarming.nl/app/uploads/2018/01/84008402-Bedieningsvoorschrift-Xtreme.pdf", section: "3.1, 6"}
+    - id: top_up
+      names: {nl: cv-water bijvullen bij de vulkraan, en: top up at the filling point}
+      sources: &boiler_tenant
+        - {title: "TLoKB: veelgestelde vragen over CO-vrij", url: "https://www.tlokb.nl/werkzaamheden-aan-gasverbrandingsinstallaties/veelgestelde-vragen-over-co-vrij"}
+        - {title: "Besluit kleine herstellingen", url: "https://wetten.overheid.nl/BWBR0014931/", section: "bijlage, onder i"}
+        - {title: "Intergas Xtreme bedieningsvoorschrift", url: "https://intergas-verwarming.nl/app/uploads/2018/01/84008402-Bedieningsvoorschrift-Xtreme.pdf", section: "6"}
+    - id: bleed_radiators
+      names: {nl: radiatoren ontluchten, en: bleed a radiator}
+      sources: *boiler_tenant
+    - id: reset_per_manual
+      names: {nl: resetten volgens de handleiding, en: reset per the manual}
+      sources: *boiler_tenant
+    - id: power_cycle
+      names: {nl: de ketel uit en weer aan zetten, en: switch the boiler off and on}
+      sources: *boiler_user
+
+rules:
+  # ---------- Emergencies: fixed scripts, said at once. The gas-smell and CO scripts are never merged. ----------
+  - id: nl.gas.smell
+    family: gas
+    zone: smell
+    parts:
+      nl: [ruik gas, ruik het gas, ruikt naar gas, ruik ik gas, ruik je gas, ruik jij gas, ruikt het naar gas, gaslucht, gaslek, stinkt naar gas, sist gas]
+      en: [smell gas, smell of gas, smells of gas, smells like gas, gas smell, gas leak, hissing gas, gas hissing]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Ruik je gas? Ga naar buiten en bel 0800-9009."
+      en: "Smell gas? Go outside and call 0800-9009."
+    script:
+      nl: "Ruik je gas? Zet ramen en deuren open, draai de hoofdgaskraan bij de meter dicht als dat kan, gebruik geen vuur en geen schakelaars, en ga met iedereen naar buiten. Bel dan buiten 0800-9009. Bij brand of als iemand onwel is: 112."
+      en: "If you smell gas: open windows and doors, close the main gas valve at the meter if you can reach it, don't use flames or switches, and get everyone outside. Then call 0800-9009 from outside. If there is fire or someone is unwell, call 112."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Liander: ik ruik gas", url: "https://www.liander.nl/storingen-en-onderhoud/ik-ruik-gas"}
+    look_only_exemptions: []
+
+  - id: nl.co.alarm
+    family: co
+    zone: alarm
+    parts:
+      nl: [co melder, comelder, koolmonoxide, rookgaslucht, uitlaatlucht]
+      en: [co alarm, co detector, carbon monoxide, flue gas smell, smell of flue gas]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Gaat de koolmonoxidemelder af? Ga naar buiten en bel buiten 112."
+      en: "Carbon monoxide alarm? Go outside and call 112 from outside."
+    script:
+      nl: "Gaat de koolmonoxidemelder af? Waarschuw iedereen in huis, ga direct naar buiten en bel buiten 112. Ga pas weer naar binnen als de hulpdienst zegt dat het veilig is."
+      en: "A carbon monoxide alarm means leave now. Warn everyone in the house, go outside, and call 112 from outside. Don't go back in until the emergency services say it's safe."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "co-wijzer.nl: veelgestelde vragen", url: "https://www.co-wijzer.nl/"}
+      - {title: "Brandweer: koolmonoxide", url: "https://www.brandweer.nl/onderwerpen/koolmonoxide/"}
+    look_only_exemptions: []
+
+  - id: nl.heat.fire
+    family: heat
+    zone: fire
+    parts:
+      nl: [ik zie rook, er komt rook, rook uit, het rookt, vlammen, vonken, staat in brand, vlam in]
+      en: [smoke, on fire, flames, sparks, sparking, a fire]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Rook of vuur? Ga met iedereen naar buiten en bel 112."
+      en: "Smoke or fire? Get everyone out and call 112."
+    script:
+      nl: "Ga met iedereen naar buiten, doe de deuren achter je dicht en bel 112."
+      en: "Get everyone out, close the doors behind you and call 112."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Brandweer", url: "https://www.brandweer.nl/"}
+      - {title: "Samsung WW5000C user manual", section: "Safety information"}
+    look_only_exemptions: []
+
+  - id: nl.heat.burning
+    family: heat
+    zone: burning
+    parts:
+      nl: [brandlucht, schroeilucht, ruikt branderig, ruikt verbrand, ruikt naar verbrand, smeulend]
+      en: [burning smell, smell of burning, smells burnt, smells like burning, smouldering, smoldering]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Een brandlucht is voor de servicedienst. Ik ga hier niet verder."
+      en: "A burning smell is for the service engineer. I won't go on with this."
+    script:
+      nl: "Stop met het apparaat. Is de stekker droog en makkelijk te pakken, trek hem er dan nu uit; anders zet je de groep in de meterkast uit. Zet het niet weer aan. Zie je rook, ga dan naar buiten en bel 112. Dit is voor de servicedienst van de fabrikant."
+      en: "Stop using it. If the plug is dry and easy to reach, pull it out now; otherwise switch off its group in the meter cupboard. Don't restart it. If you see smoke, leave and call 112. This needs the manufacturer's service."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Samsung WW5000C user manual", section: "Safety information: strange noise, burning smell or smoke"}
+      - {title: "Bosch SMV4HAX40N gebruiksaanwijzing", section: "Veiligheid: beschadigd apparaat"}
+    look_only_exemptions: []
+
+  - id: nl.water.flood
+    family: water
+    zone: flood
+    parts:
+      nl: [water bij de stekker, water bij het stopcontact, water in de meterkast, natte stekker, nat stopcontact, staat onder water, onder water gelopen]
+      en: [water on the socket, water near the socket, water on the plug, wet plug, wet socket, water in the consumer unit, flooded]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Water bij de stroom: raak de stekker niet aan. Ik ga hier niet verder."
+      en: "Water near the power: don't touch the plug. I won't go on with this."
+    script:
+      nl: "Raak de stekker en het stopcontact niet aan met natte handen. Draai de waterkraan dicht en zet de stroom uit in de meterkast, die groep of de hoofdschakelaar. Bel daarna de servicedienst."
+      en: "Don't touch the plug or the socket with wet hands. Turn off the water tap, then switch off the power at the meter cupboard: that group, or the main switch. Then call service. I won't continue this repair."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Samsung WW5000C user manual", section: "Safety information: flooded appliance, wet hands"}
+      - {title: "Enexis: zelf klussen in de meterkast", url: "https://www.enexis.nl/meter-en-meterkast/meterkast/zelf-klussen-in-de-meterkast"}
+    look_only_exemptions: []
+
+  # ---------- Gas: the boiler's gas side is a CO-vrij certified company's, by law since 1 April 2023. ----------
+  - id: nl.gas.tap
+    family: gas
+    zone: tap
+    parts:
+      nl: [gaskraan, gasleiding, gasafsluiter, gasafsluitkraan, gasaansluiting, gastoevoer, gele kraan, gasblok, gasklep, brander, gasslang, gasinlaat, gasventiel]
+      en: [gas tap, gas valve, gas pipe, gas line, gas supply, gas cock, gas shut off, gas shutoff, yellow tap, yellow handle, burner, gas inlet, gas hose, gas connection, gas fitting]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Dat is de gastoevoer. Aan gas werkt alleen een CO-vrij gecertificeerd bedrijf. Ruik je gas? 0800-9009."
+      en: "That's the gas supply. Gas work needs a certified gas installer (CO-vrij). Smell gas? 0800-9009."
+    script:
+      nl: "Dat is de gastoevoer: handen terug. Was je de ketel aan het bijvullen, draai dan de kraan op de vulslang dicht. Aan gas werkt alleen een CO-vrij gecertificeerd bedrijf. Ruik je gas? Bel 0800-9009."
+      en: "That's the gas supply: hands back. If you were topping up the boiler, close the tap on the filling hose. Gas work needs a certified gas installer (CO-vrij). Smell gas? Call 0800-9009."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Rijksoverheid: hoe voorkom ik koolmonoxidevergiftiging in mijn huis?", url: "https://www.rijksoverheid.nl/documenten/vraag-en-antwoord/gezonde-en-veilige-leefomgeving/hoe-voorkom-ik-koolmonoxidevergiftiging-in-mijn-huis"}
+      - {title: "TLoKB: veelgestelde vragen over CO-vrij", url: "https://www.tlokb.nl/werkzaamheden-aan-gasverbrandingsinstallaties/veelgestelde-vragen-over-co-vrij"}
+    # The guide's own look-only card lines. Exactly these lines pass the part-name hold; any edit is held.
+    #   21725f85…: "The yellow tap is gas. Check it's open: just look."
+    #   164cac47…: "De gele kraan is gas. Kijk of hij open staat: alleen kijken."
+    look_only_exemptions:
+      - 21725f8528f3df1106ba28c83b635b761ea98d53cf334c182d6d7ceab8719578
+      - 164cac472e211e6e8af14e18c3beecaf4c0ded43660c2ed759745bd14f365ad4
+
+  - id: nl.gas.casing
+    family: gas
+    zone: casing
+    parts:
+      nl: [mantel, ketelmantel, frontplaat van de ketel, kap van de ketel, ketelkast openen, voorkant van de ketel eraf, voorkant van de ketel open, voorkant van de ketel los, ketelkap, ketelkast]
+      en: [boiler casing, boiler front panel, front cover of the boiler, front panel of the boiler, inside the boiler, open the boiler, boiler front cover, boiler's front cover, front off the boiler, cover off the boiler, cover on the boiler, front of the boiler open, front of the boiler off]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "De mantel openmaken is werk voor een CO-vrij gecertificeerd bedrijf."
+      en: "Opening the boiler casing needs a certified gas installer (CO-vrij)."
+    script:
+      nl: "Hier stop ik. De mantel openmaken is werk voor een gecertificeerde monteur, wettelijk en voor je veiligheid. Waar ik wel bij help: de waterdruk, bijvullen, radiatoren ontluchten en resetten."
+      en: "I'll stop here. Opening the casing needs a certified gas installer (CO-vrij), both legally and for safety. What I can help with is the pressure, topping up, bleeding radiators and a reset."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "TLoKB: veelgestelde vragen over CO-vrij", url: "https://www.tlokb.nl/werkzaamheden-aan-gasverbrandingsinstallaties/veelgestelde-vragen-over-co-vrij"}
+      - {title: "Nefit TrendLine II gebruikershandleiding", section: "Veiligheid: verwijder nooit de mantel"}
+    look_only_exemptions: []
+
+  - id: nl.gas.boiler
+    family: gas
+    zone: boiler
+    parts:
+      nl: [warmtewisselaar, ontstekingselektrode, ontstekingspen, ionisatiepen, verbrandingskamer, ketelventilator, printplaat van de ketel, branderdeur]
+      en: [heat exchanger, ignition electrode, ignition probe, ionisation probe, combustion chamber, boiler fan, boiler circuit board, boiler pcb]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Dat zit binnen in de ketel. Dat is voor een CO-vrij gecertificeerd bedrijf."
+      en: "That's inside the boiler. It needs a certified gas installer (CO-vrij)."
+    script:
+      nl: "Hier stop ik. Alles buiten de waterdruk, bijvullen, ontluchten en resetten is werk voor een CO-vrij gecertificeerd bedrijf. Daar help ik je wel mee."
+      en: "I'll stop here. Anything beyond the pressure, topping up, bleeding and a reset needs a certified gas installer (CO-vrij). Those I can help with."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "TLoKB: veelgestelde vragen over CO-vrij", url: "https://www.tlokb.nl/werkzaamheden-aan-gasverbrandingsinstallaties/veelgestelde-vragen-over-co-vrij"}
+      - {title: "Rijksoverheid: hoe voorkom ik koolmonoxidevergiftiging in mijn huis?", url: "https://www.rijksoverheid.nl/documenten/vraag-en-antwoord/gezonde-en-veilige-leefomgeving/hoe-voorkom-ik-koolmonoxidevergiftiging-in-mijn-huis"}
+    look_only_exemptions: []
+
+  - id: nl.gas.flue
+    family: gas
+    zone: flue
+    parts:
+      nl: [rookgasafvoer, luchttoevoer, condensafvoer, condensaatafvoer, condensleiding, condensaatleiding, condenssifon,
+          sifon van de ketel, sifon van de cv-ketel, ketelsifon, schoorsteen van de ketel, dakdoorvoer]
+      en: [flue, condensate drain, condensate pipe, condensate trap, condensate siphon, condensate line, condensate outlet,
+          air intake pipe, boiler chimney, carries the fumes, fumes out of the boiler, exhaust pipe]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "De rookgasafvoer en de condensafvoer zijn voor de monteur. Bij een gedeelde afvoer in een flat: de VvE."
+      en: "The flue and the condensate drain are engineer-only. In a flat with a shared flue, your VvE is responsible."
+    script:
+      nl: "Hier stop ik. De rookgasafvoer en de condensafvoer zijn voor een CO-vrij gecertificeerd bedrijf. Woon je in een flat met een gedeelde afvoer, dan is je VvE verantwoordelijk."
+      en: "I'll stop here. The flue and the condensate drain need a certified gas installer (CO-vrij). If you're in a flat with a shared flue, your VvE is responsible."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Rijksoverheid: handreiking gemeenschappelijke rookgasafvoeren", url: "https://rijksoverheid.nl/binaries/rijksoverheid/documenten/publicaties/2023/02/01/handreiking-en-infoblad-gemeenschappelijke-rookgasafvoeren/Samen+voorkomen+we+koolmonoxidevergiftiging.pdf"}
+    look_only_exemptions: []
+
+  - id: nl.pressure.relief_valve
+    family: pressure
+    zone: relief_valve
+    parts:
+      nl: [overstortventiel, veiligheidsventiel, overdrukventiel, expansievat]
+      en: [safety valve, relief valve, pressure relief, expansion vessel, red valve on the boiler]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Laat het overstortventiel met rust. Dat is voor de installateur."
+      en: "Leave the safety valve alone. That's for the installer."
+    script:
+      nl: "Draai nu de kraan op de waterslang dicht, en dan de vulkraan. De druk is te hoog. Laat het overstortventiel met rust en bel een installateur."
+      en: "Close the water tap now, then the fill valve. The pressure is too high. Leave the safety valve alone and call an installer."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Remeha Calenta Ace gebruikershandleiding", section: "Waterdruk: maximaal 3 bar"}
+      - {title: "Nefit TrendLine II gebruikershandleiding", section: "Overstortventiel"}
+    look_only_exemptions: []
+
+  - id: nl.pressure.repeat_top_up
+    family: pressure
+    zone: repeat_top_up
+    parts:
+      nl: [steeds bijvullen, vaak bijvullen, telkens bijvullen, weer bijvullen na een week, lekstopmiddel]
+      en: [keep topping up, keeps losing pressure, top up every week, leak sealer]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Vaak bijvullen betekent meestal een lek of een moe expansievat. Bel de installateur."
+      en: "Topping up often usually means a leak or a tired expansion vessel. Call the engineer."
+    script:
+      nl: "Je hebt de afgelopen twaalf maanden al vaker bijgevuld. Dat betekent meestal een lek of een moe expansievat. Bel de installateur; ik vul nu niet verder bij."
+      en: "You've topped up more than twice in the past twelve months. That usually means a leak or a tired expansion vessel. Please call the engineer; I won't walk another top-up."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Remeha Calenta classic gebruikershandleiding", section: "Bijvullen: 2 keer per jaar zou voldoende moeten zijn"}
+      - {title: "Intergas Xtreme bedieningsvoorschrift", url: "https://intergas-verwarming.nl/app/uploads/2018/01/84008402-Bedieningsvoorschrift-Xtreme.pdf", section: "6"}
+    look_only_exemptions: []
+
+  # ---------- Mains: the casing fires whatever the power state. A tripped breaker goes back on once. ----------
+  - id: nl.mains.casing
+    family: mains
+    zone: casing
+    parts:
+      nl: [achterwand, achterpaneel, behuizing, bovenblad, zijpaneel, zijwand van de machine, onderplaat, plint eraf, binnenkant van de machine, achterkant eraf, achterkant van de machine los, buitenmantel, buitenkant van de machine los, achterplaat, plint weg, printplaat, besturingsprint, regelprint]
+      en: [back panel, rear panel, outer panel, casing, housing, top panel, side panel, worktop panel, kick plate, base plate, behind the drum, panel at the rear, panel on the back, outer shell, metal shell, rear cover, the back off, plate under the door, plate on the side, cover off the back, back cover off, cover on the back, control board, circuit board, pcb, rear sheet, back sheet]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Achter de achterwand zit netspanning. Dat is voor een monteur."
+      en: "There is mains power behind the back panel. This needs a technician."
+    script:
+      nl: "Handen weg: achter de achterwand zit netspanning. Laat hem zitten; dit is voor een monteur."
+      en: "Hands off: there is mains power behind the back panel. Leave it on; this needs a technician."
+    ring_cm: 5
+    landlord: false
+    sources:
+      - {title: "Samsung WW5000C user manual", section: "Safety information: do not attempt to repair, disassemble, or modify the appliance yourself"}
+      - {title: "Bosch SMV4HAX40N gebruiksaanwijzing", section: "Veiligheid: alleen daarvoor geschoold vakpersoneel mag reparaties uitvoeren"}
+    look_only_exemptions: []
+
+  - id: nl.mains.wiring
+    family: mains
+    zone: wiring
+    parts:
+      nl: [bedrading, kale draad, blanke draad, aansluitklem, kroonsteen, binnenkant van het stopcontact, stopcontact openschroeven, stopcontact losschroeven, aarddraad, fasedraad, nuldraad, aansluitdraad, uit de klem, van de klem, uit zijn klem, klemmenstrook, klemmenblok, netaansluiting, lasdoos, schroefklem, kabelschoen, kabelboom, aansluitblok, klemblok, kabelaansluiting]
+      en: [wiring, bare wire, exposed wire, live wire, terminal block, inside the socket, socket faceplate, unscrew the socket, open up the wall outlet, open the outlet, the wires inside, join the wires, strip the cable, strip back the, earth wire, neutral wire, mains connection, mains terminal, mains terminals, wiring terminal, wiring terminals, supply terminal, supply terminals, live terminal, neutral terminal, earth terminal, mains terminal cover, wiring terminal cover, supply terminal cover, cooker terminal cover, hob terminal cover, oven terminal cover, terminal cover on the back, terminal cover at the back, choc block, chocolate block, connector block, connection block, junction box, screw terminal, spade connector, spade terminal, wiring connector, electrical connector, wiring loom, wiring harness, plug socket inside, socket inside the machine, plug connector]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Dat is elektrisch werk. Alleen een erkend installateur opent stopcontacten of bedrading."
+      en: "That's electrical work. Only a qualified electrician opens sockets or wiring."
+    script:
+      nl: "Dat is elektrisch werk. Alleen een erkend installateur opent stopcontacten of de meterkast. Ik stop hier."
+      en: "That's electrical work. Only a qualified electrician should open sockets or the meter cupboard. I'll stop here."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Enexis: zelf klussen in de meterkast", url: "https://www.enexis.nl/meter-en-meterkast/meterkast/zelf-klussen-in-de-meterkast"}
+    look_only_exemptions: []
+
+  - id: nl.mains.consumer_unit
+    family: mains
+    zone: consumer_unit
+    parts:
+      nl: [kap van de groepenkast, deksel van de groepenkast, afdekkap van de meterkast, afdekplaat van de groepenkast, binnenkant van de groepenkast, binnenkant van de meterkast, zegel, rail in de groepenkast]
+      en: [consumer unit cover, fuse box cover, inside the consumer unit, inside the fuse box, busbar, meter seal, distribution board cover, cover off the fuse board, cover off the consumer unit, cover off the fuse box, lid off the breaker box, breaker box cover, fuse board cover, breaker module, din rail, main fuse, service fuse, cutout fuse]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Aan de binnenkant van de meterkast werkt alleen een erkend installateur. Een verbroken zegel: 0800-9009."
+      en: "Inside the consumer unit is for a qualified electrician only. A broken meter seal: 0800-9009."
+    script:
+      nl: "Hier stop ik. De groepenkast openmaken is voor een erkend installateur; zegels verbreken mag alleen een installateur met zegelrecht. Is een zegel kapot? Bel 0800-9009."
+      en: "I'll stop here. Opening the consumer unit is for a qualified electrician, and only an installer with sealing rights may break a meter seal. Is a seal broken? Call 0800-9009."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Enexis: zelf klussen in de meterkast", url: "https://www.enexis.nl/meter-en-meterkast/meterkast/zelf-klussen-in-de-meterkast"}
+    look_only_exemptions: []
+
+  - id: nl.mains.consumer_unit_open
+    family: mains
+    zone: consumer_unit_open
+    parts:
+      nl: [groepenkast, meterkast, zekeringkast, aardlekschakelaar, installatieautomaat]
+      en: [consumer unit, fuse box, fuse board, distribution board, rcd, circuit breaker]
+    verbs:
+      nl: [openschroef, losschroef, schroef, demonteer, verwijder de kap, haal de kap, haal het deksel, wrik, vervang de groep]
+      en: [unscrew, screw, dismantle, take the cover off, remove the cover, pry, prise, rewire, replace the breaker]
+    action: HOLD
+    line:
+      nl: "De meterkast openschroeven is voor een erkend installateur."
+      en: "Opening up the consumer unit is for a qualified electrician."
+    script:
+      nl: "Hier stop ik. De groepenkast openmaken is voor een erkend installateur."
+      en: "I'll stop here. Opening the consumer unit is for a qualified electrician."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Enexis: zelf klussen in de meterkast", url: "https://www.enexis.nl/meter-en-meterkast/meterkast/zelf-klussen-in-de-meterkast"}
+    look_only_exemptions: []
+
+  - id: nl.mains.breaker
+    family: mains
+    zone: breaker
+    parts:
+      nl: [groep weer aan, groep weer omhoog, aardlekschakelaar weer aan, aardlekschakelaar weer omhoog, schakelaar weer omhoog]
+      en: [breaker back on, breaker back up, trip switch back up, trip switch back on, rcd back on, rcd back up, reset the breaker]
+    verbs: {nl: [], en: []}
+    action: ALLOW
+    line:
+      nl: "Een gesprongen groep mag je één keer weer aanzetten."
+      en: "You can switch a tripped breaker back on once."
+    script:
+      nl: "Springt hij er weer uit, laat hem dan uit en bel een erkend installateur."
+      en: "If it trips again, leave it off and call a qualified electrician."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Enexis: zelf klussen in de meterkast (groepen en hoofdschakelaar bedient de bewoner)", url: "https://www.enexis.nl/meter-en-meterkast/meterkast/zelf-klussen-in-de-meterkast"}
+    look_only_exemptions: []
+
+  - id: nl.mains.breaker_repeat
+    family: mains
+    zone: breaker_repeat
+    parts:
+      nl: [springt weer, springt er weer uit, slaat weer af, valt weer uit, blijft eruit springen, blijft uitvallen]
+      en: [trips again, tripped again, keeps tripping, trips straight away, won't stay on]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Springt de groep er weer uit, dan is het voor een erkend installateur."
+      en: "If the breaker trips again, it's for a qualified electrician."
+    script:
+      nl: "Laat de groep uit. Hij is er voor de tweede keer uitgesprongen, dus er is een fout. Haal de stekker van het apparaat eruit als dat veilig kan, en bel een erkend installateur."
+      en: "Leave the breaker off. It has tripped a second time, so something is faulty. Unplug the appliance if that is safe to do, and call a qualified electrician."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Enexis: zelf klussen in de meterkast", url: "https://www.enexis.nl/meter-en-meterkast/meterkast/zelf-klussen-in-de-meterkast"}
+    look_only_exemptions: []
+
+  # ---------- Names that a broader rule would otherwise catch (the over-blocking risk, c9 row 36). ----------
+  - id: nl.mains.user_covers
+    family: mains
+    zone: user_covers
+    parts:
+      nl: [filterklep, onderhoudsklep, filterdeksel, pompdeksel, filterbehuizing, filterhuis, deur van de meterkast, meterkastdeur, pompbehuizing, pomphuis, pompafdekking, afvoerpompdeksel, zeefhuis]
+      en: [filter cover, filter flap, service flap, pump cover, filter housing, filter casing, meter cupboard door, casing of the debris filter, casing of the filter, debris filter casing, pump housing, drain pump housing, drain pump cover, sump cover, sump housing, pump lid, impeller cover]
+    verbs: {nl: [], en: []}
+    action: ALLOW
+    line:
+      nl: "Die klep is voor jou: de handleiding laat je hem openen."
+      en: "That flap is yours: the manual has you open it."
+    script:
+      nl: "Die klep is voor jou: de handleiding laat je hem openen."
+      en: "That flap is yours: the manual has you open it."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Bosch SMV4HAX40N user manual", section: "Cleaning the drain pump (p. 59)"}
+      - {title: "Samsung WW5000C user manual", section: "Maintenance: debris filter"}
+      - {title: "Bosch SMV4HAX40N gebruiksaanwijzing", section: "Zeven reinigen; afvoerpomp reinigen"}
+    look_only_exemptions: []
+
+  # ---------- Water and heat: the manuals' own preconditions. ----------
+  - id: nl.heat.hot_water
+    family: heat
+    zone: hot_water
+    parts:
+      nl: [heet water, hete water, heet afvoerwater, het water is heet, verwarmingselement]
+      en: [hot water, hot drain water, the water is hot, heating element, heater element]
+    verbs:
+      nl: [raak, aanraken, pak, voel, grijp, haal eruit, verwijder]
+      en: [touch, grab, reach, feel, hold, take out, remove, pull]
+    action: HOLD
+    line:
+      nl: "Wacht: dat water of dat element kan heet zijn. Laat het eerst afkoelen."
+      en: "Wait: that water or that element may be hot. Let it cool first."
+    script:
+      nl: "Wacht: dat kan heet zijn. Laat het eerst afkoelen; ik kijk over een paar minuten weer."
+      en: "Wait: that may be hot. Let it cool first; I'll check back in a few minutes."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Samsung WW5000C user manual", section: "Safety information: water drained during a high-temperature cycle is hot"}
+      - {title: "Bosch SMV4HAX40N gebruiksaanwijzing", section: "Veiligheid: heet water"}
+    look_only_exemptions: []
+
+  - id: nl.water.aquastop
+    family: water
+    zone: aquastop
+    parts:
+      nl: [aquastop, waterstopventiel, aquastopslang]
+      en: [aquastop, water block valve, safety hose]
+    verbs:
+      nl: [snijd, knip, open, haal, dompel, schroef los, koppel los, verwijder, trek, omzeil, draai los, losdraai]
+      en: [cut, open, take apart, submerge, unscrew, disconnect, remove, dismantle, take off, pull apart, bypass, loosen]
+    action: HOLD
+    line:
+      nl: "Dat is de lekbeveiliging. Draai de waterkraan dicht en bel de servicedienst."
+      en: "That's the leak protection. Close the water tap and call service."
+    script:
+      nl: "Dat is de lekbeveiliging. Draai de waterkraan dicht en bel de servicedienst; gebruik het apparaat niet meer. Dompel het ventiel nooit onder en snijd de slang niet door."
+      en: "That's the leak protection. Close the water tap and call service; don't keep using it. Never submerge the valve or cut the hose."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Bosch SMV4HAX40N gebruiksaanwijzing", section: "Veiligheid: AquaStop; storingen E:30, E:31, E:34"}
+    look_only_exemptions: []
+
+  - id: nl.chemical.refrigerant
+    family: chemical
+    zone: refrigerant
+    parts:
+      nl: [koudemiddel, koelmiddel, koelcircuit, freon, compressor, koelleiding]
+      en: [refrigerant, cooling circuit, freon, compressor, regas, coolant pipe, cooling loop, sealed loop]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Dat is het gesloten koelcircuit. Dat is voor een F-gassen gecertificeerd bedrijf."
+      en: "That's the sealed cooling circuit. It needs an F-gas certified company."
+    script:
+      nl: "Dat is het gesloten koelcircuit; daar werkt alleen een F-gassen gecertificeerd bedrijf aan. Sommige koelkasten gebruiken brandbaar gas: sist het, zet dan ramen open, geen vuur, en trek de stekker eruit als dat veilig kan."
+      en: "That's the sealed cooling circuit. It needs a certified refrigeration company. Some fridges use flammable gas, so if it's hissing: ventilate, no flames, and unplug it if that's safe."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Ondernemersplein: certificaat voor werken met f-gassen", url: "https://ondernemersplein.overheid.nl/wetten-en-regels/certificaat-voor-werken-met-f-gassen/"}
+    look_only_exemptions: []
+
+  # ---------- What the model or the user reports when no other rule fits. ----------
+  - id: nl.mechanical.hazard
+    family: mechanical
+    zone: hazard
+    parts:
+      nl: [beschadigde kabel, kapotte kabel, gerafelde kabel, kapot snoer, beschadigd snoer]
+      en: [damaged cable, frayed cable, damaged cord, frayed cord, broken cable]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Dat kan gevaarlijk zijn. Ik ga hier niet verder; dit is voor de servicedienst."
+      en: "That could be dangerous. I won't go on with this; it's for the service engineer."
+    script:
+      nl: "Is de stekker droog en makkelijk te pakken, trek hem er dan uit; anders zet je de groep in de meterkast uit. Gebruik het niet meer tot de servicedienst ernaar gekeken heeft."
+      en: "If the plug is dry and easy to reach, pull it out; otherwise switch off its group in the meter cupboard. Don't use it again until a service engineer has looked at it."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Bosch SMV4HAX40N gebruiksaanwijzing", section: "Veiligheid: beschadigd apparaat"}
+    look_only_exemptions: []
+
+  - id: nl.mechanical.repeat_fault
+    family: mechanical
+    zone: repeat_fault
+    parts:
+      nl: [code komt terug, komt steeds terug, weer dezelfde foutcode, blijft dezelfde code geven]
+      en: [code came back, code keeps coming back, same error again, same code again]
+    verbs: {nl: [], en: []}
+    action: STOP
+    line:
+      nl: "Komt de fout terug na de reparatie, dan is het voor de servicedienst."
+      en: "If the fault comes back after the fix, it's for the service engineer."
+    script:
+      nl: "Dit kwam terug na de reparatie, dus blijf het niet proberen. Noteer de code; de servicedienst vraagt erom."
+      en: "This came back after the fix, so it's not something to keep trying. Note the code; the service desk will ask for it."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Bosch SMV4HAX40N gebruiksaanwijzing", section: "Storingen verhelpen: andere foutcode"}
+      - {title: "Samsung WW5000C user manual", section: "Information codes: if the information code remains"}
+    look_only_exemptions: []

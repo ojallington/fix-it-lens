@@ -1,0 +1,15 @@
+{
+  "found": true,
+  "count": 1,
+  "mask_svg": "M10 10L40 10L40 40Z",
+  "box": [
+    612,
+    700,
+    760,
+    880
+  ],
+  "conf": 0.9,
+  "area_pct": 2.4,
+  "frame_id": "f000123",
+  "cached": false
+}

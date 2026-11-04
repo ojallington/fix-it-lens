@@ -1,0 +1,22 @@
+configuration:
+  calls:
+    name: Calls
+    description: >-
+      replay plays the recorded sessions: no key, nothing spent. live calls Meta's models with your own key
+      (meta-model-api.key in this add-on's config folder), billed to you.
+  phone_url:
+    name: Phone address
+    description: >-
+      The HTTPS address your phone opens, with the host port you gave 8790, for example
+      https://homeassistant.example.org:8790. The invites' QR codes open it.
+  ssl:
+    name: HTTPS
+    description: Serve the phone's address over HTTPS with Home Assistant's own certificate (from its ssl folder).
+  certfile:
+    name: Certificate
+    description: The certificate's file name in Home Assistant's ssl folder.
+  keyfile:
+    name: Private key
+    description: The private key's file name in Home Assistant's ssl folder.
+network:
+  8790/tcp: The app for your phone (turn on HTTPS)

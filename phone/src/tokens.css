@@ -1,0 +1,32 @@
+/* The app's tokens: the site's art direction A (Field manual), settled. Light is a service manual on paper, dark the
+   same manual read at night on warm charcoal; over the camera the app is always dark. Fonts are OFL, in ./fonts/ with
+   their licences.
+
+   Colour: ink and paper carry the screen. One accent, two signals, and green for one thing only.
+     --blue   the accent: the primary button, links, the part outlined, the step in hand, focus
+     --red    a signal: STOP and red zones only; --stop is the STOP screen's fill in both themes
+     --amber  a signal: a miss, held, overdue, a check in progress
+     --green  done: the tick when a step or a job is done, nothing else
+   Type: five text steps (--t-xs 12 mono labels, --t-s 14 secondary, --t-m 17 body, --t-l 20 titles, --t-xl 26 small
+   display) on Fraunces / Inter / JetBrains Mono 500 uppercase. Space: the 8-based scale, 4 8 12 16 24 32 48 64.
+   Shape: 4px on buttons and panels, 3px on chips; hard offset shadows with no blur, except over the camera, where
+   panels blur what is behind them so the words stay readable. One focus ring: 2px blue, 3px out. */
+
+@font-face { font-family: "Fraunces"; font-weight: 300 900; font-display: swap; src: url(./fonts/fraunces-var.woff2) format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 400; font-display: swap; src: url(./fonts/inter-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 600; font-display: swap; src: url(./fonts/inter-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 700; font-display: swap; src: url(./fonts/inter-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 500; font-display: swap; src: url(./fonts/jetbrains-mono-latin-500-normal.woff2) format("woff2"); }
+
+:root {
+  --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --t-xs: 12px; --t-s: 13px; --t-m: 16px; --t-l: 19px; --t-xl: 28px;
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+  --r-chip: 3px;
+  --r: 4px;
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --stop: #d9381e;
+  --stop-fg: #ffffff;
+}

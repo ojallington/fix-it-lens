@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest">
+<title>HTTPS probe</title>
+<style>
+  body { font: 16px/1.4 system-ui, sans-serif; margin: 16px; background: #fff; color: #111; }
+  button { font-size: 20px; padding: 12px 24px; }
+  li.ok { color: #0a6b2d; } li.bad { color: #b00020; }
+  video { width: 100%; max-height: 40vh; background: #000; margin-top: 12px; }
+</style>
+</head>
+<body>
+<h1>HTTPS probe</h1>
+<p>Checks the camera, a service worker, a WebSocket and notifications over this origin.</p>
+<button id="run">Run</button>
+<ul id="out"></ul>
+<video id="v" playsinline muted></video>
+<script>
+const out = document.getElementById("out");
+const res = {};
+function line(name, ok, detail) {
+  res[name] = { ok, detail };
+  const li = document.createElement("li");
+  li.className = ok ? "ok" : "bad";
+  li.textContent = `${ok ? "✓" : "✗"} ${name}: ${detail}`;
+  out.appendChild(li);
+}
+async function camera() {
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: 1280 } });
+    const v = document.getElementById("v");
+    v.srcObject = s; await v.play();
+    const t = s.getVideoTracks()[0].getSettings();
+    line("camera", true, `${t.width}x${t.height} @ ${t.frameRate} fps`);
+  } catch (e) { line("camera", false, String(e)); }
+}
+async function serviceWorker() {
+  if (!("serviceWorker" in navigator)) return line("service worker", false, "no API");
+  try {
+    const reg = await navigator.serviceWorker.register("sw.js", { scope: "./" });
+    await navigator.serviceWorker.ready;
+    line("service worker", true, `registered, scope ${reg.scope}, push ${"pushManager" in reg}`);
+  } catch (e) { line("service worker", false, String(e)); }
+}
+function websocket() {
+  return new Promise((done) => {
+    const url = new URL("ws", location.href); url.protocol = location.protocol === "https:" ? "wss:" : "ws:";
+    let ws;
+    try { ws = new WebSocket(url); } catch (e) { line("websocket", false, String(e)); return done(); }
+    const rtts = []; let n = 0; const timer = setTimeout(() => { line("websocket", false, "timeout after 8 s"); done(); }, 8000);
+    ws.onopen = () => ws.send(String(performance.now()));
+    ws.onmessage = (m) => {
+      rtts.push(performance.now() - Number(JSON.parse(m.data).echo));
+      if (++n < 20) return ws.send(String(performance.now()));
+      clearTimeout(timer); rtts.sort((a, b) => a - b);
+      line("websocket", true, `${url} · 20 echoes · p50 ${rtts[10].toFixed(0)} ms · max ${rtts[19].toFixed(0)} ms`);
+      ws.close(); done();
+    };
+    ws.onerror = () => { clearTimeout(timer); line("websocket", false, `error on ${url}`); done(); };
+  });
+}
+async function notifications() {
+  if (!("Notification" in window)) return line("notifications", false, "no API");
+  const p = await Notification.requestPermission();
+  line("notifications", p === "granted", p);
+}
+document.getElementById("run").onclick = async () => {
+  out.innerHTML = "";
+  line("secure context", window.isSecureContext, location.origin);
+  await camera(); await serviceWorker(); await websocket(); await notifications();
+  const c = navigator.connection;
+  await fetch("result", { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ results: res, rtt: c && c.rtt, effectiveType: c && c.effectiveType }) });
+};
+</script>
+</body>
+</html>

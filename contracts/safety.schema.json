@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fixit.invalid/contracts/safety.schema.json",
+  "title": "Safety",
+  "description": "SafetyState = OK | HOLD{precondition} | STOP{rule_id, evidence, script}, and the events that move it. The model may only raise; code clears, on its own rules. There is no event that turns a gate off.",
+  "$defs": {
+    "RuleId": {
+      "type": "string",
+      "pattern": "^[a-z]{2}\\.[a-z]+\\.[a-z_]+$"
+    },
+    "Ok": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "const": "OK"
+        }
+      }
+    },
+    "Hold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "precondition"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "const": "HOLD"
+        },
+        "precondition": {
+          "type": "string",
+          "enum": [
+            "side_view",
+            "power_off_seen",
+            "hand_visible",
+            "fresh_frame",
+            "zone_outlined",
+            "view_scale",
+            "user_confirm"
+          ]
+        },
+        "rule_id": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/RuleId"
+            }
+          ]
+        },
+        "detail": {
+          "type": "string"
+        }
+      }
+    },
+    "Stop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "rule_id",
+        "evidence",
+        "script"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "const": "STOP"
+        },
+        "rule_id": {
+          "$ref": "#/$defs/RuleId"
+        },
+        "evidence": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "script": {
+          "type": "string",
+          "description": "The country's fixed stop script, in the answer language"
+        }
+      }
+    },
+    "SafetyState": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Ok"
+        },
+        {
+          "$ref": "#/$defs/Hold"
+        },
+        {
+          "$ref": "#/$defs/Stop"
+        }
+      ]
+    },
+    "SafetyEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "One move of the safety state. source=model can only raise (to HOLD or STOP), never clear.",
+      "required": [
+        "t_ms",
+        "source",
+        "kind",
+        "to",
+        "reason"
+      ],
+      "properties": {
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "model",
+            "g0",
+            "g1",
+            "rules",
+            "ha",
+            "user",
+            "code"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "raise",
+            "clear"
+          ]
+        },
+        "to": {
+          "$ref": "#/$defs/SafetyState"
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 300
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "model"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "kind": {
+                "const": "raise"
+              },
+              "to": {
+                "not": {
+                  "$ref": "#/$defs/Ok"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "clear"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "enum": [
+                  "rules",
+                  "code",
+                  "user",
+                  "g1"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/SafetyState"
+    },
+    {
+      "$ref": "#/$defs/SafetyEvent"
+    }
+  ]
+}

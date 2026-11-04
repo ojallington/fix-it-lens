@@ -1,0 +1,1778 @@
+schema_version: 1
+brand: bosch
+model: SMV4HAX40N
+aliases:
+- SMV4HAX40N/17
+appliance_kind: dishwasher
+appliance_file_model: muse-wonder-1.0
+manual:
+  source_url: https://media3.bsh-group.com/Documents/9001522704_C.pdf
+  lang: nl
+  page_count: 64
+  page_text_sha256:
+  - 586795ef7cfef4a12940fe369ffdf395e8d94027e798407566d4f3284009eb62
+  - c5f68c21d8df29d9f27c4da60d5b4214f7bc6a0c02b4884c072a7b363872b443
+  - bc59ca2e2a499f21753747aacbc05910af1cf773a60ccb511489341b11525672
+  - b2d4cc24a1a89fef3b791a7813023398649ee92fd7c280c95e94718c54e3f07c
+  - beb132a7482c349bcbde62abeb8f23ad6366f5ca1a43d897a57cd2f2f53dff29
+  - 72738d2653d6030975a13ddbbc5592f1e9958c58dd7c946d4bed5c0f32baceab
+  - 4c9766c430368583c256feca49f101fec494b9d7a19bc9c3de84fbf574c2c14a
+  - c3732804b121efb4d5f581dd1de13629507be6f28f400bec9f097753fb5513f3
+  - 72f8a07e195d67599bf7110c933244e5e1c8de4713fea6cd68ee592a5aa6f660
+  - 6be6bb30a028d1ccff8f93dd2bf7c6928257282450c37a0f3d979371f5870d54
+  - 98eced54930e3b9ab3c1da8520eecf10334d4a55450c5c891eee0e994cb2d418
+  - 72ba794101b8bbd2fe043dd23ed6c8e17c31995a1cae89b15065e76fc3538e5b
+  - f97bb952f24fabbd93aa4a916a3d18df1cc5020456c5337aa7e436414015e413
+  - a217f687a67664cb4bfff6e1b21c4871d1da1a99a9d2f185a3d2654d18658ce8
+  - bde448a4532d918852be8fd7e0be4c9284348098b8ac906f0812e5fbdf56b9f7
+  - 909ee340a1c28d7d264a72684cd94558076d6310a87299ebe8a349a97b3715ff
+  - ed7849b35c1c96aa6392d945f5a6c7058974d9f2f9e9ff81bb4f1c2d7a39a28a
+  - 259068d2857074e00853c9becf0a063128a898380795522215020febf8e6796a
+  - 311eac2c7c99be1dedaec93216154edb331f12ec7400f481a306e5449ad20caa
+  - 972756f6fbf66e4c35a69cbbc39b3043168e0078b9707933b7d135293b640701
+  - 1267cc4b7259d3daf20d4b1d9c55c9618089f2f5c3dff5d75284408f57680efb
+  - e54aadf029d070b3fa57b5a91b319617dc2f01f9b6d5f93809984ef185480a85
+  - f6104b068a199eb3bfcca2dff28cecf82fbffc20bede25b17250d353a63c9fcd
+  - 8bbbe5f484308810c23109c6ec9d7c8cb51e3567f0fba796b046ceff84a351b8
+  - 15d9a63d0e4bb3d968a20b856223502c2d3ac8cdf6561c3fd7605d1c0b044b54
+  - 77744ad47e945d7b94ddb3cc7c9b1047af65bc45e64acaf3dd99569e6adbe24d
+  - fe3ff6e06bc42b9b82629ba686ca9864a4e301c330367012a084729e06401ec3
+  - e542532648154f69b75c5878583bfbdcadbcee5dbefcf26ca03fb8e027de70b4
+  - 9f569f5cc3d13a8d9231d13379c6093f8517383e6eab2e6c4d00ca868e479153
+  - 5333a804c41ddd9bc3381de90964c09f64e119404e66aa28c21ebc26416f0d54
+  - bd0ec0edbda3f548ed669db6eac11573cff5090aea732fdfc2615f9bc5068412
+  - 50a93543433166640adbb05314b4a8c8ed28664dfdd063456d49048f7cb37d65
+  - cb332fc0f3b1a93b79256f9685184dae4e84d2e0b1b03bbe1d9cc7f90d2d1b29
+  - 1fad5aabbeb4c5ba0c33d5a42944de9eb5eac21d608fdbb6be8857dd2abdfb9a
+  - ac92c0ee04a7189fcff9d4282b4072413543d252714bdd4da64df42aa931ef2a
+  - f214d24d8f68413ea4d3ddfa68831358376d9452773a99715fbe1b13d1fae6c8
+  - e547d4ec46fcf59657aa3a5eb56540b3695328e9b46c03583b7962e5e8c02a34
+  - f44999bfc7a010a765f97140b306bbd326d41b6b0bb9782119af8745d0e1d670
+  - 0a04bceacf57bc04aaab1cc43ff37d074e7b8e4e005e42a1c9eda3d217b24a38
+  - 13f2c52096dc4f1e8040496a2363745e9151af68cfd28cce49670d08a708584a
+  - 9c534699d0dd062dd82de9bbb4ced7e5e379bcfcece2f07538f6b38ee5426674
+  - 0dc3cca9b1067622770a65f009b9a22e598b525f88552b869860edae60d21081
+  - e087ad52c5e0c8889747239d1a0ace303ee3403d74dbae51c921fe966a44d8de
+  - 214a42e2c8800864094de5c2b23b63959dbe21fd7085dc42bee510dbeaeab75e
+  - 55a0f97af3db1fe5b73b0d15f728f4be1aafb934b906e044e5031d724d461a8c
+  - ddcee52bc26829d594266dd6cc57b399ea04d473137ec9430f37bc37af0c6e4d
+  - d4224a03edfb16fd6dc317e39c287f6735fa3bc7ba4f35019c63bb3f1217598b
+  - 211a55564a7d364327c957fb00bffd630c3ded4ee4ac09e6986a8504f4915db9
+  - a663043190a725f1394ed3cedfae71d15beb4be184493d26385765e68682f6d5
+  - 0b4babf31f71381d5f17713bc2ebbd55608da623eb17bd71d4bc9f33de1754e5
+  - 73d3355b8021b39d70e12cb78748c30a633f0864f9a32be177385a11a4f512ec
+  - 43c5716e74fee71764d5dafb6b2e917296d58eff8a96517cb54825da07bb53c7
+  - f320b48d3b48740da7e1d7ca1ef2726a3e2579c876832a329ce303b2862c9f86
+  - 96afaad21404dbc3e894e86d51251064de6512388143fce814f021227ca01b2b
+  - cf76653c5bf279d2b386a20a3b12ef07dcb839c5f770c1a2d8114296306d5dfb
+  - 0142b213bd738ba1d1433d7048fae03c2241e6937edd214790b76d008d1da506
+  - 7c92bf9094df4c55390be3d5329566dd7cf185bafb6764f040055ebc3f2036e6
+  - 7b8e73f37ec92b05b71ed06329a31fcf45c0e945375ee1784f7696c6387234c6
+  - 8b9c4333eeca171b4fc871d325441f4fb9b756afe5af9faf42330cd5a502d690
+  - 57c22b811f6e4b1bde8e9beb315711bb2cb3226f937dd5c7a340ec613c8e1cf0
+  - e33b3748ebcca6539ee07a670fb476a036c0eff5663586729f9243c4f6e7a513
+  - fecb3c49d4b0b006b28854661d55d822a40ac1138340c0efd0dac99e2b9956da
+  - 167fa69176c10bb35fe4995cd6968d4b52aec39acd64f665fbd2e69f5ceacdaf
+  - ecf3aa98c7ae127cb602207520ec663468fe010d781dc32a8b52c7ba4b1df82f
+  title: Afwasautomaat SMV4HAX40N
+  doc_id: '9001522704'
+  pdf_sha256: 92d3203f807d109dea089587b51fec1f754198de9db75cbb9730c2a6e56f2732
+parts:
+- id: filter_system
+  names:
+    en: filter system
+    nl: zeefsysteem
+  locate: appearance
+  cue: stack of mesh filters at bottom centre of tub
+  sam_text: drain strainer
+  kind: allowed
+- id: filter_system_cylinder
+  names:
+    en: coarse filter cylinder
+    nl: cilinder van de grove zeef
+  locate: appearance
+  cue: grey see-through coarse filter cylinder, bottom centre
+  sam_text: drain strainer
+  kind: allowed
+- id: coarse_filter
+  names:
+    en: coarse filter
+    nl: grove zeef
+  locate: appearance
+  cue: coarse filter with locking tabs, bottom centre
+  sam_text: drain strainer
+  kind: allowed
+- id: fine_filter_mesh
+  names:
+    en: micro filter
+    nl: microzeef
+  locate: appearance
+  cue: flat fine mesh filter plate in the tub floor
+  sam_text: metal mesh plate
+  kind: allowed
+- id: upper_spray_arm
+  names:
+    en: upper spray arm
+    nl: bovenste sproeiarm
+  locate: appearance
+  cue: grey spray arm under the upper rack, centre
+  sam_text: spray arm
+  kind: allowed
+- id: lower_spray_arm
+  names:
+    en: lower spray arm
+    nl: onderste sproeiarm
+  locate: appearance
+  cue: long rotating arm above the filter in the tub floor
+  sam_text: spray arm
+  kind: allowed
+- id: rinse_aid_reservoir
+  names:
+    en: rinse aid reservoir
+    nl: glansspoelmiddelreservoir
+  locate: appearance
+  cue: rinse aid compartment with flap cover inside the door
+  sam_text: rinse aid dispenser
+  kind: allowed
+- id: rinse_aid_reservoir_cap
+  names:
+    en: rinse aid lid
+    nl: deksel van het glansspoelmiddelreservoir
+  locate: appearance
+  cue: flap cover over the rinse aid opening inside the door
+  sam_text: rinse aid cover
+  kind: allowed
+- id: drain_pump_cover
+  names:
+    en: pump cover
+    nl: pompafdekking
+  locate: appearance
+  cue: small cover over the drain pump in the tub sump
+  sam_text: pump cover
+  kind: allowed
+- id: drain_impeller
+  names:
+    en: pump impeller
+    nl: pompwaaier
+  locate: appearance
+  cue: small open impeller visible under the pump cover in the sump
+  sam_text: pump impeller
+  kind: allowed
+- id: inlet_sieve
+  names:
+    en: inlet filter
+    nl: zeef in de toevoerslang
+  locate: appearance
+  cue: small sieve inside the inlet hose connection at the tap
+  sam_text: inlet filter
+  kind: allowed
+- id: aquastop_valve
+  names:
+    en: AquaStop valve housing
+    nl: AquaStop-behuizing
+  locate: function
+  cue: plastic housing on supply hose containing electric valve; never immerse or cut hose
+  sam_text: AquaStop valve
+  kind: red_zone
+- id: spray_marks
+  names:
+    en: dishwasher interior
+    nl: binnenruimte
+  locate: appearance
+  cue: tub markings and openings referred to for emptying and cleaning
+  sam_text: tub interior
+  kind: allowed
+- id: detergent_disp_button
+  names:
+    en: detergent dispenser
+    nl: vaatwasmiddelbakje
+  locate: appearance
+  cue: detergent dispenser flap inside the door
+  sam_text: detergent dispenser
+  kind: allowed
+- id: upper_rack
+  names:
+    en: upper rack
+    nl: bovenste servieskorf
+  locate: appearance
+  cue: upper pull-out dish rack
+  sam_text: dish basket
+  kind: allowed
+- id: heating_element
+  names:
+    en: heating element
+    nl: verwarmingselement
+  locate: function
+  cue: hidden heating element inside the appliance; hot water risk
+  sam_text: heating element
+  kind: red_zone
+- id: appliance_casing
+  names:
+    en: appliance casing
+    nl: apparaatbehuizing
+  locate: appearance
+  cue: appliance casing; repairs only by trained specialist personnel
+  sam_text: appliance casing
+  kind: red_zone
+red_zones:
+- id: aquastop_valve
+  part_id: aquastop_valve
+  rule_id: nl.water.aquastop
+  page: 5
+  quote:
+    text: De kunststof behuizing nooit in water onderdompelen. In de kunststof behuizing aan de toevoerslang bevindt zich
+      een elektrisch ventiel.
+    lang: nl
+    page: 5
+  ring_cm: 5
+- id: heating_element
+  part_id: heating_element
+  rule_id: nl.heat.hot_water
+  page: 7
+  quote:
+    text: Als de apparaatdeur tijdens het programmaverloop wordt geopend, kan er heet water uit het apparaat spatten.
+    lang: nl
+    page: 7
+  ring_cm: 5
+- id: appliance_casing
+  part_id: appliance_casing
+  rule_id: nl.mains.casing
+  page: 8
+  quote:
+    text: Alleen daarvoor geschoold vakpersoneel mag reparaties aan het apparaat uitvoeren.
+    lang: nl
+    page: 8
+  ring_cm: 5
+quotes:
+- id: q_machine_cleaning_interval
+  text: Als het apparaat geen herinneringsfunctie heeft, adviseren wij u om de machinereiniging om de 2 maanden uit te voeren.
+  lang: nl
+  page: 42
+  en: If the appliance has no reminder function, we advise you to run Machine Clean every 2 months.
+- id: q_fill_rinse_aid_lift_rinse_aid_cover
+  text: De lip aan het deksel van het glansspoelmiddelreservoir indrukken en optillen.
+  lang: nl
+  page: 27
+  en: Press the tab on the lid of the rinse aid reservoir and lift it.
+- id: q_fill_rinse_aid_fill_rinse_aid_to_max
+  text: Het glansspoelmiddel tot de markering max bijvullen.
+  lang: nl
+  page: 28
+  en: Top up the rinse aid to the max mark.
+- id: q_fill_rinse_aid_remove_spilled_rinse_aid
+  text: Als er glansspoelmiddel is overgelopen, moet dit uit de spoelmiddelhouder worden verwijderd.
+  lang: nl
+  page: 28
+  en: If rinse aid has spilled over, it must be removed from the rinse aid dispenser.
+- id: q_fill_rinse_aid_close_rinse_aid_cover
+  text: Het deksel van het glansspoelmiddelreservoir sluiten.
+  lang: nl
+  page: 28
+  en: Close the lid of the rinse aid reservoir.
+- id: q_clean_filters_check_filters
+  text: Na elke afwasbeurt de zeven op etensresten controleren.
+  lang: nl
+  page: 42
+  en: After every wash, check the filters for food remains.
+- id: q_clean_filters_remove_filter_system
+  text: De grove zeef tegen de klok in draaien en het zeefsysteem eruit nemen.
+  lang: nl
+  page: 43
+  en: Turn the coarse filter anticlockwise and take the filter system out.
+- id: q_clean_filters_remove_micro_filter
+  text: De microzeef naar beneden lostrekken.
+  lang: nl
+  page: 43
+  en: Pull the micro filter downwards to release it.
+- id: q_clean_filters_remove_coarse_filter
+  text: De vergrendelingsstukken samendrukken en de grove zeef er naar boven uitnemen.
+  lang: nl
+  page: 43
+  en: Squeeze the locking pieces together and lift the coarse filter up and out.
+- id: q_clean_filters_clean_filter_elements
+  text: De zeefelementen onder stromend water reinigen.
+  lang: nl
+  page: 43
+  en: Clean the filter parts under running water.
+- id: q_clean_filters_reassemble_filter_system
+  text: Het zeefsysteem in elkaar zetten.
+  lang: nl
+  page: 43
+  en: Put the filter system back together.
+- id: q_clean_filters_refit_filter_system
+  text: Het zeefsysteem in het apparaat plaatsen en de grove zeef met de klok mee draaien.
+  lang: nl
+  page: 43
+  en: Put the filter system into the appliance and turn the coarse filter clockwise.
+- id: q_clean_filters_check_arrow_marks
+  text: Controleer of de pijlmarkeringen tegenover elkaar staan.
+  lang: nl
+  page: 43
+  en: Check that the arrow marks are opposite each other.
+- id: q_clean_spray_arms_remove_upper_spray_arm
+  text: De bovenste sproeiarm losschroeven en naar beneden lostrekken.
+  lang: nl
+  page: 44
+  en: Unscrew the upper spray arm and pull it downwards to release it.
+- id: q_clean_spray_arms_remove_lower_spray_arm
+  text: De onderste sproeiarm naar boven lostrekken.
+  lang: nl
+  page: 44
+  en: Pull the lower spray arm upwards to release it.
+- id: q_clean_spray_arms_check_and_clear_spray_arm_jets
+  text: De uitstroomopeningen van de sproeiarmen onder stromend water op verstoppingen controleren en eventuele vreemde voorwerpen
+    verwijderen.
+  lang: nl
+  page: 44
+  en: Check the outlet holes of the spray arms for blockages under running water and remove any foreign objects.
+- id: q_clean_spray_arms_refit_lower_spray_arm
+  text: De onderste sproeiarm aanbrengen.
+  lang: nl
+  page: 44
+  en: Fit the lower spray arm.
+- id: q_clean_spray_arms_refit_upper_spray_arm
+  text: De bovenste sproeiarm aanbrengen en vastschroeven.
+  lang: nl
+  page: 44
+  en: Fit the upper spray arm and screw it tight.
+- id: q_machine_cleaning_remove_coarse_dirt
+  text: Grove verontreinigingen in de binnenruimte met een vochtige doek verwijderen.
+  lang: nl
+  page: 42
+  en: Remove coarse dirt from the interior with a damp cloth.
+- id: q_machine_cleaning_clean_filters_place_care_product
+  text: De zeven reinigen. Het machineonderhoudsmiddel in de binnenruimte van het apparaat plaatsen.
+  lang: nl
+  page: 42
+  en: Clean the filters. Place the machine care product in the interior of the appliance.
+- id: q_machine_cleaning_fill_detergent_dispenser
+  text: De machinereiniger in het vaatwasmiddelbakje doen tot dit volledig gevuld is.
+  lang: nl
+  page: 42
+  en: Put machine cleaner in the detergent dispenser until it is completely full.
+- id: q_clean_drain_pump_remove_upper_lower_racks
+  text: Verwijder de bovenste en onderste servieskorf.
+  lang: nl
+  page: 59
+  en: Remove the upper and lower racks.
+- id: q_clean_drain_pump_clean_drain_pump-remove_filter_system
+  text: Verwijder het zeefsysteem.
+  lang: nl
+  page: 59
+  en: Remove the filter system.
+- id: q_clean_drain_pump_scoop_out_water
+  text: Schep het aanwezige water eruit. Gebruik hiervoor zo nodig een spons.
+  lang: nl
+  page: 59
+  en: Scoop out the water that is there. Use a sponge for this if needed.
+- id: q_clean_drain_pump_lift_pump_cover
+  text: De pompafdekking met behulp van een lepel opwippen en aan de beugel vastpakken.
+  lang: nl
+  page: 59
+  en: Lever up the pump cover with a spoon and take hold of it by the bracket.
+- id: q_clean_drain_pump_remove_pump_cover
+  text: De pompafdekking schuin naar binnen optillen en verwijderen.
+  lang: nl
+  page: 59
+  en: Lift the pump cover diagonally inwards and remove it.
+- id: q_clean_drain_pump_remove_impeller_remnants
+  text: Etensresten en vreemde voorwerpen bij de pompwaaier verwijderen.
+  lang: nl
+  page: 59
+  en: Remove food remains and foreign objects at the pump impeller.
+- id: q_clean_drain_pump_refit_pump_cover
+  text: De pompafdekking aanbrengen en omlaag drukken.
+  lang: nl
+  page: 59
+  en: Fit the pump cover and press it down.
+- id: q_clean_drain_pump_clean_drain_pump-refit_filter_system
+  text: Het zeefsysteem monteren.
+  lang: nl
+  page: 59
+  en: Fit the filter system.
+- id: q_clean_drain_pump_refit_upper_lower_racks
+  text: De onderste en bovenste servieskorf aanbrengen.
+  lang: nl
+  page: 59
+  en: Fit the lower and upper racks.
+- id: q_fix_e3200_inlet_sieve_close_tap_unscrew_water_connector
+  text: Draai de kraan dicht. Schroef de wateraansluiting los.
+  lang: nl
+  page: 45
+  en: Turn the tap off. Unscrew the water connection.
+- id: q_fix_e3200_inlet_sieve_remove_sieve_from_supply_hose
+  text: Neem de zeef uit de toevoerslang
+  lang: nl
+  page: 46
+  en: Take the filter out of the supply hose
+- id: q_fix_e3200_inlet_sieve_clean_replace_inlet_sieve
+  text: Reinig de zeef. Plaats de zeef in de toevoerslang.
+  lang: nl
+  page: 46
+  en: Clean the filter. Put the filter in the supply hose.
+- id: q_fix_e3200_inlet_sieve_tighten_water_connection
+  text: Schroef de wateraansluiting vast.
+  lang: nl
+  page: 46
+  en: Screw the water connection tight.
+- id: q_fix_e3200_inlet_sieve_check_water_connection_leaks
+  text: Controleer de wateraansluiting op lekkage.
+  lang: nl
+  page: 46
+  en: Check the water connection for leaks.
+- id: q_fix_e3200_inlet_sieve_open_tap
+  text: Draai de kraan open.
+  lang: nl
+  page: 45
+  en: Turn the tap on.
+- id: q_fix_e9240_clean_sieves_clean_sieves
+  text: Zeven zijn vuil of verstopt. Reinig de zeven.
+  lang: nl
+  page: 47
+  en: The filters are dirty or blocked. Clean the filters.
+- id: q_machine_cleaning_start_machine_clean
+  text: Voer het programma Machinereiniging zonder ingeruimd serviesgoed uit.
+  lang: nl
+  page: 42
+  en: Run the Machine Clean programme without any dishes loaded.
+jobs:
+- id: fill_rinse_aid
+  title:
+    en: Refill the rinse aid
+    nl: Glansspoelmiddel bijvullen
+  kind: upkeep
+  interval: null
+  fault_codes: []
+  landlord: false
+  duration_min: null
+  needs:
+  - id: rinse_aid
+    what:
+      en: rinse aid
+      nl: glansspoelmiddel
+    kind: product
+    quote_ref: q_fill_rinse_aid_fill_rinse_aid_to_max
+  steps:
+  - id: lift_rinse_aid_cover
+    text:
+      en: Press the tab on the rinse aid lid and lift the lid.
+      nl: Druk op het lipje van het deksel en til het deksel op.
+    page: 27
+    quote:
+      text: De lip aan het deksel van het glansspoelmiddelreservoir indrukken en optillen.
+      lang: nl
+      page: 27
+      en: Press the tab on the lid of the rinse aid reservoir and lift it.
+    done_when:
+    - id: rinse_aid_lid_open
+      text:
+        en: The rinse aid lid is open.
+        nl: Het deksel van het glansspoelmiddelreservoir staat open.
+      quote_ref: q_fill_rinse_aid_lift_rinse_aid_cover
+    parts:
+    - rinse_aid_reservoir
+    - rinse_aid_reservoir_cap
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: rinse_aid_reservoir_cap
+      expect: absent
+      anchor: null
+  - id: fill_rinse_aid_to_max
+    text:
+      en: Pour in rinse aid up to the max mark.
+      nl: Vul glansspoelmiddel bij tot de markering max.
+    page: 28
+    quote:
+      text: Het glansspoelmiddel tot de markering max bijvullen.
+      lang: nl
+      page: 28
+      en: Top up the rinse aid to the max mark.
+    done_when:
+    - id: rinse_aid_at_max
+      text:
+        en: The rinse aid reaches the max mark.
+        nl: Het glansspoelmiddel staat tot aan de markering max.
+      quote_ref: q_fill_rinse_aid_fill_rinse_aid_to_max
+    parts:
+    - rinse_aid_reservoir
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: rinse_aid_reservoir
+      expect: present
+      anchor: null
+  - id: remove_spilled_rinse_aid
+    text:
+      en: If any rinse aid spilled over, wipe it out of the dispenser.
+      nl: Is er glansspoelmiddel overgelopen? Veeg het dan uit de spoelmiddelhouder.
+    page: 28
+    quote:
+      text: Als er glansspoelmiddel is overgelopen, moet dit uit de spoelmiddelhouder worden verwijderd.
+      lang: nl
+      page: 28
+      en: If rinse aid has spilled over, it must be removed from the rinse aid dispenser.
+    done_when:
+    - id: no_spilled_rinse_aid
+      text:
+        en: No spilled rinse aid is left around the dispenser.
+        nl: Er ligt geen overgelopen glansspoelmiddel meer rond de spoelmiddelhouder.
+      quote_ref: q_fill_rinse_aid_remove_spilled_rinse_aid
+    parts:
+    - rinse_aid_reservoir
+    - spray_marks
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: rinse_aid_reservoir
+      expect: present
+      anchor: null
+  - id: close_rinse_aid_cover
+    text:
+      en: Close the rinse aid lid.
+      nl: Sluit het deksel van het glansspoelmiddelreservoir.
+    page: 28
+    quote:
+      text: Het deksel van het glansspoelmiddelreservoir sluiten.
+      lang: nl
+      page: 28
+      en: Close the lid of the rinse aid reservoir.
+    done_when:
+    - id: rinse_aid_lid_closed
+      text:
+        en: The rinse aid lid is closed.
+        nl: Het deksel van het glansspoelmiddelreservoir is dicht.
+      quote_ref: q_fill_rinse_aid_close_rinse_aid_cover
+    parts:
+    - rinse_aid_reservoir_cap
+    - rinse_aid_reservoir
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: rinse_aid_reservoir_cap
+      expect: present
+      anchor: null
+- id: clean_filters
+  title:
+    en: Clean the filters
+    nl: Zeven reinigen
+  kind: upkeep
+  interval: null
+  fault_codes: []
+  landlord: false
+  duration_min: null
+  steps:
+  - id: check_filters
+    text:
+      en: Look at the filters for any food left on them.
+      nl: Kijk of er etensresten op de zeven zitten.
+    page: 42
+    quote:
+      text: Na elke afwasbeurt de zeven op etensresten controleren.
+      lang: nl
+      page: 42
+      en: After every wash, check the filters for food remains.
+    done_when:
+    - id: filters_in_view
+      text:
+        en: The filters at the bottom of the dishwasher are in view.
+        nl: De zeven onder in de vaatwasser zijn in beeld.
+      quote_ref: q_clean_filters_check_filters
+    parts:
+    - filter_system
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: filter_system
+      expect: present
+      anchor: null
+  - id: remove_filter_system
+    text:
+      en: Turn the coarse filter anticlockwise and lift the filter system out.
+      nl: Draai de grove zeef tegen de klok in en neem het zeefsysteem eruit.
+    page: 43
+    quote:
+      text: De grove zeef tegen de klok in draaien en het zeefsysteem eruit nemen.
+      lang: nl
+      page: 43
+      en: Turn the coarse filter anticlockwise and take the filter system out.
+    done_when:
+    - id: clean_filters_1_c1
+      text:
+        en: The filter system is out of the dishwasher.
+        nl: Het zeefsysteem is uit de vaatwasser.
+      quote_ref: q_clean_filters_remove_filter_system
+    parts:
+    - filter_system
+    - filter_system_cylinder
+    - coarse_filter
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: filter_system
+      expect: absent
+      anchor: null
+  - id: remove_micro_filter
+    text:
+      en: Pull the micro filter down and off.
+      nl: Trek de microzeef naar beneden los.
+    page: 43
+    quote:
+      text: De microzeef naar beneden lostrekken.
+      lang: nl
+      page: 43
+      en: Pull the micro filter downwards to release it.
+    done_when:
+    - id: clean_filters_2_c1
+      text:
+        en: The micro filter is off the filter system.
+        nl: De microzeef zit los van het zeefsysteem.
+      quote_ref: q_clean_filters_remove_micro_filter
+    parts:
+    - fine_filter_mesh
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: fine_filter_mesh
+      expect: absent
+      anchor: null
+  - id: remove_coarse_filter
+    text:
+      en: Squeeze the locking clips and lift the coarse filter up and out.
+      nl: Druk de vergrendelingen samen en neem de grove zeef er naar boven uit.
+    page: 43
+    quote:
+      text: De vergrendelingsstukken samendrukken en de grove zeef er naar boven uitnemen.
+      lang: nl
+      page: 43
+      en: Squeeze the locking pieces together and lift the coarse filter up and out.
+    done_when:
+    - id: clean_filters_3_c1
+      text:
+        en: The coarse filter is out of the filter system.
+        nl: De grove zeef is uit het zeefsysteem.
+      quote_ref: q_clean_filters_remove_coarse_filter
+    parts:
+    - coarse_filter
+    - filter_system_cylinder
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: coarse_filter
+      expect: absent
+      anchor: null
+  - id: clean_filter_elements
+    text:
+      en: Rinse the filter parts under running water.
+      nl: Spoel de zeefdelen af onder stromend water.
+    page: 43
+    quote:
+      text: De zeefelementen onder stromend water reinigen.
+      lang: nl
+      page: 43
+      en: Clean the filter parts under running water.
+    done_when:
+    - id: clean_filters_4_c1
+      text:
+        en: The filter parts are clean, with no food left on them.
+        nl: De zeefdelen zijn schoon, zonder etensresten.
+      quote_ref: q_clean_filters_clean_filter_elements
+    parts:
+    - filter_system
+    - coarse_filter
+    - fine_filter_mesh
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: filter_system
+      expect: present
+      anchor: null
+  - id: reassemble_filter_system
+    text:
+      en: Put the filter system back together.
+      nl: Zet het zeefsysteem weer in elkaar.
+    page: 43
+    quote:
+      text: Het zeefsysteem in elkaar zetten.
+      lang: nl
+      page: 43
+      en: Put the filter system back together.
+    done_when:
+    - id: clean_filters_5_c1
+      text:
+        en: The filter system is back together as one piece.
+        nl: Het zeefsysteem is weer één geheel.
+      quote_ref: q_clean_filters_reassemble_filter_system
+    parts:
+    - filter_system
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: filter_system
+      expect: present
+      anchor: null
+  - id: refit_filter_system
+    text:
+      en: Put the filter system back in and turn the coarse filter clockwise.
+      nl: Plaats het zeefsysteem terug en draai de grove zeef met de klok mee.
+    page: 43
+    quote:
+      text: Het zeefsysteem in het apparaat plaatsen en de grove zeef met de klok mee draaien.
+      lang: nl
+      page: 43
+      en: Put the filter system into the appliance and turn the coarse filter clockwise.
+    done_when:
+    - id: clean_filters_6_c1
+      text:
+        en: The filter system is back in the dishwasher.
+        nl: Het zeefsysteem zit weer in de vaatwasser.
+      quote_ref: q_clean_filters_refit_filter_system
+    - id: clean_filters_6_c2
+      text:
+        en: The coarse filter is turned clockwise.
+        nl: De grove zeef is met de klok mee gedraaid.
+      quote_ref: q_clean_filters_refit_filter_system
+    parts:
+    - filter_system
+    - coarse_filter
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: filter_system
+      expect: present
+      anchor: null
+  - id: check_arrow_marks
+    text:
+      en: Check that the arrow marks line up opposite each other.
+      nl: Controleer of de pijlmarkeringen tegenover elkaar staan.
+    page: 43
+    quote:
+      text: Controleer of de pijlmarkeringen tegenover elkaar staan.
+      lang: nl
+      page: 43
+      en: Check that the arrow marks are opposite each other.
+    done_when:
+    - id: clean_filters_7_c1
+      text:
+        en: The arrow marks face each other.
+        nl: De pijlmarkeringen staan tegenover elkaar.
+      quote_ref: q_clean_filters_check_arrow_marks
+    parts:
+    - filter_system
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: filter_system
+      expect: present
+      anchor: null
+- id: clean_spray_arms
+  title:
+    en: Clean the spray arms
+    nl: Sproeiarmen reinigen
+  kind: upkeep
+  interval: null
+  fault_codes: []
+  landlord: false
+  duration_min: null
+  steps:
+  - id: remove_upper_spray_arm
+    text:
+      en: Unscrew the upper spray arm and pull it down and off.
+      nl: Schroef de bovenste sproeiarm los en trek hem naar beneden eraf.
+    page: 44
+    quote:
+      text: De bovenste sproeiarm losschroeven en naar beneden lostrekken.
+      lang: nl
+      page: 44
+      en: Unscrew the upper spray arm and pull it downwards to release it.
+    done_when:
+    - id: upper_spray_arm_off
+      text:
+        en: The upper spray arm is off its mount.
+        nl: De bovenste sproeiarm is los van de houder.
+      quote_ref: q_clean_spray_arms_remove_upper_spray_arm
+    parts:
+    - upper_spray_arm
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: upper_spray_arm
+      expect: absent
+      anchor: null
+  - id: remove_lower_spray_arm
+    text:
+      en: Pull the lower spray arm up and off.
+      nl: Trek de onderste sproeiarm naar boven los.
+    page: 44
+    quote:
+      text: De onderste sproeiarm naar boven lostrekken.
+      lang: nl
+      page: 44
+      en: Pull the lower spray arm upwards to release it.
+    done_when:
+    - id: lower_spray_arm_off
+      text:
+        en: The lower spray arm is off its mount.
+        nl: De onderste sproeiarm is los van de houder.
+      quote_ref: q_clean_spray_arms_remove_lower_spray_arm
+    parts:
+    - lower_spray_arm
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: lower_spray_arm
+      expect: absent
+      anchor: null
+  - id: check_and_clear_spray_arm_jets
+    text:
+      en: Check the spray arm nozzles under running water and clear anything blocking them.
+      nl: Controleer de sproeiopeningen onder stromend water op verstoppingen en verwijder eventuele vreemde voorwerpen.
+    page: 44
+    quote:
+      text: De uitstroomopeningen van de sproeiarmen onder stromend water op verstoppingen controleren en eventuele vreemde
+        voorwerpen verwijderen.
+      lang: nl
+      page: 44
+      en: Check the outlet holes of the spray arms for blockages under running water and remove any foreign objects.
+    done_when:
+    - id: spray_arm_nozzles_clear
+      text:
+        en: The spray arm nozzles are clear.
+        nl: De sproeiopeningen zijn vrij.
+      quote_ref: q_clean_spray_arms_check_and_clear_spray_arm_jets
+    parts:
+    - lower_spray_arm
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: lower_spray_arm
+      expect: present
+      anchor: null
+  - id: refit_lower_spray_arm
+    text:
+      en: Put the lower spray arm back on.
+      nl: Zet de onderste sproeiarm terug.
+    page: 44
+    quote:
+      text: De onderste sproeiarm aanbrengen.
+      lang: nl
+      page: 44
+      en: Fit the lower spray arm.
+    done_when:
+    - id: lower_spray_arm_refitted
+      text:
+        en: The lower spray arm is back on its mount.
+        nl: De onderste sproeiarm zit weer op de houder.
+      quote_ref: q_clean_spray_arms_refit_lower_spray_arm
+    parts:
+    - lower_spray_arm
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: lower_spray_arm
+      expect: present
+      anchor: null
+  - id: refit_upper_spray_arm
+    text:
+      en: Put the upper spray arm back and screw it tight.
+      nl: Zet de bovenste sproeiarm terug en schroef hem vast.
+    page: 44
+    quote:
+      text: De bovenste sproeiarm aanbrengen en vastschroeven.
+      lang: nl
+      page: 44
+      en: Fit the upper spray arm and screw it tight.
+    done_when:
+    - id: upper_spray_arm_refitted
+      text:
+        en: The upper spray arm is back on and screwed tight.
+        nl: De bovenste sproeiarm zit weer vast.
+      quote_ref: q_clean_spray_arms_refit_upper_spray_arm
+    parts:
+    - upper_spray_arm
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: upper_spray_arm
+      expect: present
+      anchor: null
+- id: machine_cleaning
+  title:
+    en: Run the machine-cleaning programme
+    nl: Machinereiniging uitvoeren
+  kind: upkeep
+  interval:
+    every: 2
+    unit: month
+    quote_ref: q_machine_cleaning_interval
+  fault_codes: []
+  landlord: false
+  duration_min: null
+  needs:
+  - id: damp_cloth
+    what:
+      en: damp cloth
+      nl: vochtige doek
+    kind: tool
+    quote_ref: q_machine_cleaning_remove_coarse_dirt
+  - id: machine_care_product
+    what:
+      en: machine care product
+      nl: machineonderhoudsmiddel
+    kind: product
+    quote_ref: q_machine_cleaning_clean_filters_place_care_product
+  - id: machine_cleaner
+    what:
+      en: machine cleaner
+      nl: machinereiniger
+    kind: product
+    quote_ref: q_machine_cleaning_fill_detergent_dispenser
+  steps:
+  - id: remove_coarse_dirt
+    text:
+      en: Wipe any loose dirt out of the inside with a damp cloth.
+      nl: Veeg grof vuil uit de binnenruimte met een vochtige doek.
+    page: 42
+    quote:
+      text: Grove verontreinigingen in de binnenruimte met een vochtige doek verwijderen.
+      lang: nl
+      page: 42
+      en: Remove coarse dirt from the interior with a damp cloth.
+    done_when:
+    - id: interior_wiped
+      text:
+        en: The inside is free of loose dirt.
+        nl: De binnenruimte is vrij van grof vuil.
+      quote_ref: q_machine_cleaning_remove_coarse_dirt
+    parts:
+    - spray_marks
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness: null
+    camera: none
+  - id: clean_filters_place_care_product
+    text:
+      en: Clean the filters, then put the machine care product inside the dishwasher.
+      nl: Reinig de zeven en zet het machineonderhoudsmiddel in de binnenruimte.
+    page: 42
+    quote:
+      text: De zeven reinigen. Het machineonderhoudsmiddel in de binnenruimte van het apparaat plaatsen.
+      lang: nl
+      page: 42
+      en: Clean the filters. Place the machine care product in the interior of the appliance.
+    done_when:
+    - id: filters_clean
+      text:
+        en: The filters are clean.
+        nl: De zeven zijn schoon.
+      quote_ref: q_machine_cleaning_clean_filters_place_care_product
+    - id: care_product_inside
+      text:
+        en: The machine care product is inside the dishwasher.
+        nl: Het machineonderhoudsmiddel staat in de binnenruimte.
+      quote_ref: q_machine_cleaning_clean_filters_place_care_product
+    parts:
+    - filter_system
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: filter_system
+      expect: present
+      anchor: null
+  - id: fill_detergent_dispenser
+    text:
+      en: Fill the detergent dispenser to the top with machine cleaner.
+      nl: Vul het vaatwasmiddelbakje helemaal met machinereiniger.
+    page: 42
+    quote:
+      text: De machinereiniger in het vaatwasmiddelbakje doen tot dit volledig gevuld is.
+      lang: nl
+      page: 42
+      en: Put machine cleaner in the detergent dispenser until it is completely full.
+    done_when:
+    - id: dispenser_full
+      text:
+        en: The detergent dispenser is full of machine cleaner.
+        nl: Het vaatwasmiddelbakje is vol machinereiniger.
+      quote_ref: q_machine_cleaning_fill_detergent_dispenser
+    parts:
+    - detergent_disp_button
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: detergent_disp_button
+      expect: present
+      anchor: null
+  - id: start_machine_clean
+    text:
+      en: Start the Machine Clean programme, with no dishes inside.
+      nl: Start het programma Machinereiniging, zonder servies erin.
+    page: 42
+    quote:
+      text: Voer het programma Machinereiniging zonder ingeruimd serviesgoed uit.
+      lang: nl
+      page: 42
+      en: Run the Machine Clean programme without any dishes loaded.
+    done_when:
+    - id: machine_clean_running
+      text:
+        en: The Machine Clean programme is running.
+        nl: Het programma Machinereiniging loopt.
+      quote_ref: q_machine_cleaning_start_machine_clean
+    parts: []
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+  due_name:
+    en: Machine Clean
+    nl: machinereiniging
+- id: clean_drain_pump
+  title:
+    en: Clean the drain pump
+    nl: Afvoerpomp reinigen
+  kind: upkeep
+  interval: null
+  fault_codes: []
+  landlord: false
+  duration_min: null
+  needs:
+  - id: spoon
+    what:
+      en: spoon
+      nl: lepel
+    kind: tool
+    quote_ref: q_clean_drain_pump_lift_pump_cover
+  - id: sponge
+    what:
+      en: sponge
+      nl: spons
+    kind: tool
+    quote_ref: q_clean_drain_pump_scoop_out_water
+  steps:
+  - id: remove_foreign_objects_carefully
+    text:
+      en: 'Take care: sharp objects such as broken glass can block the pump and cut you. Remove foreign objects carefully.'
+      nl: 'Let op: scherpe voorwerpen zoals glasscherven kunnen de pomp blokkeren en verwondingen veroorzaken. Verwijder vreemde voorwerpen voorzichtig.'
+    page: 59
+    quote:
+      text: Scherpe en puntige voorwerpen zoals glasscherven kunnen de afvoerpomp blokkeren en tot verwondingen leiden. Vreemde voorwerpen voorzichtig verwijderen.
+      lang: nl
+      page: 59
+      en: Sharp and pointed objects such as glass shards can block the drain pump and cause injuries. Remove foreign objects carefully.
+    done_when: []
+    parts: []
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    camera: none
+  - id: unplug_appliance
+    text:
+      en: Unplug the dishwasher from the socket.
+      nl: Haal de stekker van de vaatwasser uit het stopcontact.
+    page: 59
+    quote:
+      text: Haal de stekker van het apparaat uit het stopcontact.
+      lang: nl
+      page: 59
+      en: Pull the appliance's plug out of the socket.
+    done_when: []
+    parts: []
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+  - id: remove_upper_lower_racks
+    text:
+      en: Take out the upper and lower racks.
+      nl: Haal de bovenste en onderste servieskorf eruit.
+    page: 59
+    quote:
+      text: Verwijder de bovenste en onderste servieskorf.
+      lang: nl
+      page: 59
+      en: Remove the upper and lower racks.
+    done_when:
+    - id: upper_rack_out
+      text:
+        en: The upper rack is out of the dishwasher.
+        nl: De bovenste servieskorf is uit de vaatwasser.
+      quote_ref: q_clean_drain_pump_remove_upper_lower_racks
+    - id: lower_rack_out
+      text:
+        en: The lower rack is out of the dishwasher.
+        nl: De onderste servieskorf is uit de vaatwasser.
+      quote_ref: q_clean_drain_pump_remove_upper_lower_racks
+    parts:
+    - upper_rack
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: upper_rack
+      expect: absent
+      anchor: null
+  - id: clean_drain_pump-remove_filter_system
+    text:
+      en: Take out the filter system.
+      nl: Haal het zeefsysteem eruit.
+    page: 59
+    quote:
+      text: Verwijder het zeefsysteem.
+      lang: nl
+      page: 59
+      en: Remove the filter system.
+    done_when:
+    - id: filter_system_out
+      text:
+        en: The filter system is out of the dishwasher.
+        nl: Het zeefsysteem is uit de vaatwasser.
+      quote_ref: q_clean_drain_pump_clean_drain_pump-remove_filter_system
+    parts:
+    - filter_system
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: filter_system
+      expect: absent
+      anchor: null
+  - id: scoop_out_water
+    text:
+      en: Scoop out any water left in the bottom; use a sponge if you need to.
+      nl: Schep het water eruit, zo nodig met een spons.
+    page: 59
+    quote:
+      text: Schep het aanwezige water eruit. Gebruik hiervoor zo nodig een spons.
+      lang: nl
+      page: 59
+      en: Scoop out the water that is there. Use a sponge for this if needed.
+    done_when:
+    - id: water_out
+      text:
+        en: No water is standing in the bottom.
+        nl: Er staat geen water meer op de bodem.
+      quote_ref: q_clean_drain_pump_scoop_out_water
+    parts:
+    - spray_marks
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+    witness: null
+  - id: lift_pump_cover
+    text:
+      en: Lever the pump cover up with a spoon and hold it by the bracket.
+      nl: Wip de pompafdekking op met een lepel en pak hem vast aan de beugel.
+    page: 59
+    quote:
+      text: De pompafdekking met behulp van een lepel opwippen en aan de beugel vastpakken.
+      lang: nl
+      page: 59
+      en: Lever up the pump cover with a spoon and take hold of it by the bracket.
+    done_when:
+    - id: pump_cover_pried_up
+      text:
+        en: The pump cover is lifted from its seat.
+        nl: De pompafdekking is losgewipt.
+      quote_ref: q_clean_drain_pump_lift_pump_cover
+    - id: impeller_area_partly_open
+      text:
+        en: You are holding the pump cover by its bracket.
+        nl: Je houdt de pompafdekking vast aan de beugel.
+      quote_ref: q_clean_drain_pump_lift_pump_cover
+    parts:
+    - drain_pump_cover
+    - drain_impeller
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: drain_pump_cover
+      expect: present
+      anchor: null
+  - id: remove_pump_cover
+    text:
+      en: Tilt the pump cover inwards, lift it and take it out.
+      nl: Til de pompafdekking schuin naar binnen op en haal hem eruit.
+    page: 59
+    quote:
+      text: De pompafdekking schuin naar binnen optillen en verwijderen.
+      lang: nl
+      page: 59
+      en: Lift the pump cover diagonally inwards and remove it.
+    done_when:
+    - id: pump_cover_out
+      text:
+        en: the pump cover is out of its housing
+      quote_ref: q_clean_drain_pump_remove_pump_cover
+    - id: impeller_exposed
+      text:
+        en: The impeller is visible where the cover was.
+        nl: De pompwaaier is zichtbaar waar de afdekking zat.
+      quote_ref: q_clean_drain_pump_remove_pump_cover
+    parts:
+    - drain_pump_cover
+    - drain_impeller
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: drain_pump_cover
+      expect: absent
+      anchor: null
+  - id: remove_impeller_remnants
+    text:
+      en: Remove any food remains and foreign objects from around the impeller.
+      nl: Verwijder etensresten en vreemde voorwerpen bij de pompwaaier.
+    page: 59
+    quote:
+      text: Etensresten en vreemde voorwerpen bij de pompwaaier verwijderen.
+      lang: nl
+      page: 59
+      en: Remove food remains and foreign objects at the pump impeller.
+    done_when:
+    - id: impeller_clear_of_remnants
+      text:
+        en: No food remains are left at the impeller.
+        nl: Er zitten geen etensresten meer bij de pompwaaier.
+      quote_ref: q_clean_drain_pump_remove_impeller_remnants
+    - id: impeller_clear_of_foreign_objects
+      text:
+        en: No foreign objects are left at the impeller.
+        nl: Er zitten geen vreemde voorwerpen meer bij de pompwaaier.
+      quote_ref: q_clean_drain_pump_remove_impeller_remnants
+    parts:
+    - drain_impeller
+    - drain_pump_cover
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: drain_impeller
+      expect: present
+      anchor: null
+  - id: refit_pump_cover
+    text:
+      en: Put the pump cover back and press it down.
+      nl: Plaats de pompafdekking terug en druk hem omlaag.
+    page: 59
+    quote:
+      text: De pompafdekking aanbrengen en omlaag drukken.
+      lang: nl
+      page: 59
+      en: Fit the pump cover and press it down.
+    done_when:
+    - id: pump_cover_refitted
+      text:
+        en: the pump cover is back in place over its housing
+      quote_ref: q_clean_drain_pump_refit_pump_cover
+    - id: pump_cover_pushed_down
+      text:
+        en: The pump cover is pressed all the way down.
+        nl: De pompafdekking is helemaal omlaag gedrukt.
+      quote_ref: q_clean_drain_pump_refit_pump_cover
+    parts:
+    - drain_pump_cover
+    - drain_impeller
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: drain_pump_cover
+      expect: present
+      anchor: null
+  - id: clean_drain_pump-refit_filter_system
+    text:
+      en: Put the filter system back in.
+      nl: Plaats het zeefsysteem terug.
+    page: 59
+    quote:
+      text: Het zeefsysteem monteren.
+      lang: nl
+      page: 59
+      en: Fit the filter system.
+    done_when:
+    - id: filter_system_refitted
+      text:
+        en: The filter system is back in the dishwasher.
+        nl: Het zeefsysteem zit weer in de vaatwasser.
+      quote_ref: q_clean_drain_pump_clean_drain_pump-refit_filter_system
+    parts:
+    - filter_system
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: filter_system
+      expect: present
+      anchor: null
+  - id: refit_upper_lower_racks
+    text:
+      en: Put the lower and upper racks back in.
+      nl: Zet de onderste en bovenste servieskorf terug.
+    page: 59
+    quote:
+      text: De onderste en bovenste servieskorf aanbrengen.
+      lang: nl
+      page: 59
+      en: Fit the lower and upper racks.
+    done_when:
+    - id: lower_rack_refitted
+      text:
+        en: The lower rack is back in place.
+        nl: De onderste servieskorf zit weer op zijn plaats.
+      quote_ref: q_clean_drain_pump_refit_upper_lower_racks
+    - id: upper_rack_refitted
+      text:
+        en: The upper rack is back in place.
+        nl: De bovenste servieskorf zit weer op zijn plaats.
+      quote_ref: q_clean_drain_pump_refit_upper_lower_racks
+    parts:
+    - upper_rack
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: upper_rack
+      expect: present
+      anchor: null
+- id: fix_e3200_inlet_sieve
+  title:
+    en: Clean the inlet filter (fault E:32-00)
+    nl: Zeef in de toevoerslang reinigen (storing E:32-00)
+  kind: fix
+  interval: null
+  fault_codes:
+  - E:32-00
+  landlord: false
+  duration_min: null
+  steps:
+  - id: switch_off_unplug_appliance
+    text:
+      en: Switch the dishwasher off and unplug it.
+      nl: Zet de vaatwasser uit en haal de stekker uit het stopcontact.
+    page: 45
+    quote:
+      text: Schakel het apparaat uit. Haal de stekker uit het stopcontact.
+      lang: nl
+      page: 45
+      en: Switch the appliance off. Pull the plug out of the socket.
+    done_when: []
+    parts: []
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+  - id: close_tap_unscrew_water_connector
+    text:
+      en: Turn off the water tap, then unscrew the water connection.
+      nl: Draai de kraan dicht en schroef de wateraansluiting los.
+    page: 45
+    quote:
+      text: Draai de kraan dicht. Schroef de wateraansluiting los.
+      lang: nl
+      page: 45
+      en: Turn the tap off. Unscrew the water connection.
+    done_when:
+    - id: tap_closed
+      text:
+        en: The tap is turned off.
+        nl: De kraan is dicht.
+      quote_ref: q_fix_e3200_inlet_sieve_close_tap_unscrew_water_connector
+    - id: connector_unscrewed
+      text:
+        en: The water connection is unscrewed.
+        nl: De wateraansluiting is losgeschroefd.
+      quote_ref: q_fix_e3200_inlet_sieve_close_tap_unscrew_water_connector
+    parts:
+    - inlet_sieve
+    - aquastop_valve
+    power: 'off'
+    zones:
+    - aquastop_valve
+    view: side
+    look_only_lines: []
+    witness:
+      part: inlet_sieve
+      expect: present
+      anchor: null
+  - id: remove_sieve_from_supply_hose
+    text:
+      en: Take the filter out of the supply hose.
+      nl: Haal de zeef uit de toevoerslang.
+    page: 46
+    quote:
+      text: Neem de zeef uit de toevoerslang
+      lang: nl
+      page: 46
+      en: Take the filter out of the supply hose
+    done_when:
+    - id: sieve_out_of_hose
+      text:
+        en: The filter is out of the supply hose.
+        nl: De zeef is uit de toevoerslang.
+      quote_ref: q_fix_e3200_inlet_sieve_remove_sieve_from_supply_hose
+    parts:
+    - inlet_sieve
+    power: 'off'
+    zones:
+    - aquastop_valve
+    view: side
+    look_only_lines: []
+    witness:
+      part: inlet_sieve
+      expect: absent
+      anchor: null
+  - id: clean_replace_inlet_sieve
+    text:
+      en: Clean the filter and put it back in the supply hose.
+      nl: Maak de zeef schoon en plaats hem terug in de toevoerslang.
+    page: 46
+    quote:
+      text: Reinig de zeef. Plaats de zeef in de toevoerslang.
+      lang: nl
+      page: 46
+      en: Clean the filter. Put the filter in the supply hose.
+    done_when:
+    - id: sieve_clean
+      text:
+        en: The filter is clean.
+        nl: De zeef is schoon.
+      quote_ref: q_fix_e3200_inlet_sieve_clean_replace_inlet_sieve
+    - id: sieve_replaced_in_hose
+      text:
+        en: The filter is back in the supply hose.
+        nl: De zeef zit weer in de toevoerslang.
+      quote_ref: q_fix_e3200_inlet_sieve_clean_replace_inlet_sieve
+    parts:
+    - inlet_sieve
+    power: 'off'
+    zones:
+    - aquastop_valve
+    view: side
+    look_only_lines: []
+    witness:
+      part: inlet_sieve
+      expect: present
+      anchor: null
+  - id: tighten_water_connection
+    text:
+      en: Screw the water connection back on tight.
+      nl: Schroef de wateraansluiting weer vast.
+    page: 46
+    quote:
+      text: Schroef de wateraansluiting vast.
+      lang: nl
+      page: 46
+      en: Screw the water connection tight.
+    done_when:
+    - id: water_connection_tight
+      text:
+        en: The water connection is screwed on tight.
+        nl: De wateraansluiting zit stevig vast.
+      quote_ref: q_fix_e3200_inlet_sieve_tighten_water_connection
+    parts:
+    - inlet_sieve
+    power: 'off'
+    zones:
+    - aquastop_valve
+    view: side
+    look_only_lines: []
+    witness:
+      part: inlet_sieve
+      expect: present
+      anchor: null
+  - id: open_tap
+    text:
+      en: Turn the water tap back on.
+      nl: Draai de kraan open.
+    page: 45
+    quote:
+      text: Draai de kraan open.
+      lang: nl
+      page: 45
+      en: Turn the tap on.
+    done_when:
+    - id: tap_open
+      text:
+        en: The tap is turned on.
+        nl: De kraan is open.
+      quote_ref: q_fix_e3200_inlet_sieve_open_tap
+    parts: []
+    power: 'off'
+    zones:
+    - aquastop_valve
+    view: side
+    look_only_lines: []
+  - id: check_water_connection_leaks
+    text:
+      en: Check the water connection for leaks.
+      nl: Controleer de wateraansluiting op lekkage.
+    page: 46
+    quote:
+      text: Controleer de wateraansluiting op lekkage.
+      lang: nl
+      page: 46
+      en: Check the water connection for leaks.
+    done_when:
+    - id: water_connection_no_leak
+      text:
+        en: The water connection is dry.
+        nl: De wateraansluiting is droog.
+      quote_ref: q_fix_e3200_inlet_sieve_check_water_connection_leaks
+    parts:
+    - inlet_sieve
+    power: 'off'
+    zones:
+    - aquastop_valve
+    view: side
+    look_only_lines: []
+    witness:
+      part: inlet_sieve
+      expect: present
+      anchor: null
+  - id: plug_in_appliance
+    text:
+      en: Plug the dishwasher back in.
+      nl: Steek de stekker weer in het stopcontact.
+    page: 46
+    quote:
+      text: Plaats de stekker weer in het stopcontact.
+      lang: nl
+      page: 46
+      en: Put the plug back in the socket.
+    done_when: []
+    parts: []
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+  - id: switch_on_after_inlet_sieve
+    text:
+      en: Switch the dishwasher on.
+      nl: Schakel het apparaat in.
+    page: 46
+    quote:
+      text: Schakel het apparaat in.
+      lang: nl
+      page: 46
+      en: Switch the appliance on.
+    done_when: []
+    parts: []
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+- id: fix_e9240_clean_sieves
+  title:
+    en: Clean blocked filters (fault E:92-40)
+    nl: Verstopte zeven reinigen (storing E:92-40)
+  kind: fix
+  interval: null
+  fault_codes:
+  - E:92-40
+  landlord: false
+  duration_min: null
+  steps:
+  - id: clean_sieves
+    text:
+      en: Clean the filters, because they are dirty or blocked.
+      nl: 'De zeven zijn vuil of verstopt: maak ze schoon.'
+    page: 47
+    quote:
+      text: Zeven zijn vuil of verstopt. Reinig de zeven.
+      lang: nl
+      page: 47
+      en: The filters are dirty or blocked. Clean the filters.
+    done_when:
+    - id: fix_e9240_clean_sieves_0
+      text:
+        en: The filters are clean.
+        nl: De zeven zijn schoon.
+      quote_ref: q_fix_e9240_clean_sieves_clean_sieves
+    parts:
+    - filter_system
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+    witness:
+      part: filter_system
+      expect: present
+      anchor: null
+- id: fix_other_codes_power_reset
+  title:
+    en: Reset the dishwasher (faults E:01-00, E:90-10)
+    nl: Vaatwasser resetten (storingen E:01-00, E:90-10)
+  kind: fix
+  interval: null
+  fault_codes:
+  - E:01-00
+  - E:90-10
+  landlord: false
+  duration_min: null
+  steps:
+  - id: fix_other_codes_power_reset-unplug_appliance
+    text:
+      en: Unplug the dishwasher, or switch off its circuit at the fuse box.
+      nl: Haal de stekker uit het stopcontact of zet de zekering uit.
+    page: 47
+    quote:
+      text: Trek de stekker van het apparaat uit het stopcontact of schakel de zekering uit.
+      lang: nl
+      page: 47
+      en: Pull the appliance's plug out of the socket or switch off the fuse.
+    done_when: []
+    parts: []
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+  - id: wait_two_minutes
+    text:
+      en: Wait at least two minutes.
+      nl: Wacht minstens 2 minuten.
+    page: 47
+    quote:
+      text: Wacht ten minste 2 minuten.
+      lang: nl
+      page: 47
+      en: Wait at least 2 minutes.
+    done_when: []
+    parts: []
+    power: 'off'
+    zones: []
+    view: front
+    look_only_lines: []
+  - id: fix_other_codes_power_reset-plug_in_appliance
+    text:
+      en: Plug the dishwasher back in, or switch its circuit back on at the fuse box.
+      nl: Steek de stekker weer in het stopcontact of zet de zekering weer aan.
+    page: 47
+    quote:
+      text: Plaats de stekker van het apparaat in een stopcontact of schakel de zekering in.
+      lang: nl
+      page: 47
+      en: Put the appliance's plug in a socket or switch on the fuse.
+    done_when: []
+    parts: []
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+  - id: switch_on_appliance
+    text:
+      en: Switch the dishwasher on.
+      nl: Zet de vaatwasser aan.
+    page: 47
+    quote:
+      text: Schakel het apparaat in.
+      lang: nl
+      page: 47
+      en: Switch the appliance on.
+    done_when: []
+    parts: []
+    power: any
+    zones: []
+    view: front
+    look_only_lines: []
+keywords:
+- afvoerpomp
+- apparaatbehuizing
+- appliance casing
+- AquaStop housing / electric valve
+- AquaStop valve housing
+- AquaStop-behuizing
+- AquaStop-ventiel in kunststof behuizing
+- binnenruimte
+- bovenste servieskorf
+- bovenste sproeiarm
+- cilinder van de grove zeef
+- coarse filter
+- coarse filter cylinder
+- deksel van het glansspoelmiddelreservoir
+- detergent dispenser
+- dishwasher interior
+- E:01-00
+- E:20-60
+- E:32-00
+- E:61-02
+- E:61-03
+- E:90-10
+- E:92-40
+- filter system
+- glansspoelmiddel
+- glansspoelmiddelreservoir
+- grove zeef
+- heating element
+- inlet filter
+- lower spray arm
+- machinereiniging
+- micro filter
+- microzeef
+- onderste sproeiarm
+- onthardingszout
+- pompafdekking
+- pompwaaier
+- pump cover
+- pump impeller
+- rinse aid lid
+- rinse aid reservoir
+- sproeiarmen
+- upper rack
+- upper spray arm
+- vaatwasmiddelbakje
+- verwarmingselement
+- zeef in de toevoerslang
+- zeefsysteem
+- zeven

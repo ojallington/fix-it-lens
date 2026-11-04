@@ -1,0 +1,5 @@
+#!/bin/sh
+# Takes assistant attribution lines out of a commit message. Installed by `make hooks`, with the pre-commit guard.
+kept="$1.kept"
+grep -viE '^(co-authored-by:[[:space:]]*claude|claude-session:)' "$1" > "$kept"
+mv "$kept" "$1"

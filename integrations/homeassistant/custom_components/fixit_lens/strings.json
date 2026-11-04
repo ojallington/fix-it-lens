@@ -1,0 +1,131 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Fix-It Lens",
+        "description": "The address of your Fix-It Lens and a token your home made for Home Assistant. Make one that can write so ticking a job off works.",
+        "data": {
+          "url": "Address",
+          "token": "Home Assistant token"
+        }
+      },
+      "hassio_confirm": {
+        "title": "Fix-It Lens",
+        "description": "The Fix-It Lens add-on made a key for one of its homes. Add it to see that home's upkeep jobs here, tick them off and snooze them."
+      },
+      "reauth_confirm": {
+        "title": "Fix-It Lens",
+        "description": "Fix-It Lens refused the token (revoked, or the home was deleted). Make a new one and paste it here.",
+        "data": {
+          "token": "Home Assistant token"
+        }
+      },
+      "discover": {
+        "title": "Appliances Home Assistant knows",
+        "description": "Tick the ones to add to your Fix-It Lens home. Only each ticked one's maker, model, kind and name are sent. A model Fix-It Lens has a checked card for links it at once; any other gets its manual's pages, and its card is made on request. Tick none to add none.",
+        "data": {
+          "devices": "Appliances"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "That token was refused.",
+      "cannot_connect": "Fix-It Lens did not answer at that address.",
+      "read_only": "This token can only read, so it cannot add appliances. Make one that can write, or tick none.",
+      "refused": "Fix-It Lens did not add: {refused}"
+    },
+    "abort": {
+      "already_configured": "This household is already set up.",
+      "reauth_successful": "The new token works.",
+      "invalid_auth": "Fix-It Lens refused the key the add-on sent. Press Connect again in the add-on's panel.",
+      "cannot_connect": "The Fix-It Lens add-on did not answer. Check that it is running."
+    }
+  },
+  "services": {
+    "mark_done": {
+      "name": "Mark done",
+      "description": "Marks a Fix-It Lens job done, today or on a past date. The next date follows from the manual or your own schedule.",
+      "fields": {
+        "job": {
+          "name": "Job",
+          "description": "The job, as its next-due sensor's `job` attribute or the fixit_lens_job_due event gives it."
+        },
+        "date": {
+          "name": "Date",
+          "description": "The day it was done. Leave empty for today."
+        }
+      }
+    },
+    "snooze": {
+      "name": "Snooze",
+      "description": "Moves a Fix-It Lens job's due date later. It never moves a date earlier.",
+      "fields": {
+        "job": {
+          "name": "Job",
+          "description": "The job, as its next-due sensor's `job` attribute or the fixit_lens_job_due event gives it."
+        },
+        "until": {
+          "name": "Until",
+          "description": "The new due date, after the one it has now."
+        },
+        "days": {
+          "name": "Days",
+          "description": "Or: this many days after the date it is due now (or today, if it is overdue)."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "job_due": {
+        "name": "{job} due"
+      },
+      "next_job": {
+        "name": "Next job",
+        "state_attributes": {
+          "due_on": {
+            "name": "Due on"
+          },
+          "status": {
+            "name": "Status"
+          }
+        }
+      },
+      "overdue": {
+        "name": "Overdue jobs"
+      },
+      "due_now": {
+        "name": "Due jobs"
+      }
+    },
+    "todo": {
+      "upkeep": {
+        "name": "Upkeep"
+      }
+    },
+    "calendar": {
+      "upkeep": {
+        "name": "Upkeep"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "discover": {
+        "title": "Appliances Home Assistant knows",
+        "description": "Tick the ones to add to your Fix-It Lens home. Only each ticked one's maker, model, kind and name are sent. A model Fix-It Lens has a checked card for links it at once; any other gets its manual's pages, and its card is made on request. Tick none to add none.",
+        "data": {
+          "devices": "Appliances"
+        }
+      }
+    },
+    "error": {
+      "read_only": "This token can only read, so it cannot add appliances. Make one that can write, or tick none.",
+      "refused": "Fix-It Lens did not add: {refused}",
+      "cannot_connect": "Fix-It Lens did not answer at that address."
+    },
+    "abort": {
+      "nothing_found": "Home Assistant knows no appliance that your Fix-It Lens home does not have yet."
+    }
+  }
+}

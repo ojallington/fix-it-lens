@@ -1,0 +1,33 @@
+Licence for the data and media in this repository
+
+The data in cards/ and rules/ is licensed under the Creative Commons Attribution-ShareAlike 4.0 International
+licence (CC BY-SA 4.0): https://creativecommons.org/licenses/by-sa/4.0/legalcode.en
+
+Attribute it as "Fix-It Lens contributors", with a link to this repository and to the licence.
+
+What the licence covers: our own work in these files, and only that. That means the wording of every step, title,
+cue and warning, the structure, the selection and arrangement, and any database right in them.
+
+What it does not cover: the makers' quotes. A card carries short verbatim quotes from the maker's manual, each with
+its page, as the source of our own wording beside it: the `text` of every entry in a card's `quotes`, every field
+named `quote`, and a quote's `en` translation (as in cards/bosch/SMV4HAX40N.yaml), which renders the maker's words and
+is not ours to license. Each quote is (c) its maker, quoted with its source (maker, model, manual and page) under the
+right to quote (in the Netherlands, article 15a of the Auteurswet). This licence cannot license it, and does not. If
+you reuse a card, keep each quote with its source, or leave the quote out.
+
+The manuals themselves are not in this repository. A card holds a hash of each page's text, never the text, and the
+app links to the maker's own copy of the manual. A household's own uploaded copy stays with that household.
+
+The rest of this repository
+
+- Our own eval data (labels, test sentences and scores we wrote or computed, in eval/ and fixtures/): CC BY-SA 4.0, on
+  the terms above.
+- Recorded model output (the recorded replies in fixtures/ and eval/, kept so the eval can be rerun): we claim no
+  rights in it and grant none. Its use is subject to the model provider's terms.
+- brand/, apart from its code (such as brand/build.py, which is under Apache-2.0), and the README's images and video
+  (docs/readme/, including stop.gif): (c) the Fix-It Lens contributors, all rights reserved. You may show them to refer
+  to this project. Neither licence grants any right to the name or logo.
+- The demo photos: as stated in demo/replays/demo/CREDITS.md.
+
+To ask for a card or a quote to be changed or taken down, as a maker or as anyone whose rights it affects, write to
+oscar@craftycast.com and name the card's file.

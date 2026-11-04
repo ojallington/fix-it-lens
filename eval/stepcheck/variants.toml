@@ -1,0 +1,43 @@
+# Step-check variants. The ablation (B) is four rungs: abl_single -> abl_clauses -> judge (+ crop) -> judge_sam
+# (+ video witness); crop=false and clauses=false are check_clip kwargs in app/.
+
+[[variant]]
+id = "judge_sam"
+about = "production: clause judge at minimal + the SAM 3.1 witness (video, single-frame fallback)"
+effort = "minimal"
+witness = "sam"
+
+[[variant]]
+id = "judge"
+about = "the Spark judge alone at minimal, no witness (the two-witness row)"
+effort = "minimal"
+witness = "none"
+
+[[variant]]
+id = "judge_sam_low"
+about = "production at effort low (the minimal/low A/B)"
+effort = "low"
+witness = "sam"
+
+[[variant]]
+id = "grey"
+about = "negative control: production with every frame flat grey"
+effort = "minimal"
+witness = "sam"
+grey = true
+
+[[variant]]
+id = "abl_single"
+about = "ablation rung 1: the last frame only, whole frame, no clauses, no witness"
+effort = "minimal"
+witness = "none"
+frames = "last"
+crop = false
+clauses = false
+
+[[variant]]
+id = "abl_clauses"
+about = "ablation rung 2: the clip, clause judge on the whole frame, no crop, no witness"
+effort = "minimal"
+witness = "none"
+crop = false

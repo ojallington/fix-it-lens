@@ -1,0 +1,110 @@
+# What a fridge-freezer manual usually gives, derived from the gold cards (eval/gold.py). Names only.
+# One gold card so far: every item has evidence 1, a weak prompt, and the list is not complete.
+# Format and checks: eval/checklist.py.
+appliance_kind: fridge
+gold_cards: [electrolux__KNA6LE18S]
+items:
+  - id: fridge.defrost
+    names: {en: Defrost the freezer, nl: Vriezer ontdooien}
+    kind: upkeep
+    who: user
+    evidence: 1
+    note: the headline job on a freezer without frost-free
+    gold: [electrolux__KNA6LE18S:defrost_freezer, electrolux__KNA6LE18S:too_much_frost]
+  - id: fridge.drain_hole
+    names: {en: Clean the defrost water drain hole, nl: Afvoergaatje voor dooiwater reinigen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:clean_drain_hole]
+  - id: fridge.clean_interior
+    names: {en: Clean the inside and the door seals, nl: Binnenkant en deurrubbers reinigen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:clean_interior]
+  - id: fridge.leave_unused
+    names: {en: Leave the appliance unused for a long time, nl: Apparaat lange tijd buiten gebruik stellen}
+    kind: upkeep
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:leave_unused]
+  - id: fridge.not_working
+    names: {en: Appliance does not work, nl: Apparaat werkt niet}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:not_working]
+  - id: fridge.water_inside
+    names: {en: Water inside the fridge, nl: Water in de koelkast}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:water_in_fridge]
+  - id: fridge.water_on_floor
+    names: {en: Water on the floor, nl: Water op de vloer}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:water_on_floor]
+  - id: fridge.compressor_runs
+    names: {en: Compressor runs all the time, nl: Compressor draait voortdurend}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:compressor_runs]
+  - id: fridge.condensation
+    names: {en: Too much condensation, nl: Te veel condens}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:condensation]
+  - id: fridge.temperature
+    names: {en: Temperature cannot be set, nl: Temperatuur niet in te stellen}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:temp_cannot_set]
+  - id: fridge.alarm
+    names: {en: Alarm sounds or shows, nl: Alarm klinkt of brandt}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:alarm_sounds]
+  - id: fridge.noisy
+    names: {en: Appliance is noisy, nl: Apparaat maakt lawaai}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:noisy]
+  - id: fridge.door_hard_to_open
+    names: {en: Door hard to open, nl: Deur gaat moeilijk open}
+    kind: fix
+    who: user
+    evidence: 1
+    gold: [electrolux__KNA6LE18S:door_hard_to_open]
+  - id: fridge.pro.refrigerant
+    names: {en: Refrigerant circuit service, nl: Onderhoud van het koelcircuit}
+    who: professional
+    evidence: 1
+    gold: [electrolux__KNA6LE18S]
+  - id: fridge.pro.electrical
+    names: {en: 'Electrical parts: mains cable, plug, compressor', nl: 'Elektrische delen: netsnoer, stekker, compressor'}
+    who: professional
+    evidence: 1
+    gold: [electrolux__KNA6LE18S]
+  - id: fridge.pro.installation
+    names: {en: Installation and earthing, nl: Installatie en aarding}
+    who: professional
+    evidence: 1
+    gold: [electrolux__KNA6LE18S]
+  - id: fridge.pro.repair
+    names: {en: Repairs, a lamp or damaged door seals, nl: Reparaties, lampje of beschadigde deurrubbers}
+    who: professional
+    evidence: 1
+    gold: [electrolux__KNA6LE18S]
+  - id: fridge.pro.fault_recurs
+    names: {en: Warning lights that keep flashing, nl: Waarschuwingslampjes die blijven knipperen}
+    who: professional
+    evidence: 1
+    gold: [electrolux__KNA6LE18S]

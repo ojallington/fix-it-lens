@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "brand": "acme",
+  "model": "WM-0000",
+  "aliases": [
+    "WM 0000"
+  ],
+  "appliance_kind": "washer",
+  "appliance_file_model": "muse-wonder-1.0",
+  "manual": {
+    "source_url": "https://example.invalid/acme/wm-0000/manual-en",
+    "title": "Acme WM-0000 user manual - FAKE",
+    "doc_id": "AC-0000-EN",
+    "lang": "en",
+    "page_count": 6,
+    "page_text_sha256": [
+      "9a221b9c3e86bde5f0398bdfe7a1b0b17d46f5b13f0c34a3c33478fc5874da2d",
+      "38a7c723b9f3906d2c8a1cb890ea11b1fba5e887cba2a98ab074d702c4f58a1d",
+      "c769a4d3b6e94cbf72bfcb253da0b648e23a3c419c4a1fdf5b4a2587d91a912a",
+      "f3220c118a5578b063d642f79f60141dd2c08aeca841e05796c488d3c6a03f97",
+      "c8ebd3047aba676df24719e74494699c880777d56773be5826fe93001a79d094",
+      "6ca23082bc68b9fbf499dda6658f007f5e3ea8743c448e012ab1960e67d79bcf"
+    ]
+  },
+  "parts": [
+    {
+      "id": "debris_filter",
+      "names": {
+        "en": "debris filter",
+        "nl": "pompfilter"
+      },
+      "locate": "appearance",
+      "cue": "round knob behind a small flap, bottom right of the front panel",
+      "sam_text": "filter knob",
+      "kind": "allowed"
+    },
+    {
+      "id": "filter_flap",
+      "names": {
+        "en": "filter flap",
+        "nl": "filterklep"
+      },
+      "locate": "appearance",
+      "cue": "small rectangular flap, bottom right",
+      "sam_text": "small flap",
+      "kind": "allowed"
+    },
+    {
+      "id": "back_panel",
+      "names": {
+        "en": "back panel",
+        "nl": "achterwand"
+      },
+      "locate": "function",
+      "cue": "the metal panel on the back held by screws",
+      "sam_text": "back panel",
+      "kind": "red_zone"
+    }
+  ],
+  "red_zones": [
+    {
+      "id": "casing",
+      "part_id": "back_panel",
+      "rule_id": "xx.mains.casing",
+      "page": 2,
+      "quote": {
+        "text": "Do not open the casing. Behind the back panel is mains power.",
+        "lang": "en",
+        "page": 2
+      },
+      "ring_cm": 5
+    }
+  ],
+  "quotes": [
+    {
+      "id": "q_interval",
+      "text": "Clean the debris filter every 3 months.",
+      "lang": "en",
+      "page": 3
+    },
+    {
+      "id": "q_arrows",
+      "text": "Screw the filter back in clockwise until the arrow marks line up.",
+      "lang": "en",
+      "page": 4
+    },
+    {
+      "id": "q_duration",
+      "text": "The whole job takes about 10 minutes.",
+      "lang": "en",
+      "page": 4
+    }
+  ],
+  "jobs": [
+    {
+      "id": "clean_debris_filter",
+      "title": {
+        "en": "Clean the debris filter",
+        "nl": "Pompfilter schoonmaken"
+      },
+      "kind": "upkeep",
+      "interval": {
+        "every": 3,
+        "unit": "month",
+        "quote_ref": "q_interval"
+      },
+      "fault_codes": [
+        "E21"
+      ],
+      "landlord": false,
+      "duration_min": {
+        "value": 10,
+        "source": "manual_quote",
+        "ref": "q_duration"
+      },
+      "steps": [
+        {
+          "id": "unplug",
+          "text": {
+            "en": "Unplug the machine from the socket."
+          },
+          "page": 4,
+          "quote": {
+            "text": "Unplug the machine from the socket before you start.",
+            "lang": "en",
+            "page": 4
+          },
+          "done_when": [
+            {
+              "id": "plug_out",
+              "text": {
+                "en": "The plug is out of the socket"
+              },
+              "quote_ref": null
+            }
+          ],
+          "parts": [],
+          "power": "off",
+          "zones": [],
+          "view": "front",
+          "look_only_lines": [],
+          "witness": null
+        },
+        {
+          "id": "unplug",
+          "text": {
+            "en": "Open the filter flap, bottom right."
+          },
+          "page": 4,
+          "quote": {
+            "text": "Open the filter flap at the bottom right of the front panel.",
+            "lang": "en",
+            "page": 4
+          },
+          "done_when": [
+            {
+              "id": "flap_open",
+              "text": {
+                "en": "The flap is open and the filter knob is visible"
+              },
+              "quote_ref": null
+            }
+          ],
+          "parts": [
+            "filter_flap",
+            "debris_filter"
+          ],
+          "power": "off",
+          "zones": [],
+          "view": "front",
+          "look_only_lines": []
+        },
+        {
+          "id": "refit_filter",
+          "text": {
+            "en": "Screw the filter back in until the arrows line up."
+          },
+          "page": 4,
+          "quote": {
+            "text": "Screw the filter back in clockwise until the arrow marks line up.",
+            "lang": "en",
+            "page": 4
+          },
+          "done_when": [
+            {
+              "id": "arrows_aligned",
+              "text": {
+                "en": "The arrow marks line up"
+              },
+              "quote_ref": "q_arrows"
+            }
+          ],
+          "parts": [
+            "debris_filter"
+          ],
+          "power": "off",
+          "zones": [
+            "casing"
+          ],
+          "zone_rings": [
+            {
+              "zone_id": "casing",
+              "ring_cm": 3
+            }
+          ],
+          "view": "front",
+          "look_only_lines": [
+            "The back panel stays on; you only look at the front."
+          ],
+          "witness": {
+            "part": "debris_filter",
+            "expect": "present",
+            "anchor": null
+          }
+        }
+      ],
+      "due_name": {
+        "en": "debris filter",
+        "nl": "pompfilter"
+      }
+    }
+  ],
+  "keywords": [
+    "pompfilter",
+    "filterklep",
+    "E21"
+  ],
+  "checks": null
+}

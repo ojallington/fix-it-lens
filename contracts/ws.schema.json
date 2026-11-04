@@ -1,0 +1,1554 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fixit.invalid/contracts/ws.schema.json",
+  "title": "WsProtocol",
+  "description": "Phone <-> server WebSocket protocol, JSON text frames. Every message has a seq (per direction, from 0) and t_ms. Heartbeat 2 s; resume by session_id and last_seq (the server keeps a 10-minute ring of s2c messages).",
+  "$defs": {
+    "RuleId": {
+      "type": "string",
+      "pattern": "^[a-z]{2}\\.[a-z]+\\.[a-z_]+$"
+    },
+    "Hello": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "session_id",
+        "last_seq",
+        "client",
+        "lang"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "hello"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "session_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "last_seq": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "household": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "client": {
+          "type": "string",
+          "enum": [
+            "phone",
+            "quest",
+            "spectator"
+          ]
+        },
+        "lang": {
+          "type": "string",
+          "pattern": "^[a-z]{2}$"
+        },
+        "replay_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "A recording to play; the literal golden plays the curated one (the hello is refused while none is curated)."
+        },
+        "appliance_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Set when a reminder opened the app: the session starts on this appliance"
+        },
+        "job_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Set with appliance_id: the job to start"
+        }
+      },
+      "description": "First message. With session_id and last_seq it resumes: the server re-sends every s2c message after last_seq."
+    },
+    "Frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "frame_id",
+        "jpeg_1024",
+        "phash"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "frame"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "frame_id": {
+          "type": "string"
+        },
+        "jpeg_1024": {
+          "type": "string",
+          "contentEncoding": "base64",
+          "description": "JPEG, long edge <= 1024 px"
+        },
+        "phash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{16}$",
+          "description": "64-bit perceptual hash, hex"
+        },
+        "width": {
+          "type": "integer"
+        },
+        "height": {
+          "type": "integer"
+        }
+      },
+      "description": "Latest-wins: the phone drops frames rather than queue them. t_ms is the capture time."
+    },
+    "G1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "zone_id",
+        "kind",
+        "ttc_ms",
+        "dist_cm",
+        "frame_id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "g1"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "zone_id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "stop",
+            "pause"
+          ]
+        },
+        "ttc_ms": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "dist_cm": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "frame_id": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "ttc",
+            "distance",
+            "covered",
+            "hand_lost",
+            "stale_frame"
+          ]
+        }
+      },
+      "description": "The phone fired G1 on the device; the server records it and moves the safety state."
+    },
+    "Utterance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "utterance_id",
+        "text",
+        "lang"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "utterance"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "utterance_id": {
+          "type": "string"
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "audio_wav_b64": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "contentEncoding": "base64"
+        },
+        "lang": {
+          "type": "string",
+          "pattern": "^[a-z]{2}$"
+        }
+      },
+      "description": "Typed text, or a WAV (mono 16-bit, 16 or 24 kHz) for the server to transcribe."
+    },
+    "Tap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "action"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "tap"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "done",
+            "repeat",
+            "next",
+            "back",
+            "stop",
+            "yes",
+            "no",
+            "closer",
+            "share_note",
+            "confirm_gas_tap",
+            "confirm_plate",
+            "end",
+            "did_it"
+          ]
+        },
+        "step_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The step the person saw when they tapped (did_it, done, repeat, next, back, closer): the server refuses a tap whose step is not the current one and says why (notice tap_not_current), so a tap never lands on a step the person has not seen. Absent: the current step (phones before 1.50), or a tap not about a step (end, stop, confirm_plate)"
+        },
+        "arg": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "confirm_plate: JSON of the chosen options, {field name: [option per uncertain index]}. end: the person ends the session (the server closes it and records the outcome). did_it: after the camera could not check a step, the person says they did it; recorded as confirmed by the person, never as checked."
+        }
+      }
+    },
+    "JobReady": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "job_id",
+        "ready"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "job_ready"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "job_id": {
+          "type": "string"
+        },
+        "ready": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "The ids of the preview's needs the person says they have ready; an id left out is one they go ahead without"
+        }
+      },
+      "description": "The person's 'I'm ready', answering job_preview: recorded as said by the person, never as checked. The server then sends the first step. It never clears a hold, a stop or a safety rule, and never changes a step's power, zones or camera"
+    },
+    "View": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "ok",
+        "kind",
+        "scale_cm_per_px"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "view"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "front",
+            "side"
+          ]
+        },
+        "scale_cm_per_px": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        }
+      },
+      "description": "The phone's view check result."
+    },
+    "PlatePhoto": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "photo_id",
+        "jpeg"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "plate_photo"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "photo_id": {
+          "type": "string"
+        },
+        "jpeg": {
+          "type": "string",
+          "contentEncoding": "base64"
+        }
+      }
+    },
+    "Ping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "ping"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "description": "Heartbeat, every 2 s, both ways. 5 s of silence means reconnect."
+    },
+    "HelloOk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "session_id",
+        "resumed",
+        "mode"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "hello_ok"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "resumed": {
+          "type": "boolean"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "api",
+            "local",
+            "replay"
+          ]
+        }
+      }
+    },
+    "Outline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "part_id",
+        "kind",
+        "mask_svg",
+        "frame_id",
+        "conf"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "outline"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "part_id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "target",
+            "do_not_touch",
+            "context"
+          ]
+        },
+        "mask_svg": {
+          "type": "string"
+        },
+        "frame_id": {
+          "type": "string"
+        },
+        "conf": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "label": {
+          "type": "string"
+        }
+      }
+    },
+    "ZoneMsg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "zone_id",
+        "rule_id",
+        "ring_cm",
+        "mask_svg",
+        "frame_id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "zone"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "zone_id": {
+          "type": "string"
+        },
+        "rule_id": {
+          "$ref": "#/$defs/RuleId"
+        },
+        "ring_cm": {
+          "type": "number",
+          "minimum": 3
+        },
+        "ring_step": {
+          "type": "boolean"
+        },
+        "mask_svg": {
+          "type": "string"
+        },
+        "frame_id": {
+          "type": "string"
+        },
+        "known_width_cm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "The part's real width, from the card or rules; the view check uses it for scale"
+        },
+        "tool_len_cm": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Set when SAM measured a tool in the hand; the phone grows the ring by it"
+        }
+      },
+      "description": "A red zone for G1 to enforce on the device."
+    },
+    "StepMsg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "job_id",
+        "step_id",
+        "index",
+        "of",
+        "text",
+        "view",
+        "power"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "step"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "job_id": {
+          "type": "string"
+        },
+        "step_id": {
+          "type": "string"
+        },
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "of": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "text": {
+          "type": "string",
+          "description": "Already passed by G0"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The manual's page; absent only with origin fixit"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "fixit"
+          ],
+          "description": "Absent means manual. fixit: the phone shows its own fixed words (our step, not from the manual), never text from the server, and no page"
+        },
+        "quote": {
+          "type": "string"
+        },
+        "view": {
+          "type": "string",
+          "enum": [
+            "front",
+            "side"
+          ]
+        },
+        "power": {
+          "type": "string",
+          "enum": [
+            "on",
+            "off",
+            "any"
+          ]
+        },
+        "quote_en": {
+          "type": "string",
+          "description": "English translation of the manual's quote, shown under it on the step card (the quote stays verbatim)"
+        },
+        "camera": {
+          "type": "string",
+          "enum": [
+            "check",
+            "find",
+            "none"
+          ],
+          "description": "Absent means check. find: outlines, no done check; none: no camera; the person confirms either. A power-off step still waits for the plug seen out"
+        }
+      },
+      "if": {
+        "required": [
+          "origin"
+        ],
+        "properties": {
+          "origin": {
+            "const": "fixit"
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "page"
+              ]
+            },
+            {
+              "required": [
+                "quote"
+              ]
+            },
+            {
+              "required": [
+                "quote_en"
+              ]
+            }
+          ]
+        }
+      },
+      "else": {
+        "required": [
+          "page"
+        ]
+      }
+    },
+    "JobPreview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "job_id",
+        "title",
+        "needs",
+        "steps"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "job_preview"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "job_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string",
+          "description": "The job's title, already passed by G0"
+        },
+        "needs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "title": "NeedItem",
+            "required": [
+              "id",
+              "what",
+              "page",
+              "quote"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "what": {
+                "type": "string",
+                "description": "Already passed by G0"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "product",
+                  "tool",
+                  "consumable"
+                ]
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "quote": {
+                "type": "string",
+                "description": "The manual's words that call for it, verbatim"
+              },
+              "quote_en": {
+                "type": "string",
+                "description": "English translation of the quote, shown under it (the quote stays verbatim)"
+              }
+            }
+          },
+          "description": "What to have ready, each with the manual's page and quote; [] when the card lists none"
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "title": "PreviewStep",
+            "required": [
+              "step_id",
+              "text",
+              "power",
+              "camera",
+              "warnings"
+            ],
+            "properties": {
+              "step_id": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string",
+                "description": "The step's own line from the card, already passed by G0 (what the step card says)"
+              },
+              "origin": {
+                "type": "string",
+                "enum": [
+                  "manual",
+                  "fixit"
+                ],
+                "description": "Absent means manual. fixit: the phone shows its own fixed words, no page or quote"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Absent only with origin fixit"
+              },
+              "quote": {
+                "type": "string",
+                "description": "The manual's full words for the step, verbatim"
+              },
+              "quote_en": {
+                "type": "string"
+              },
+              "power": {
+                "type": "string",
+                "enum": [
+                  "on",
+                  "off",
+                  "any"
+                ]
+              },
+              "camera": {
+                "type": "string",
+                "enum": [
+                  "check",
+                  "find",
+                  "none"
+                ],
+                "description": "The card step's camera mode (check when the card leaves it out)"
+              },
+              "warnings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "title": "PreviewWarning",
+                  "required": [
+                    "kind",
+                    "text"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "zone",
+                        "power"
+                      ],
+                      "description": "zone: a red zone active on the step; power: the step's power precondition"
+                    },
+                    "text": {
+                      "type": "string",
+                      "description": "Already passed by G0: a zone's manual quote, or the fixed power line from code"
+                    },
+                    "rule_id": {
+                      "$ref": "#/$defs/RuleId",
+                      "description": "With zone: the rule that governs it"
+                    }
+                  }
+                }
+              }
+            },
+            "if": {
+              "required": [
+                "origin"
+              ],
+              "properties": {
+                "origin": {
+                  "const": "fixit"
+                }
+              }
+            },
+            "then": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "page"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "quote"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "quote_en"
+                    ]
+                  }
+                ]
+              }
+            },
+            "else": {
+              "required": [
+                "page"
+              ]
+            }
+          },
+          "description": "Every step of the job, in order"
+        }
+      },
+      "description": "The job up front, before it starts: what you need and what you are going to do. Sent after hello_ok when hello names a job (and again when the job restarts), before step 0; the first step follows the person's job_ready. Read only: it starts nothing, and a step's checks and safety gates run at the step as always"
+    },
+    "Checking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "step_id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "checking"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "step_id": {
+          "type": "string"
+        },
+        "check_id": {
+          "type": "string"
+        }
+      },
+      "description": "Shown at once when a check starts."
+    },
+    "VerdictMsg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "verdict"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "verdict"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "verdict": {
+          "$ref": "judge.schema.json#/$defs/Verdict"
+        }
+      }
+    },
+    "Sentence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "id",
+        "text"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "sentence"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "id": {
+          "type": "string"
+        },
+        "step_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The step this line is about: the step current when the guide turn began, or the step a fixed line belongs to. Absent: not tied to a step (the disclosure, a hazard script). The phone hides a line whose step is no longer the current one"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "description": "Only sentences G0 passed. Drawn and spoken."
+    },
+    "Held": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "rule_id",
+        "line",
+        "words"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "held"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "sentence_id": {
+          "type": "string"
+        },
+        "step_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The step this line is about: the step current when the guide turn began, or the step a fixed line belongs to. Absent: not tied to a step (the disclosure, a hazard script). The phone hides a line whose step is no longer the current one"
+        },
+        "rule_id": {
+          "$ref": "#/$defs/RuleId"
+        },
+        "line": {
+          "type": "string"
+        },
+        "words": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many words were held"
+        }
+      },
+      "description": "A sentence G0 held. The held text is never sent; the amber bar shows the rule id and line."
+    },
+    "SafetyMsg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "state"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "safety"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "state": {
+          "$ref": "safety.schema.json#/$defs/SafetyState"
+        }
+      }
+    },
+    "Rail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "tool",
+        "args_short",
+        "result_short",
+        "ms"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "rail"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "tool": {
+          "type": "string"
+        },
+        "args_short": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "result_short": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "ms": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "Notice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "kind"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "notice"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "slow_connection",
+            "hand_lost",
+            "paused",
+            "resumed",
+            "reconnected",
+            "local_mode",
+            "cap_reached",
+            "lookup_failed",
+            "ingest_failed",
+            "job_refused",
+            "no_recording",
+            "transcribe_failed",
+            "no_rules_for_country",
+            "did_it_offered",
+            "tap_not_current"
+          ]
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "Replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "badge",
+        "replay_id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "replay"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "badge": {
+          "type": "boolean",
+          "const": true
+        },
+        "replay_id": {
+          "type": "string"
+        }
+      },
+      "description": "Sent first in a replay; the UI shows a permanent REPLAY badge."
+    },
+    "Pong": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "pong"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "Timings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "hands_ms",
+        "stops"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "timings"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "hands_ms": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "description": "Hand landmarks on the device, ms per frame, for the frames since the last timings message"
+        },
+        "stops": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "frame_id",
+              "ms"
+            ],
+            "properties": {
+              "frame_id": {
+                "type": "string"
+              },
+              "ms": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "description": "Each G1 stop since the last timings message: its frame (the id in its g1 message) and frame capture to the STOP painted, in ms"
+        }
+      },
+      "description": "The device's own timings, for the acceptance numbers (landmarks ms per frame, frame to STOP): sent every 5 s while there are new ones and when the session ends. Numbers and frame ids only. The server records it and does nothing else with it."
+    },
+    "C2S": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Hello"
+        },
+        {
+          "$ref": "#/$defs/Frame"
+        },
+        {
+          "$ref": "#/$defs/G1"
+        },
+        {
+          "$ref": "#/$defs/Utterance"
+        },
+        {
+          "$ref": "#/$defs/Tap"
+        },
+        {
+          "$ref": "#/$defs/JobReady"
+        },
+        {
+          "$ref": "#/$defs/View"
+        },
+        {
+          "$ref": "#/$defs/PlatePhoto"
+        },
+        {
+          "$ref": "#/$defs/Ping"
+        },
+        {
+          "$ref": "#/$defs/Timings"
+        }
+      ]
+    },
+    "PlateRead": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "seq",
+        "t_ms",
+        "photo_id",
+        "brand",
+        "model",
+        "fields"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "plate_read"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "photo_id": {
+          "type": "string"
+        },
+        "brand": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Lower-case slug, null if unread"
+        },
+        "model": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The public model code, null if unread"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "value",
+              "uncertain"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "uncertain": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "index",
+                    "options"
+                  ],
+                  "properties": {
+                    "index": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "Character index in value"
+                    },
+                    "options": {
+                      "type": "array",
+                      "minItems": 2,
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "title": "PlateUncertain"
+                }
+              }
+            },
+            "title": "PlateField"
+          }
+        }
+      },
+      "description": "What the plate read found, for the plate card (\"Letter O or zero?\": one tap answers with Tap confirm_plate). Lives only in the session; never in a card or the repo."
+    },
+    "S2C": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/HelloOk"
+        },
+        {
+          "$ref": "#/$defs/Outline"
+        },
+        {
+          "$ref": "#/$defs/ZoneMsg"
+        },
+        {
+          "$ref": "#/$defs/JobPreview"
+        },
+        {
+          "$ref": "#/$defs/StepMsg"
+        },
+        {
+          "$ref": "#/$defs/Checking"
+        },
+        {
+          "$ref": "#/$defs/VerdictMsg"
+        },
+        {
+          "$ref": "#/$defs/Sentence"
+        },
+        {
+          "$ref": "#/$defs/Held"
+        },
+        {
+          "$ref": "#/$defs/SafetyMsg"
+        },
+        {
+          "$ref": "#/$defs/Rail"
+        },
+        {
+          "$ref": "#/$defs/Notice"
+        },
+        {
+          "$ref": "#/$defs/Replay"
+        },
+        {
+          "$ref": "#/$defs/Pong"
+        },
+        {
+          "$ref": "#/$defs/PlateRead"
+        }
+      ]
+    },
+    "CapClose": {
+      "description": "Not a message: the reason text of a WebSocket close with code 4429, as JSON. A spend cap was reached; the same error codes as a REST 429.",
+      "type": "object",
+      "required": [
+        "error",
+        "reopens_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "type": "string",
+          "enum": [
+            "home_cap",
+            "global_cap",
+            "judges_cap"
+          ]
+        },
+        "reopens_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "ISO 8601 UTC; the next UTC midnight for home_cap; null for judges_cap (the link's spend is a total, ever, so it does not reopen), and for global_cap when no reopening time is known"
+        }
+      },
+      "x-close-code": 4429,
+      "if": {
+        "properties": {
+          "error": {
+            "const": "home_cap"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reopens_at": {
+            "type": "string"
+          }
+        }
+      },
+      "else": {
+        "if": {
+          "properties": {
+            "error": {
+              "const": "judges_cap"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "reopens_at": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    },
+    "GoneClose": {
+      "description": "Not a message: the reason text of a WebSocket close with code 4410, as JSON. The household was deleted (DELETE /household): the server closes every open session of it before it removes the files, and closes any later hello for it the same way. Final: the phone does not reconnect and goes back to the start.",
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "type": "string",
+          "const": "household_deleted"
+        }
+      },
+      "x-close-code": 4410
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/C2S"
+    },
+    {
+      "$ref": "#/$defs/S2C"
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fixit.invalid/contracts/feedback.schema.json",
+  "title": "FeedbackRecord",
+  "description": "One line per answer to the post-session feedback form (eval/consent/feedback.md, which names each question's key), appended to FIXIT_PRIVATE/feedback/feedback.jsonl by the server after a session in the app, or by `python -m eval.feedback import` from a filled PDF. Only a household in the store's pilot_cohort view writes one (consented, not deleted, not our own or a test, joined by a pilot invite). Written answers are stored exactly as typed, never trimmed or rewritten by the server. A deleted household's records go with it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "household",
+    "at",
+    "source",
+    "lang",
+    "form_version",
+    "answers",
+    "quote",
+    "quote_name",
+    "withdrawn_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^fb-[0-9a-f]{12}$"
+    },
+    "household": {
+      "type": "string",
+      "minLength": 1,
+      "description": "households.id"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "app",
+        "pdf"
+      ]
+    },
+    "lang": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "nl",
+        "en",
+        null
+      ]
+    },
+    "form_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "The form these answers' keys belong to"
+    },
+    "answers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "would_use",
+        "would_use_why",
+        "practical",
+        "hard",
+        "unsafe",
+        "unsafe_which",
+        "monthly",
+        "friend"
+      ],
+      "description": "null is no answer. Tick boxes take their box's value; written answers are as typed",
+      "properties": {
+        "would_use": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "yes",
+            "maybe",
+            "no",
+            null
+          ]
+        },
+        "would_use_why": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000,
+          "description": "As typed; longer than 2,000 characters is refused (422), never cut"
+        },
+        "practical": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "yes",
+            "partly",
+            "no",
+            null
+          ]
+        },
+        "hard": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000,
+          "description": "As typed; longer than 2,000 characters is refused (422), never cut"
+        },
+        "unsafe": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "no",
+            "yes",
+            null
+          ]
+        },
+        "unsafe_which": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000,
+          "description": "As typed; longer than 2,000 characters is refused (422), never cut"
+        },
+        "monthly": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000,
+          "description": "As typed; longer than 2,000 characters is refused (422), never cut"
+        },
+        "friend": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000,
+          "description": "As typed; longer than 2,000 characters is refused (422), never cut"
+        }
+      }
+    },
+    "quote": {
+      "type": "string",
+      "enum": [
+        "none",
+        "anonymous",
+        "named"
+      ],
+      "description": "none: the answers count in the totals and are never printed"
+    },
+    "quote_name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "The name to quote them by: set with quote named, null otherwise. Withdrawing blanks it, so a withdrawn named quote may have none"
+    },
+    "withdrawn_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Set when the household withdrew: its words are never printed again"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "quote": {
+            "not": {
+              "const": "named"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "quote_name": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "quote": {
+            "const": "named"
+          },
+          "withdrawn_at": {
+            "type": "null"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "quote_name": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ]
+}

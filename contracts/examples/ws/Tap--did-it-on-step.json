@@ -1,0 +1,7 @@
+{
+  "type": "tap",
+  "seq": 21,
+  "t_ms": 71508,
+  "action": "did_it",
+  "step_id": "open_flap"
+}

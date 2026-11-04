@@ -1,0 +1,44 @@
+{
+  "entity": {
+    "sensor": {
+      "job_due": {
+        "default": "mdi:calendar-clock"
+      },
+      "next_job": {
+        "default": "mdi:wrench-clock"
+      },
+      "overdue": {
+        "default": "mdi:alert-circle",
+        "range": {
+          "0": "mdi:check-circle-outline",
+          "1": "mdi:alert-circle"
+        }
+      },
+      "due_now": {
+        "default": "mdi:clock-alert-outline",
+        "range": {
+          "0": "mdi:check-circle-outline",
+          "1": "mdi:clock-alert-outline"
+        }
+      }
+    },
+    "todo": {
+      "upkeep": {
+        "default": "mdi:wrench-clock"
+      }
+    },
+    "calendar": {
+      "upkeep": {
+        "default": "mdi:calendar-check"
+      }
+    }
+  },
+  "services": {
+    "mark_done": {
+      "service": "mdi:check-circle"
+    },
+    "snooze": {
+      "service": "mdi:alarm-snooze"
+    }
+  }
+}

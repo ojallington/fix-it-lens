@@ -1,0 +1,21 @@
+# The public history was squashed into one commit at the public cut, and the private history is kept. These are the
+# commits from before that cut which eval/claims.json and eval/failures.toml cite. `make claims` and `make eval` take
+# a cited commit if it is listed here or in HEAD's history; any other fails. One full sha per line.
+07f12a8ec673c042026a6c91d45ef1326a9bac84
+30df6d5a29835824732d3cdb7453be394eb8e707
+332a519a36f9bbc47e99ebfd3de7b5d7cd9ea6df
+3b4d11109344d9a514457976702ee8209a441bc1
+4581d2c2adaad16b953f03bd2df55d3bd08a262d
+4e59a9bb79a57cea84b0389ba6dec6d278d5ff19
+5565182f2fe898a76bd32141f33891f31a35f2d7
+7f9d7360df9efc6aff2e9392bf30f76c8cb8446e
+85122a60dc54964da4414b3de730f1981ab056a7
+91e3089e8d282441ac37134ce6f18b6f5a92ad2e
+93a734cb2b75146c832c82e019f464a3c83416f2
+af739168fdf37d5ba438d6cdcd77d11160bbcf6d
+c8b842315951ca7e55afb961a6411fea824e0a2e
+cb45f237ec0ab4b12d56dd30e2bda44f4b38ac6e
+d55c91ccea50d5b56dd9d977bc0b51b1cb5d36e2
+fb654046128ab5e20d0318e65c5c2a7481293cea
+fe0f0ff74b2dfb15e8bd4e08e837b664925d13e0
+fe748498cc658ab2b05d076bd5c4c4d8f67d9002

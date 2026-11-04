@@ -1,0 +1,19 @@
+{
+  "id": "stepcheck.false_done",
+  "value": 2,
+  "unit": "of 40",
+  "n": 40,
+  "ci": [
+    0.014,
+    0.165
+  ],
+  "measured_at": "2026-10-30T20:00:00Z",
+  "commit": "abc1234",
+  "command": "make eval",
+  "rows": [
+    "stepcheck"
+  ],
+  "readme_anchor": "#eval",
+  "target": "2 of 40",
+  "note": "example only"
+}

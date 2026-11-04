@@ -1,0 +1,27 @@
+# Fixed text for the app (phone/). The AI disclosure is EU AI Act Art. 50(1),
+# in force since 2 Aug 2026, and the Meta Model API ToS §1 puts it on us; §10.1 sets the 18+ line.
+# A positive scope statement, never "not professional advice" or "use at your own risk" as the spoken line, and no
+# promise that anything is safe: the rules stop, the AI shows where things are. Never model text; never edited per
+# session. The Dutch strings are drafts until the maintainer checks them.
+version: 1.0.0
+first_run:
+  en: "Fix-It Lens is an AI assistant. It guides only the maintenance your appliance's own manual says you can do yourself, and it shows the manual page for each step. It stops and tells you who to call for gas, electrical work, opening casings and anything outside your manual. It can misread what it sees: if a step doesn't match what's in front of you, stop and check the page. You must be 18 or older. Not affiliated with Bosch, Samsung, the boiler makers or Meta."
+  nl: "Fix-It Lens is een AI-assistent. Hij begeleidt alleen onderhoud dat de handleiding van je apparaat je zelf laat doen, en laat bij elke stap de pagina zien. Bij gas, elektra, het openen van behuizingen en alles buiten je handleiding stopt hij en zegt hij wie je moet bellen. Hij kan zich vergissen in wat hij ziet: klopt een stap niet met wat je voor je hebt, stop dan en kijk de pagina na. Je moet 18 jaar of ouder zijn. Niet verbonden aan Bosch, Samsung, de ketelfabrikanten of Meta."
+# Said once at session start, before anything else. §5 asks for at most 6 s; its wording ran about 8 s at speech
+# speed (21 and 23 words), so this is the same line cut to 15 words.
+spoken:
+  en: "I'm an AI guide: I keep to your manual's own steps and stop for anything risky."
+  nl: "Ik ben een AI-gids: ik volg alleen je handleiding en stop bij alles wat riskant is."
+# On every step card, with a "show page" button; {page} comes from the card.
+step_citation:
+  en: "Manual p.{page}"
+  nl: "Handleiding p.{page}"
+# Said after a held sentence's rule line (and before its manual page), so a hold does not end the turn. Never after a
+# gas or CO line, an emergency, or a line that says to leave, call a number or that the guide stops (rules/g0.py).
+held_follow_on:
+  en: "I can't take you further with that part, but I can still help with what you can see or hear from outside it: tell me what you notice."
+  nl: "Met dat onderdeel kan ik je niet verder helpen, maar wel met wat je er van buitenaf aan ziet of hoort: vertel me wat je merkt."
+# In the repo and the app's terms page, not spoken.
+terms:
+  en: "Provided as is, without warranty. You are responsible for your actions; follow the safety instructions in your manufacturer's manual."
+  nl: "Geleverd zoals het is, zonder garantie. Je bent zelf verantwoordelijk voor wat je doet; volg de veiligheidsinstructies in de handleiding van je fabrikant."

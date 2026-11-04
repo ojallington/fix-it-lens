@@ -1,0 +1,454 @@
+# Germany. In words: schema/rules.md. Same zones as nl.yaml; written from the design's country table: the network operator's
+# gas emergency line, NDAV §13 and NAV §13 (only a firm on the network operator's installer register works on the
+# gas or electrical installation), the Vaillant ecoTEC user guide, BGB §535.
+# There is no German rule table yet, so this file covers English answers only: a German answer fails closed (no
+# repair text, the English line and the emergency advice). The German part names on the utterance zones (smell,
+# alarm, fire, burning, flood, breaker_repeat) are there so that what a user SAYS in German still stops the repair;
+# they are machine-checked, not native-checked. DE stays fail-closed, so a missed word costs only a refusal.
+# Pages are never written here.
+# Every source was looked up on 2026-10-26; one that could not be found says (unverified). Appliance manuals are cited
+# by title and section, as in nl.yaml.
+#
+# How G0 reads this table: see nl.yaml. Zones smell, alarm, fire, burning, flood and breaker_repeat are also things
+# The user says: on those the user's own words stop the repair.
+country: de
+version: 1.0.0
+languages: [en]
+emergency:
+  en: "In danger: call 112. Smell gas? Go outside and call your gas network operator's emergency line (on your gas bill and at the meter), or 112."
+
+allow_lists:
+  sealed_boiler:
+    - id: read_pressure
+      names: {en: read the pressure}
+      sources: &boiler_user
+        - {title: "Vaillant ecoTEC plus Betriebsanleitung (0020282227_06)", url: "https://www.vaillant.at/api/download/product/de/_ecotec-plus-vc-15cs1‑5---vc-25cs1-5_1491652.pdf", section: "5.4 Fülldruck der Heizungsanlage sicherstellen"}
+    - id: top_up
+      names: {en: top up at the filling tap}
+      sources: *boiler_user
+    - id: bleed_radiators
+      names: {en: bleed a radiator}
+      sources: *boiler_user
+    - id: reset_per_manual
+      names: {en: reset per the manual}
+      sources: *boiler_user
+    - id: power_cycle
+      names: {en: switch the boiler off and on}
+      sources: *boiler_user
+
+rules:
+  # ---------- Emergencies: fixed scripts, said at once. The gas-smell and CO scripts are never merged. ----------
+  - id: de.gas.smell
+    family: gas
+    zone: smell
+    parts:
+      de: [ich rieche gas, riecht nach gas, riecht es nach gas, gasgeruch, gasleck, gas zischt]
+      en: [smell gas, smell of gas, smells of gas, smells like gas, gas smell, gas leak, hissing gas, gas hissing]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "Smell gas? Go outside and call your gas network operator's emergency line, or 112."
+    script:
+      en: "If you smell gas: open windows and doors, close the main gas valve at the meter if you can reach it, don't use flames, switches or phones inside, and get everyone outside. Then, from outside, call your gas network operator's emergency line (on your gas bill and at the meter), or 112. If there is fire or someone is unwell, call 112."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Vaillant ecoTEC plus Betriebsanleitung (0020282227_06)", url: "https://www.vaillant.at/api/download/product/de/_ecotec-plus-vc-15cs1‑5---vc-25cs1-5_1491652.pdf", section: "1.3.1 Gas: bei Gasgeruch"}
+    look_only_exemptions: []
+
+  - id: de.co.alarm
+    family: co
+    zone: alarm
+    parts:
+      de: [co melder, kohlenmonoxid, co warnmelder]
+      en: [co alarm, co detector, carbon monoxide, flue gas smell, smell of flue gas, fumes from the boiler]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "Carbon monoxide alarm? Go outside and call 112 from outside."
+    script:
+      en: "A carbon monoxide alarm means leave now. Warn everyone in the house, go outside, and call 112 from outside. Don't go back in until the emergency services say it's safe."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Initiative CO macht K.O.: bei CO-Alarm Fenster öffnen, Gebäude verlassen", url: "https://co-macht-ko.de/"}
+    look_only_exemptions: []
+
+  - id: de.heat.fire
+    family: heat
+    zone: fire
+    parts:
+      de: [ich sehe rauch, es raucht, rauch kommt, qualm, es brennt, flammen, funken, feuer im, feuer am]
+      en: [smoke, on fire, flames, sparks, sparking, a fire]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "Smoke or fire? Get everyone out and call 112."
+    script:
+      en: "Get everyone out, close the doors behind you and call 112."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Samsung WW5000C user manual", section: "Safety information"}
+    look_only_exemptions: []
+
+  - id: de.heat.burning
+    family: heat
+    zone: burning
+    parts:
+      de: [brandgeruch, riecht verbrannt, riecht verschmort, schmorgeruch, kokelt]
+      en: [burning smell, smell of burning, smells burnt, smells like burning, smouldering, smoldering]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "A burning smell is for the service engineer. I won't go on with this."
+    script:
+      en: "Stop using it. If the plug is dry and easy to reach, pull it out now; otherwise switch off its circuit at the consumer unit. Don't restart it. If you see smoke, leave and call 112. This needs the manufacturer's service."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Samsung WW5000C user manual", section: "Safety information: strange noise, burning smell or smoke"}
+    look_only_exemptions: []
+
+  - id: de.water.flood
+    family: water
+    zone: flood
+    parts:
+      de: [wasser an der steckdose, wasser am stecker, nasser stecker, nasse steckdose, wasser im sicherungskasten, unter wasser]
+      en: [water on the socket, water near the socket, water on the plug, wet plug, wet socket, water in the consumer unit, water in the fuse box, flooded]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "Water near the power: don't touch the plug. I won't go on with this."
+    script:
+      en: "Don't touch the plug or the socket with wet hands. Turn off the main water valve, then switch off the power at the consumer unit: that circuit, or the main switch, if you can reach it without standing in water. Then call service. I won't continue this repair."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Samsung WW5000C user manual", section: "Safety information: flooded appliance, wet hands"}
+    look_only_exemptions: []
+
+  # ---------- Gas: only a firm on the network operator's installer register works on gas (NDAV §13). ----------
+  - id: de.gas.tap
+    family: gas
+    zone: tap
+    parts:
+      en: [gas tap, gas valve, gas pipe, gas line, gas supply, gas cock, gas shut off, gas shutoff, gas isolation valve, emergency control valve, yellow tap, yellow handle, burner, gas inlet, gas hose, gas connection, gas fitting]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "That's the gas supply. Gas work needs a firm on the gas network operator's installer register. Smell gas? Call the network operator's emergency line."
+    script:
+      en: "That's the gas supply: hands back. If you were topping up the boiler, close the filling tap. Gas work needs a firm on the gas network operator's installer register. Smell gas? Call the network operator's emergency line, or 112."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Niederdruckanschlussverordnung (NDAV)", url: "https://www.gesetze-im-internet.de/ndav/__13.html", section: "§13"}
+    # The guide's own look-only card line. Exactly this line passes the part-name hold; any edit is held.
+    #   21725f85…: "The yellow tap is gas. Check it's open: just look."
+    look_only_exemptions:
+      - 21725f8528f3df1106ba28c83b635b761ea98d53cf334c182d6d7ceab8719578
+
+  - id: de.gas.casing
+    family: gas
+    zone: casing
+    parts:
+      en: [boiler casing, boiler front panel, front cover of the boiler, front panel of the boiler, inside the boiler, open the boiler, boiler front cover, boiler's front cover, front off the boiler, cover off the boiler, cover on the boiler, front of the boiler open, front of the boiler off]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "Opening the boiler casing is for a firm on the gas network operator's installer register."
+    script:
+      en: "I'll stop here. Opening the casing is for a firm on the gas network operator's installer register, both legally and for safety. What I can help with is the pressure, topping up, bleeding radiators and a reset."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Niederdruckanschlussverordnung (NDAV)", url: "https://www.gesetze-im-internet.de/ndav/__13.html", section: "§13"}
+      - {title: "Vaillant ecoTEC plus Betriebsanleitung (0020282227_06)", url: "https://www.vaillant.at/api/download/product/de/_ecotec-plus-vc-15cs1‑5---vc-25cs1-5_1491652.pdf", section: "1.3.3 Nachträgliche Veränderungen"}
+    look_only_exemptions: []
+
+  - id: de.gas.boiler
+    family: gas
+    zone: boiler
+    parts:
+      en: [heat exchanger, ignition electrode, ignition probe, ionisation probe, combustion chamber, boiler fan, boiler circuit board, boiler pcb, gas valve on the boiler]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "That's inside the boiler. It's for a firm on the gas network operator's installer register."
+    script:
+      en: "I'll stop here. Anything beyond the pressure, topping up, bleeding and a reset is for a firm on the gas network operator's installer register. Those I can help with."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Niederdruckanschlussverordnung (NDAV)", url: "https://www.gesetze-im-internet.de/ndav/__13.html", section: "§13"}
+    look_only_exemptions: []
+
+  - id: de.gas.flue
+    family: gas
+    zone: flue
+    parts:
+      en: [flue, condensate drain, condensate pipe, condensate trap, condensate siphon, condensate line, condensate outlet,
+          air intake pipe, boiler chimney, carries the fumes, fumes out of the boiler, exhaust pipe]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "The flue and the condensate pipe are for a registered gas installer. In a flat with a shared flue, ask your building's management."
+    script:
+      en: "I'll stop here. The flue and the condensate pipe are for a firm on the gas network operator's installer register. If you're in a flat with a shared flue, your building's management (Hausverwaltung) is responsible."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Niederdruckanschlussverordnung (NDAV)", url: "https://www.gesetze-im-internet.de/ndav/__13.html", section: "§13"}
+      - {title: "Schornsteinfeger-Handwerksgesetz (SchfHwG)", url: "https://www.gesetze-im-internet.de/schfhwg/__14.html", section: "§14 Feuerstättenschau"}
+    look_only_exemptions: []
+
+  - id: de.pressure.relief_valve
+    family: pressure
+    zone: relief_valve
+    parts:
+      en: [safety valve, relief valve, pressure relief, expansion vessel, prv, red valve on the boiler]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "Leave the pressure relief valve alone. That's for the engineer."
+    script:
+      en: "Close the filling tap now. The pressure is too high. Leave the pressure relief valve alone and call a firm on the gas network operator's installer register."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Vaillant ecoTEC plus Betriebsanleitung (0020282227_06)", url: "https://www.vaillant.at/api/download/product/de/_ecotec-plus-vc-15cs1‑5---vc-25cs1-5_1491652.pdf", section: "5.4.1 Fülldruck der Heizungsanlage prüfen"}
+    look_only_exemptions: []
+
+  - id: de.pressure.repeat_top_up
+    family: pressure
+    zone: repeat_top_up
+    parts:
+      en: [keep topping up, keeps losing pressure, top up every week, leak sealer]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "Topping up often usually means a leak or a tired expansion vessel. Call the engineer."
+    script:
+      en: "You've topped up more than twice in the past twelve months. That usually means a leak or a tired expansion vessel. Please call a firm on the gas network operator's installer register; I won't walk another top-up."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Vaillant ecoTEC plus Betriebsanleitung (0020282227_06)", url: "https://www.vaillant.at/api/download/product/de/_ecotec-plus-vc-15cs1‑5---vc-25cs1-5_1491652.pdf", section: "5.4 (repeat top-ups: unverified in this guide)"}
+    look_only_exemptions: []
+
+  # ---------- Mains: the casing fires whatever the power state. A tripped breaker goes back on once. ----------
+  - id: de.mains.casing
+    family: mains
+    zone: casing
+    parts:
+      en: [back panel, rear panel, outer panel, casing, housing, top panel, side panel, worktop panel, kick plate, plinth off, base plate, behind the drum, panel at the rear, panel on the back, outer shell, metal shell, rear cover, the back off, plate under the door, plate on the side, cover off the back, back cover off, cover on the back, control board, circuit board, pcb, rear sheet, back sheet]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "There is mains power behind the back panel. This needs a technician."
+    script:
+      en: "Hands off: there is mains power behind the back panel. Leave it on; this needs a technician."
+    ring_cm: 5
+    landlord: false
+    sources:
+      - {title: "Samsung WW5000C user manual", section: "Safety information: do not attempt to repair, disassemble, or modify the appliance yourself"}
+    look_only_exemptions: []
+
+  - id: de.mains.wiring
+    family: mains
+    zone: wiring
+    parts:
+      en: [wiring, bare wire, exposed wire, live wire, terminal block, inside the socket, socket faceplate, unscrew the socket, junction box, inside the junction box, open up the wall outlet, open the outlet, the wires inside, join the wires, strip the cable, strip back the, earth wire, neutral wire, mains connection, mains terminal, mains terminals, wiring terminal, wiring terminals, supply terminal, supply terminals, live terminal, neutral terminal, earth terminal, mains terminal cover, wiring terminal cover, supply terminal cover, cooker terminal cover, hob terminal cover, oven terminal cover, terminal cover on the back, terminal cover at the back, choc block, chocolate block, connector block, connection block, junction box, screw terminal, spade connector, spade terminal, wiring connector, electrical connector, wiring loom, wiring harness, plug socket inside, socket inside the machine, plug connector]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "That's electrical work. Only an electrician on the network operator's installer register opens sockets or wiring."
+    script:
+      en: "That's electrical work. Only an electrician on the network operator's installer register should open sockets, junction boxes or the consumer unit. I'll stop here."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Niederspannungsanschlussverordnung (NAV)", url: "https://www.gesetze-im-internet.de/nav/__13.html", section: "§13"}
+      - {title: "Bürgerliches Gesetzbuch (BGB)", url: "https://www.gesetze-im-internet.de/bgb/__535.html", section: "§535"}
+    look_only_exemptions: []
+
+  - id: de.mains.consumer_unit
+    family: mains
+    zone: consumer_unit
+    parts:
+      en: [consumer unit cover, fuse box cover, inside the consumer unit, inside the fuse box, busbar, meter seal, main fuse, house connection fuse, distribution board cover, cover off the fuse board, cover off the consumer unit, cover off the fuse box, lid off the breaker box, breaker box cover, fuse board cover, breaker module, din rail, service fuse, cutout fuse]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "Inside the consumer unit is for an electrician on the network operator's installer register only. A broken meter seal or the main fuse: call the network operator."
+    script:
+      en: "I'll stop here. Opening the consumer unit is for an electrician on the network operator's installer register. The meter, its seal and the main fuse belong to the network operator: call them."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Niederspannungsanschlussverordnung (NAV)", url: "https://www.gesetze-im-internet.de/nav/__13.html", section: "§13"}
+      - {title: "Niederspannungsanschlussverordnung (NAV)", url: "https://www.gesetze-im-internet.de/nav/__13.html", section: "§13"}
+    look_only_exemptions: []
+
+  - id: de.mains.consumer_unit_open
+    family: mains
+    zone: consumer_unit_open
+    parts:
+      en: [consumer unit, fuse box, fuse board, distribution board, rcd, rcbo, mcb, circuit breaker]
+    verbs:
+      en: [unscrew, screw, dismantle, take the cover off, remove the cover, pry, prise, rewire, replace the breaker, replace the fuse wire]
+    action: HOLD
+    line:
+      en: "Opening up the consumer unit is for an electrician on the network operator's installer register."
+    script:
+      en: "I'll stop here. Opening the consumer unit is for an electrician on the network operator's installer register."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Niederspannungsanschlussverordnung (NAV)", url: "https://www.gesetze-im-internet.de/nav/__13.html", section: "§13"}
+    look_only_exemptions: []
+
+  - id: de.mains.breaker
+    family: mains
+    zone: breaker
+    parts:
+      en: [breaker back on, breaker back up, trip switch back up, trip switch back on, rcd back on, rcd back up, reset the breaker, reset the trip switch]
+    verbs: {en: []}
+    action: ALLOW
+    line:
+      en: "You can switch a tripped breaker back on once."
+    script:
+      en: "If it trips again, leave it off and call an electrician on the network operator's installer register."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Samsung WW5000C user manual", section: "Troubleshooting: the power supply (unverified)"}
+    look_only_exemptions: []
+
+  - id: de.mains.breaker_repeat
+    family: mains
+    zone: breaker_repeat
+    parts:
+      de: [fliegt wieder raus, springt wieder raus, löst wieder aus, fliegt immer wieder raus, sicherung hält nicht]
+      en: [trips again, tripped again, keeps tripping, trips straight away, won't stay on, wont stay on]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "If the breaker trips again, it's for an electrician on the network operator's installer register."
+    script:
+      en: "Leave the breaker off. It has tripped a second time, so something is faulty. Unplug the appliance if that is safe to do, and call an electrician on the network operator's installer register."
+    ring_cm: 3
+    landlord: true
+    sources:
+      - {title: "Bürgerliches Gesetzbuch (BGB)", url: "https://www.gesetze-im-internet.de/bgb/__535.html", section: "§535"}
+    look_only_exemptions: []
+
+  # ---------- Names that a broader rule would otherwise catch (the over-blocking risk, c9 row 36). ----------
+  - id: de.mains.user_covers
+    family: mains
+    zone: user_covers
+    parts:
+      en: [filter cover, filter flap, service flap, pump cover, filter housing, filter casing, meter cupboard door, casing of the debris filter, casing of the filter, debris filter casing, pump housing, drain pump housing, drain pump cover, sump cover, sump housing, pump lid, impeller cover]
+    verbs: {en: []}
+    action: ALLOW
+    line:
+      en: "That flap is yours: the manual has you open it."
+    script:
+      en: "That flap is yours: the manual has you open it."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Bosch SMV4HAX40N user manual", section: "Cleaning the drain pump (p. 59)"}
+      - {title: "Samsung WW5000C user manual", section: "Maintenance: debris filter"}
+    look_only_exemptions: []
+
+  # ---------- Water and heat: the manuals' own preconditions. ----------
+  - id: de.heat.hot_water
+    family: heat
+    zone: hot_water
+    parts:
+      en: [hot water, hot drain water, the water is hot, heating element, heater element]
+    verbs:
+      en: [touch, grab, reach, feel, hold, take out, remove, pull]
+    action: HOLD
+    line:
+      en: "Wait: that water or that element may be hot. Let it cool first."
+    script:
+      en: "Wait: that may be hot. Let it cool first; I'll check back in a few minutes."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Samsung WW5000C user manual", section: "Safety information: water drained during a high-temperature cycle is hot"}
+    look_only_exemptions: []
+
+  - id: de.water.aquastop
+    family: water
+    zone: aquastop
+    parts:
+      en: [aquastop, water block valve, safety hose]
+    verbs:
+      en: [cut, open, take apart, submerge, unscrew, disconnect, remove, dismantle, take off, pull apart, bypass, loosen]
+    action: HOLD
+    line:
+      en: "That's the leak protection. Close the water tap and call service."
+    script:
+      en: "That's the leak protection. Close the water tap and call service; don't keep using it. Never submerge the valve or cut the hose."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Bosch SMV4HAX40N instructions for use", section: "Safety: AquaStop"}
+    look_only_exemptions: []
+
+  - id: de.chemical.refrigerant
+    family: chemical
+    zone: refrigerant
+    parts:
+      en: [refrigerant, cooling circuit, freon, compressor, regas, coolant pipe, cooling loop, sealed loop]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "That's the sealed cooling circuit. It needs an F-gas certified company."
+    script:
+      en: "That's the sealed cooling circuit; only an F-gas certified company works on it. Some fridges use flammable gas, so if it's hissing: ventilate, no flames, and unplug it if that's safe."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Regulation (EU) 2024/573 on fluorinated greenhouse gases", url: "https://eur-lex.europa.eu/eli/reg/2024/573/oj"}
+    look_only_exemptions: []
+
+  # ---------- What the model or the user reports when no other rule fits. ----------
+  - id: de.mechanical.hazard
+    family: mechanical
+    zone: hazard
+    parts:
+      en: [damaged cable, frayed cable, damaged cord, frayed cord, broken cable, damaged flex, frayed flex]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "That could be dangerous. I won't go on with this; it's for the service engineer."
+    script:
+      en: "If the plug is dry and easy to reach, pull it out; otherwise switch off its circuit at the consumer unit. Don't use it again until a service engineer has looked at it."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Bosch SMV4HAX40N instructions for use", section: "Safety: damaged appliance"}
+    look_only_exemptions: []
+
+  - id: de.mechanical.repeat_fault
+    family: mechanical
+    zone: repeat_fault
+    parts:
+      en: [code came back, code keeps coming back, same error again, same code again, keeps locking out]
+    verbs: {en: []}
+    action: STOP
+    line:
+      en: "If the fault comes back after the fix, it's for the engineer."
+    script:
+      en: "This came back after the fix, so it's not something to keep trying. Note the code; the engineer will ask for it."
+    ring_cm: 3
+    landlord: false
+    sources:
+      - {title: "Vaillant ecoTEC plus Betriebsanleitung (0020282227_06)", url: "https://www.vaillant.at/api/download/product/de/_ecotec-plus-vc-15cs1‑5---vc-25cs1-5_1491652.pdf", section: "6 Störungsbehebung"}
+      - {title: "Samsung WW5000C user manual", section: "Information codes: if the information code remains"}
+    look_only_exemptions: []

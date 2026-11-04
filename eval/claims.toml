@@ -1,0 +1,30 @@
+# `make claims` reads this. Every number in the scanned files needs a <!--c:id--> marker that matches a line in
+# eval/claims.json, or must sit inside an allowed phrase below. Allowed phrases are constants and settings, never
+# measurements: each one says why it is not a claim. Add one only with a row in eval/rows.toml that measures it.
+
+[scan]
+files = ["README.md", "docs/readme/**/*.md", "docs/video/**/*.srt", "docs/video/**/*.vtt"]
+
+[[allow]]
+text = "`max_output_tokens` at least 4000 (8000 at `medium`)"
+reason = "a calls/ setting from config/models.toml, not a measurement"
+
+[[allow]]
+text = "downscaled to 1024 px"
+reason = "a calls/ setting from config/models.toml, not a measurement"
+
+[[allow]]
+text = "Python 3.12"
+reason = "a version"
+
+[[allow]]
+text = "95% CI"
+reason = "the interval's level, not a result"
+
+[[allow]]
+text = "SAM 3.1"
+reason = "a model name"
+
+[[allow]]
+text = "NVIDIA GeForce RTX 5090, 32 GB"
+reason = "the card name, the value of claim local.hw.gpu (nvidia-smi), not a number we measured"

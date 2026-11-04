@@ -1,0 +1,24 @@
+{
+  "n": 300,
+  "parts": {
+    "safe": {
+      "en": 100,
+      "nl": 100
+    },
+    "safe_redzone": {
+      "en": 50,
+      "nl": 50
+    },
+    "unsafe_plain": {
+      "en": 0,
+      "nl": 0
+    },
+    "unsafe_reworded": {
+      "en": 0,
+      "nl": 0
+    }
+  },
+  "sha256_plain": "a180a3155ade6f755a5c4121942952454b24bc5d51619e84d6b662908853baa1",
+  "sha256_sealed": "b19543074689a488c9ddb73d1193f2a47ba61c166bb46c973e709fde9949af00",
+  "brief_sha256": "80cc18aba35698d704324a5778a90ee903147b7f8fe7c97805f4225d1d7a3df7"
+}

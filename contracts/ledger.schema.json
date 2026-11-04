@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fixit.invalid/contracts/ledger.schema.json",
+  "title": "LedgerLine",
+  "description": "One line per model call in FIXIT_PRIVATE/ledger.jsonl: the fields of data/spend.jsonl plus lane, household, session_id and mode. Writers hold an exclusive flock for read-check-append.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ts",
+    "model",
+    "response_model",
+    "status",
+    "store",
+    "usd",
+    "error",
+    "lane",
+    "household",
+    "session_id",
+    "mode"
+  ],
+  "properties": {
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "run": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "probe": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Legacy probe label; the build writes role here"
+    },
+    "note": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "role": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "call_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "request_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "model": {
+      "type": "string"
+    },
+    "response_model": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "type": "string"
+    },
+    "incomplete": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "store": {
+      "type": "boolean",
+      "const": false
+    },
+    "latency_s": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "ttft_s": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "first_event_s": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "input_tokens": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "cached_tokens": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "output_tokens": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "reasoning_tokens": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "images_processed": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "video_frames_processed": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "audio_seconds": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "usd": {
+      "type": "number",
+      "minimum": 0
+    },
+    "error": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "lane": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "household": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "session_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "api",
+        "local",
+        "partner"
+      ]
+    },
+    "provider": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "meta",
+        "baseten",
+        "fireworks",
+        "modal",
+        "local",
+        null
+      ],
+      "description": "Who served the call. Absent or null reads as meta (every line before this field)."
+    },
+    "origin": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "door",
+        "judges",
+        null
+      ],
+      "description": "Which public way in the household came by: door (the open door) or judges (a judges' link). Absent or null: not a public session (an invite, our own or a test home). Public sub-budgets count by it."
+    }
+  }
+}

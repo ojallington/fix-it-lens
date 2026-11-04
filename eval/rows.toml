@@ -1,0 +1,367 @@
+# Eval rows: one [[row]] per measured row; see eval/rows.py for the fields. Each lane registers its own rows here
+# and owns their command, fixtures and test. `make eval` runs every row in replay mode.
+
+# ---- rules: G0, the sentence filter, and the rule engine's refusals. Replay only: no model, no key.
+[[row]]
+id = "g0.unsafe"
+owner = "l4"
+command = "python -m rules.eval unsafe"
+fixtures = ["fixtures/l4/g0"]
+readme_anchor = "#safety"
+claims = ["g0.unsafe.templated.struck", "g0.unsafe.redteam.struck"]
+unmeasured = "the red-team sessions gave no unsafe sentence to strike (row redteam)"
+note = "templated, not independent (the filter's author wrote both); red-team replies are the independent set"
+
+[[row]]
+id = "g0.safe"
+owner = "l4"
+command = "python -m rules.eval safe"
+fixtures = ["fixtures/l4/g0"]
+readme_anchor = "#safety"
+claims = ["g0.safe.wrongly_struck"]
+note = "writes eval/results/g0/safe.jsonl for eval/failures.py"
+
+[[row]]
+id = "g0.adversarial"
+owner = "l4"
+command = "python -m rules.eval adversarial"
+fixtures = ["fixtures/l4/g0/adversarial.jsonl"]
+readme_anchor = "#safety"
+claims = ["g0.prohibition.adversarial.held"]
+note = "templated by the filter author, not independent"
+
+[[row]]
+id = "g0.warnings"
+owner = "l4"
+command = "python -m rules.eval warnings"
+fixtures = ["fixtures/l4/g0/warnings.jsonl"]
+readme_anchor = "#safety"
+claims = ["g0.warnings.wrongly_struck"]
+note = "a dev set written by the filter author before tuning"
+
+[[row]]
+id = "g0.reworded"
+owner = "l4"
+command = "python -m rules.eval reworded"
+fixtures = ["fixtures/l4/g0/reworded.jsonl"]
+readme_anchor = "#safety"
+claims = ["g0.reworded.struck"]
+note = "a dev set written by the filter author before tuning"
+
+[[row]]
+id = "g0.paraphrase"
+owner = "l4"
+command = "python -m rules.eval paraphrase"
+fixtures = ["fixtures/l4/g0"]
+readme_anchor = "#safety"
+claims = ["g0.paraphrase.struck"]
+note = "templated, not independent"
+
+[[row]]
+id = "g0.other_lang"
+owner = "l4"
+command = "python -m rules.eval other_lang"
+fixtures = ["fixtures/l4/g0"]
+readme_anchor = "#safety"
+claims = ["g0.other_lang.nl.struck", "g0.other_lang.unsupported.struck"]
+
+[[row]]
+id = "rules.refusal"
+owner = "l4"
+command = "python -m rules.eval refusal"
+fixtures = ["fixtures/l4/g0/refusal.toml"]
+readme_anchor = "#safety"
+claims = ["rules.refusal.recall"]
+
+[[row]]
+id = "g0.latency"
+owner = "l4"
+command = "python -m rules.eval latency"
+fixtures = ["fixtures/l4/g0"]
+readme_anchor = "#safety"
+claims = ["g0.latency.p95"]
+timing = true
+budget = 20.0
+note = "the measured p95 in ms, which varies by machine; the budget is 20 ms"
+
+# G0 on a sealed held-out set (eval/g0_heldout.py): written without sight of the filter, its fixtures or its misses,
+# and kept encrypted outside the repo. The row scores the stored verdicts; `python -m eval.g0_heldout run` (key only
+# on the eval machine) re-asks the rules CLI, and is run sparingly so the set never becomes a tuning target.
+[[row]]
+id = "g0.heldout"
+owner = "l6"
+command = "python -m eval.g0_heldout score"
+fixtures = ["eval/heldout/g0.json", "eval/results/g0_heldout.jsonl"]
+readme_anchor = "#safety"
+claims = ["g0.heldout.*"]
+unmeasured = "needs a run on the sealed set"
+note = "independent of the filter's author; counts only, never which sentences"
+
+[[row]]
+id = "g0.heldout2"
+owner = "l6"
+command = "python -m eval.g0_heldout score --set g0b"
+fixtures = ["eval/results/g0b_heldout.jsonl"]
+readme_anchor = "#safety"
+claims = ["g0.heldout2.*"]
+note = "a fresh set the filter's author has never seen; counts only, never which sentences"
+
+[[row]]
+id = "g0.heldout3"
+owner = "l6"
+command = "python -m eval.g0_heldout score --set g0c"
+fixtures = ["eval/results/g0c_heldout.jsonl"]
+readme_anchor = "#safety"
+claims = ["g0.heldout3.*"]
+note = "a fresh set the filter's author has never seen, run once on the rules that ship; counts only, never which sentences"
+
+[[row]]
+id = "redteam"
+owner = "l6"
+command = "python -m eval.redteam score"
+fixtures = ["eval/results/redteam_sentences.jsonl", "eval/results/redteam_sessions.jsonl"]
+readme_anchor = "#safety"
+claims = ["redteam.*"]
+note = "the guide's own sentences under users pushing toward red-zone work; ids, languages and verdicts only"
+
+# ---- the app: the production code paths on labelled media. Replay by default; live_command records.
+[[row]]
+id = "l1.voice"
+owner = "l1"
+command = "python -m app.eval voice"
+live_command = "FIXIT_CALLS=record python -m app.eval voice"
+fixtures = ["fixtures/l1/voice"]
+readme_anchor = "#eval"
+claims = ["l1.voice.wer.keywords", "l1.voice.wer.plain"]
+unmeasured = "needs the filmed clips"
+note = "WER of the production transcription with the card's keywords and without; n = reference words"
+
+[[row]]
+id = "l1.plugout"
+owner = "l1"
+command = "python -m app.eval plugout"
+live_command = "FIXIT_CALLS=record python -m app.eval plugout"
+fixtures = ["fixtures/l1/plugout"]
+readme_anchor = "#eval"
+claims = ["l1.plugout.unplugged", "l1.plugout.false_unplugged"]
+unmeasured = "needs the filmed clips"
+note = "camera alone (SAM plug + socket, decided in code), no HA; target 40 of 40, and 0 of 40 false"
+
+[[row]]
+id = "l1.gastap"
+owner = "l1"
+command = "python -m app.eval gastap"
+live_command = "FIXIT_CALLS=record python -m app.eval gastap"
+fixtures = ["fixtures/l1/gastap"]
+readme_anchor = "#eval"
+claims = ["l1.gastap.located"]
+unmeasured = "needs the filmed clips"
+note = "Locate on other boilers: Spark locate by function; found = box IoU >= 0.5 with the label"
+
+[[row]]
+id = "l1.latency"
+owner = "l1"
+command = "python -m app.eval latency"
+live_command = "FIXIT_CALLS=record python -m app.eval latency"
+fixtures = ["fixtures/l1/latency"]
+readme_anchor = "#eval"
+claims = ["l1.latency.judge4_p95", "l1.latency.sam_video_p95"]
+unmeasured = "needs the filmed clips"
+note = "RISKS rows 30/31; replay reports the latency calls/ measured in the live run"
+
+# ---- free-credit routing: the eval gate (does Spark Open on a partner do as well as Spark?) and the cost per
+# provider. Replay scores the recorded files; the live run is on the partner's free credit.
+[[row]]
+id = "partner"
+owner = "l7"
+command = "python -m eval.partner score"
+live_command = "FIXIT_CALLS=record python -m eval.partner run --provider baseten"
+fixtures = ["eval/results/partner"]
+readme_anchor = "#eval"
+claims = ["partner.*"]
+unmeasured = "needs a partner key and the labelled step-check clips"
+note = "a role moves to Spark Open only on a pass: not worse than Spark beyond chance, and within its timeout"
+
+# ---- phone: stops scored from the session record by labelled trial windows (eval/phone.py); readings hold ids and numbers only.
+[[row]]
+id = "phone.stops"
+owner = "l2"
+command = "python -m eval.phone stops"
+fixtures = ["eval/labels/phone_stops.jsonl", "eval/results/phone/stops.jsonl"]
+readme_anchor = "#safety"
+claims = ["phone.gas.*", "phone.casing.*"]
+unmeasured = "needs the filmed gas-tap and idle-washer trials labelled in eval/labels/phone_stops.jsonl, then eval.phone read on the build machine"
+
+[[row]]
+id = "phone.stop_ms"
+owner = "l2"
+command = "python -m eval.phone stop-ms"
+fixtures = ["eval/results/phone/timings.jsonl"]
+readme_anchor = "#safety"
+claims = ["phone.stop_p95_ms"]
+timing = true
+budget = 150.0
+unmeasured = "needs the timings saved on the demo phone during the filmed trials, then eval.phone read on the build machine"
+note = "on the phone, from the capture of the frame that fired to the red screen painted; up to one display refresh short of light on glass"
+
+# ---- eval: whole context against retrieval, through app.ask.answer. Replay scores the recorded
+# results in eval/results/wholectx; the live run records through calls/ and the ledger (make wholectx-live).
+[[row]]
+id = "wholectx"
+owner = "l6"
+command = "python -m eval.wholectx score"
+live_command = "python -m eval.wholectx live"
+fixtures = ["eval/results/wholectx"]
+readme_anchor = "#eval"
+claims = ["wholectx.*"]
+unmeasured = "needs the washer and boiler manuals, then one recorded run"
+note = "30 questions that need a manual and the household history; both arms are the production guide turn"
+
+# ---- eval: hazard to STOP. e2e is read off filmed clips of the phone (eval/labels/hazard_latency.jsonl), the number
+# the video may show; the server rows type the same 20 lines into a fresh session, a regression check shown only as
+# "server side".
+[[row]]
+id = "hazard.e2e"
+owner = "l6"
+command = "python -m eval.hazard e2e"
+fixtures = ["eval/labels/hazard_latency.jsonl"]
+readme_anchor = "#eval"
+claims = ["hazard.e2e.*"]
+unmeasured = "needs the filmed hazard lines, read off frame by frame"
+note = "end of the spoken line to STOP on the phone; 60 fps clips of the screen with sound"
+
+[[row]]
+id = "hazard.server"
+owner = "l6"
+command = "python -m eval.hazard server"
+fixtures = []
+readme_anchor = "#eval"
+claims = ["hazard.server.stopped"]
+note = "each of the 20 lines must stop a fresh session under its own hazard's rule"
+
+[[row]]
+id = "hazard.server.latency"
+owner = "l6"
+command = "python -m eval.hazard server-latency"
+fixtures = []
+readme_anchor = "#eval"
+claims = ["hazard.server.p95_ms"]
+timing = true
+budget = 50.0
+note = "server side only: no transcription, network or phone; the budget is 50 ms"
+
+# ---- cards: what a committed card holds, counted from the card and its check record (hashes only, no page text).
+[[row]]
+id = "card.bosch"
+owner = "l6"
+command = "python -m eval.cardcount bosch/SMV4HAX40N --as bosch"
+fixtures = ["cards/bosch/SMV4HAX40N.yaml", "cards/bosch/SMV4HAX40N.check.json"]
+readme_anchor = "#eval"
+claims = ["card.bosch.*"]
+note = "fails while the check record is not current for the card"
+
+# ---- any appliance, first time (eval/anyappliance.py): manuals nobody prepared, through the real ingest path. The
+# roster was frozen before the first build; the verdict is the builder's own read, so its unit says so.
+[[row]]
+id = "anyappliance"
+owner = "l6"
+command = "python -m eval.anyappliance"
+fixtures = ["eval/labels/anyappliance.jsonl"]
+readme_anchor = "#any-appliance"
+claims = ["anyappliance.*"]
+
+# ---- the camera step check (eval/stepcheck): registered before the clips are filmed, so its rows are listed as not
+# measured yet (eval/pending.json) until the labelled clips and recorded judge runs land.
+[[row]]
+id = "stepcheck"
+owner = "l6"
+command = "python -m eval.stepcheck score"
+fixtures = ["eval/labels/stepcheck.plan.jsonl"]
+readme_anchor = "#eval"
+claims = ["stepcheck.*"]
+unmeasured = "needs the labelled step-check clips and a recorded judge run"
+
+[[row]]
+id = "stepcheck.heldout"
+owner = "l6"
+command = "python -m eval.stepcheck score --set heldout"
+fixtures = []
+readme_anchor = "#eval"
+claims = ["heldout.*"]
+unmeasured = "needs labelled clips of other brands' appliances"
+
+[[row]]
+id = "stepcheck.power"
+owner = "l6"
+command = "python -m eval.stepcheck score --set power"
+fixtures = ["eval/labels/power.plan.jsonl"]
+readme_anchor = "#eval"
+claims = ["power.*"]
+unmeasured = "needs the labelled unplug clips"
+
+# ---- cost (eval/cost.py): every $ is read from the spend ledger, never estimated. `python -m eval.cost collect`
+# refreshes eval/results/cost_calls.jsonl from FIXIT_PRIVATE (no household's calls, no session ids); the rows score it.
+[[row]]
+id = "cost.calls"
+owner = "l6"
+command = "python -m eval.cost score --part calls"
+fixtures = ["eval/results/cost_calls.jsonl"]
+readme_anchor = "#cost"
+claims = ["cost.call.*", "cost.local.api_usd"]
+note = "per call: guide turns inside a session, step-check judge calls, SAM images, transcriptions; local mode's API charges"
+
+[[row]]
+id = "cost.card"
+owner = "l6"
+command = "python -m eval.cost score --part card"
+fixtures = ["eval/results/cost_calls.jsonl", "eval/labels/anyappliance.jsonl"]
+readme_anchor = "#cost"
+claims = ["cost.card_build.*", "cost.add_appliance.*"]
+unmeasured = "needs appliances added by plate photo, the add that makes a model call of its own"
+
+[[row]]
+id = "cost.session"
+owner = "l6"
+command = "python -m eval.cost score --part session"
+fixtures = ["eval/results/cost_calls.jsonl"]
+readme_anchor = "#cost"
+claims = ["cost.repair_session.*"]
+note = "the filmed repair sessions listed in eval/labels/cost-sessions.txt, each in our own home"
+
+[[row]]
+id = "cost.idle"
+owner = "l6"
+command = "python -m eval.cost score --part idle"
+fixtures = []
+readme_anchor = "#cost"
+claims = ["cost.idle_month.*"]
+unmeasured = "needs a month of reminders, push and feeds running, with their model calls read from the ledger"
+
+[[row]]
+id = "cost.energy"
+owner = "l6"
+command = "python -m eval.cost score --part energy"
+fixtures = []
+readme_anchor = "#cost"
+claims = ["cost.local.energy_eur_per_session"]
+unmeasured = "needs the GPU's energy read across a local repair session, at a stated Dutch price per kWh"
+
+[[row]]
+id = "cost.home_year"
+owner = "l6"
+command = "python -m eval.cost score --part home"
+fixtures = []
+readme_anchor = "#cost"
+claims = ["cost.per_home_year.*"]
+unmeasured = "projected once a whole repair session and a month with no repair are measured: cards once, plus the planned repairs, plus the idle months"
+
+# ---- local mode: what it needs, measured on the GPU it ran on (python -m local.hardware measure, Glimmer loaded).
+[[row]]
+id = "local.hardware"
+owner = "l7"
+command = "python -m local.hardware score"
+fixtures = ["demo/replays/demo/frames"]
+readme_anchor = "#local-mode"
+claims = ["local.hw.*"]
+unmeasured = "needs one run of python -m local.hardware measure with the local model loaded"
+note = "the card, model and quantisation, GPU memory after real step checks, decode speed, step-check latency, host RAM; the smallest card is estimated"

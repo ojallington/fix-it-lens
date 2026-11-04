@@ -1,0 +1,39 @@
+# Never in the repo: manuals, keys, private data, sessions, plate photos
+*.pdf
+private/
+data/
+!tests/data/
+*.key
+*.token
+.env*
+sessions/
+*.jpg
+*.jpeg
+!eval/clips/**/*.jpg
+!docs/**/*.jpg
+# demo replays: freely licensed frames only, each one credited in its CREDITS.md (tests/l0/test_demo.py)
+!demo/replays/*/frames/*.jpg
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+*.tsbuildinfo
+
+# Local tool state
+.DS_Store
+
+# Model weights (local mode): SAM 3.1 is fetched by the user, never bundled
+*.pt
+*.safetensors
+*.ckpt
+*.gguf

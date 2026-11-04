@@ -1,0 +1,912 @@
+@import "./tokens.css";
+
+/* Colours: warm charcoal by default and always over the camera; paper for the screens before it when the phone asks
+   for light. The values are the site's; the meanings are in tokens.css. */
+:root {
+  --bg: #15130f;
+  --surface: #211e18;
+  --surface-2: #2b2720;
+  --line: rgba(241, 236, 224, 0.16);
+  --fg: #f1ece0;
+  --muted: #c8c1b1;
+  --faint: #958e7e;
+  --blue: #93a8ff;
+  /* The primary: the brand's pair on ink, the light blue with ink text (8:1); paper keeps the ink blue with white. */
+  --accent: #93a8ff;
+  --accent-fg: #15130f;
+  --green: #5fcf98;
+  --done-fg: #0c2417;
+  --amber: #f0b54a;
+  --amber-fg: #1c1400;
+  --red: #ff6f52;
+  --sheet: rgba(21, 19, 15, 0.86);
+  --shadow: none;
+  --radius: var(--r);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) body:not(.cam) {
+    --bg: #f2ede2;
+    --surface: #faf7f0;
+    --surface-2: #e8e1d1;
+    --line: rgba(28, 26, 22, 0.16);
+    --fg: #1c1a16;
+    --muted: #4a463d;
+    --faint: #736d5f;
+    --blue: #2a49d8;
+    --accent: var(--blue); /* again here: a var() resolves where it is declared */
+    --accent-fg: #ffffff;
+    --green: #1d7a4b;
+    --done-fg: #ffffff;
+    --amber: #a96500;
+    --amber-fg: #ffffff;
+    --red: #d9381e;
+    --sheet: #faf7f0;
+    --shadow: none;
+    color-scheme: light;
+  }
+}
+/* Over the camera the panels float on video: a soft shadow and a blur keep them readable. */
+body.cam { --shadow: 0 8px 28px rgba(0, 0, 0, 0.35); }
+/* A soft shade at the top and foot of the feed, under the panels: a bright or busy picture never fights the words. */
+body.cam #app { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.42), transparent 20%, transparent 55%, rgba(21, 19, 15, 0.55) 80%, rgba(21, 19, 15, 0.96) 98%); }
+/* The frame may pan up to keep a part clear of the sheet; the strip it leaves is the page's own colour, and the shade
+   above fades into it, so there is no edge. */
+body.cam { background: #15130f; }
+:root[data-theme="dark"] body { color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body { background: var(--bg); color: var(--fg); font: var(--t-m)/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+body:not(.cam) #cam, body:not(.cam) #overlay { display: none; }
+#cam, .replay-frame, #overlay { position: fixed; inset: 0; width: 100vw; height: 100dvh; object-fit: cover; }
+/* When the frame pans up, its foot fades into the strip below instead of ending in a line. */
+#cam, .replay-frame { -webkit-mask-image: linear-gradient(to bottom, #000 calc(var(--foot, 100%) - 80px), transparent var(--foot, 100%)); mask-image: linear-gradient(to bottom, #000 calc(var(--foot, 100%) - 80px), transparent var(--foot, 100%)); }
+#overlay { pointer-events: none; }
+#app { position: fixed; inset: 0; display: flex; flex-direction: column; gap: 12px; padding: max(12px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); pointer-events: none; overflow-y: auto; }
+#app > *, .sheet > * { pointer-events: auto; width: 100%; max-width: 560px; margin-inline: auto; }
+[hidden] { display: none !important; }
+h1 { font: 560 var(--t-xl)/1.1 var(--display); font-optical-sizing: auto; margin: 0 0 8px; letter-spacing: -0.02em; }
+h2 { font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px; }
+p { margin: 0 0 8px; }
+.sub { color: var(--muted); font-size: var(--t-s); }
+.lead { font-size: var(--t-m); color: var(--fg); }
+.kicker { color: var(--muted); font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 4px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; align-items: center; }
+.row > button, .row > .button { flex: 1 1 auto; }
+.nowrap { white-space: nowrap; }
+
+button, .button { font: inherit; font-weight: 600; border: 1.5px solid var(--line); border-radius: var(--r); padding: 12px 16px; background: none; border-color: color-mix(in srgb, var(--fg) 45%, transparent); color: var(--fg); min-height: 48px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.2s; }
+button:active { transform: scale(0.98); }
+button:disabled, button.ok:disabled { opacity: 1; background: none; border-color: var(--line); color: var(--muted); cursor: not-allowed; box-shadow: none; }
+button.ok { background: var(--accent); border-color: transparent; color: var(--accent-fg); font-weight: 600; }
+button.ok:active { transform: translateY(1px); }
+@media (hover: hover) { button:hover { background: color-mix(in srgb, var(--fg) 6%, transparent); } button.ok:hover { background: color-mix(in srgb, var(--fg) 14%, var(--accent)); } button.link:hover, .link:hover { background: none; color: var(--blue); } }
+button.big { font-size: var(--t-m); min-height: 56px; width: 100%; }
+button.link, .link { background: none; border: 0; min-height: 0; padding: 0; color: inherit; text-decoration: underline; font-weight: 500; }
+/* Buttons: one blue primary per screen (.ok); the rest are outlined; a dismissal (Close, Cancel) is text. Over the
+   camera an outlined button needs the sheet behind it to be read. */
+/* Navigation to another screen: a ruled row with a chevron, read as a place to go, not an action. */
+.nav-row { justify-content: space-between; border: 0; border-block: 1px solid var(--line); border-radius: 0; padding: 12px 0; font-weight: 600; text-align: left; }
+.nav-row::after { content: ""; flex: none; width: 8px; height: 8px; margin-right: 4px; border: solid var(--muted); border-width: 0 2px 2px 0; transform: rotate(-45deg); }
+.dismiss { align-self: center; background: none; border: 0; color: var(--muted); text-decoration: none; font-weight: 600; min-height: 48px; padding: 0 16px; }
+body.cam button:not(.ok, .link, .dismiss, .talk, .stop-back, .stop-again, .chip-button), body.cam .button { background: var(--sheet); backdrop-filter: blur(8px); }
+.button.watch::before { content: ""; width: 0; height: 0; border-style: solid; border-width: 6px 0 6px 10px; border-color: transparent transparent transparent currentColor; }
+.link.quiet { align-self: center; min-height: 44px; color: var(--muted); }
+.landing .link { min-height: 48px; margin-top: 4px; color: var(--muted); }
+input { font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); min-height: 48px; padding: 12px 16px; width: 100%; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+input:focus-visible, select:focus-visible { outline-offset: 1px; }
+
+/* Header: the name, and the REPLAY / TEST ZONE chips in the flow (they never sit on top of text). */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 36px; }
+.brand { display: inline-flex; align-items: center; gap: 12px; font: 650 var(--t-l)/1.1 var(--display); letter-spacing: -0.01em; }
+.lockup { display: block; height: 32px; width: auto; color: var(--fg); }
+.chips { display: inline-flex; gap: 8px; }
+.chip { padding: 4px 12px; border-radius: var(--r-chip); font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; }
+/* A quiet tag, not a button: it says what is playing. */
+.chip.replay { background: none; color: var(--muted); border: 1px solid var(--line); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.chip.test { background: var(--amber); color: var(--amber-fg); }
+body.cam .top { background: var(--sheet); border-radius: var(--r); padding: 4px 8px 4px 8px; max-width: max-content; margin-left: 0; backdrop-filter: blur(8px); }
+/* On a narrow phone the header gives way, never the tag: the job's name ellipses first. */
+body.cam .top .brand { min-width: 0; flex: 0 1 auto; }
+body.cam .top .chips { flex: none; }
+body.cam .chip.replay { padding: 2px 8px; letter-spacing: 0.04em; }
+/* The camera's header bar: back, the appliance as a mono kicker over the job, and the steps as segments. It runs edge
+   to edge on a phone; the wordmark and the DEMO tag step aside for it (DEMO is in the kicker). */
+/* End is a word, not only a chevron: leaving a session must be findable at a glance (it closes the session). */
+.cam-back { flex: none; display: inline-flex; align-items: center; gap: 2px; height: 44px; min-height: 0; padding: 0 10px 0 4px; margin: 0 2px 0 -6px; background: none !important; border: 0; border-right: 1px solid var(--line); border-radius: 0; color: var(--fg); font: 600 var(--t-s)/1 var(--sans); backdrop-filter: none !important; }
+.cam-back svg { width: 20px; height: 20px; }
+.cam-head { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; gap: 2px; }
+.cam-kicker { font: 500 10px/1.2 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cam-title { font: 600 16px/1.2 var(--display); letter-spacing: -0.005em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cam-steps { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.cam-segs { display: flex; gap: 3px; }
+.cam-segs:empty { display: none; }
+.cam-segs > span { width: 12px; height: 4px; border-radius: 1px; background: color-mix(in srgb, var(--fg) 24%, transparent); transition: background 0.3s var(--ease); }
+.cam-segs > span.done { background: var(--blue); }
+.cam-segs > span.now { background: var(--fg); }
+/* While a check runs, the step in hand glows amber in the bar. */
+.top.is-checking .cam-segs > span.now { background: var(--amber); opacity: 1; animation: blink 1.2s ease-in-out infinite; }
+.cam-count { font: 500 11px/1 var(--mono); letter-spacing: 0.06em; color: var(--muted); font-variant-numeric: tabular-nums; }
+body.cam .top.has-head .brand, body.cam .top.has-head .chip.replay { display: none; }
+body.cam #app > .top.has-head { max-width: none; min-height: 56px; gap: 12px; }
+@media (max-width: 719px) {
+  body.cam #app > .top.has-head { margin: calc(-1 * max(12px, env(safe-area-inset-top))) -16px 0; width: calc(100% + 32px); border-radius: 0; padding: max(8px, env(safe-area-inset-top)) 16px 8px 12px; }
+  /* The bar counts the steps; the card's own rule would say it twice. */
+  body.cam .top.has-head ~ .sheet .card-progress { visibility: hidden; }
+}
+.chip-button { min-height: 48px; margin-block: -8px; padding: 0 2px; background: none; border: 0; }
+.chip.warn { letter-spacing: 0; background: color-mix(in srgb, var(--amber) 22%, var(--sheet)); color: var(--fg); border: 1px solid var(--amber); font-weight: 700; }
+/* The camera's header bar has no room beside End, the job and the steps for the hand-tracking chip: when it shows, it
+   takes a line of its own under them, whole, instead of pushing the bar past the screen's edge. */
+body.cam .top.has-head:has(#hands-chip:not([hidden])) { flex-wrap: wrap; row-gap: 4px; }
+body.cam .top.has-head:has(#hands-chip:not([hidden])) .chips { order: 1; flex: 1 0 100%; min-width: 0; }
+body.cam .top.has-head .chip-button { min-height: 44px; margin-block: -6px; }
+body.cam .top.has-head .chip.warn { white-space: nowrap; }
+.names { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; line-height: 1.15; }
+.replay-title { font-size: var(--t-xs); font-weight: 600; letter-spacing: 0; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52vw; }
+body.cam .brand { font-size: var(--t-s); gap: 8px; padding-right: 8px; }
+body.cam .lockup { height: 24px; }
+
+.status { display: flex; flex-direction: column; gap: 8px; }
+.status:not(:has(> :not([hidden]))) { display: none; }
+.notice { align-self: center; background: var(--sheet); border: 1px solid var(--line); padding: 8px 16px; border-radius: var(--r); color: var(--fg); font-weight: 600; font-size: var(--t-s); text-align: center; box-shadow: var(--shadow); backdrop-filter: blur(8px); }
+.bar.amber { background: var(--amber); color: var(--amber-fg); padding: 12px 16px; border-radius: var(--r); font-weight: 650; box-shadow: var(--shadow); }
+
+/* Panels: the screens before the camera. */
+.panel { padding: 8px 0 0; display: flex; flex-direction: column; gap: 12px; }
+.facts { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.facts li { position: relative; padding-left: 24px; }
+.facts li::before { content: ""; position: absolute; left: 4px; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+.tag { display: inline-block; align-self: flex-start; font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: var(--r-chip); padding: 3px 8px; margin-bottom: 8px; }
+.consent { display: flex; flex-direction: column; padding: 4px 0 0; }
+/* The first run: three promises with drawn marks, the consent's facts as ruled rows, the full terms folded. */
+.promise { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 16px; font-size: var(--t-m); font-weight: 600; line-height: 1.35; }
+.promise li { display: flex; gap: 12px; align-items: center; }
+.promise svg { flex: none; width: 24px; height: 24px; }
+.first-run > .sub { margin: 0; font-size: var(--t-s); }
+/* What is sent and kept: the approved words as they are, in one compact card. */
+.consent-body { margin: 0; padding: 0 12px; list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.consent-body li { padding: 10px 0; font-size: 14px; line-height: 1.45; }
+.consent-body li + li { border-top: 1px solid var(--line); }
+/* The guide can misread: one quiet line with an amber mark, under the promises. */
+.first-run > .misread { display: flex; gap: 12px; align-items: flex-start; color: var(--muted); font-size: var(--t-s); }
+.first-run > .misread::before { content: "!"; flex: none; display: grid; place-items: center; width: 24px; height: 24px; border: 2px solid var(--amber); border-radius: 50%; box-sizing: border-box; color: var(--amber); font: 700 13px/1 var(--sans); }
+/* The full terms open as a sheet over the page, so the button never moves. */
+.terms-sheet { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; max-height: 75vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 20px 16px max(16px, env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--line); border-radius: 12px 12px 0 0; box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.45); animation: rise 0.25s var(--ease); }
+.terms-sheet > * { width: 100%; max-width: 560px; margin-inline: auto; }
+/* Ticking and Continue stay in reach at the bottom, however long the page. */
+.first-foot { position: sticky; bottom: calc(-1 * max(16px, env(safe-area-inset-bottom))); z-index: 2; display: flex; flex-direction: column; gap: 8px; margin: 4px -16px 0; padding: 12px 16px max(16px, env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--line); }
+.first-foot > * { width: 100%; max-width: 560px; margin-inline: auto; }
+.first-foot button.ok:disabled { background: var(--surface-2); border-color: transparent; color: var(--muted); }
+.consent-body:empty { display: none; }
+.first-run > .tag { margin: 0; }
+.terms-more summary { list-style: none; cursor: pointer; min-height: 32px; display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: var(--t-s); font-weight: 600; }
+.terms-more summary::-webkit-details-marker { display: none; }
+.terms-more summary::after { content: "▸"; font-size: var(--t-xs); transition: transform 0.15s ease; }
+.terms-more[open] summary::after { transform: rotate(90deg); }
+.terms-more .facts { margin-top: 8px; font-size: var(--t-s); }
+.terms-more .sub { margin: 12px 0 0; }
+.consent-row { display: flex; gap: 12px; align-items: flex-start; min-height: 48px; font-size: var(--t-s); cursor: pointer; }
+.consent-row input { flex: none; appearance: none; width: 48px; height: 48px; min-height: 0; margin: -12px -12px -12px;
+  padding: 0; border: 0; background: none; display: grid; place-items: center; cursor: pointer; }
+.consent-row input::before { content: ""; grid-area: 1 / 1; width: 24px; height: 24px; box-sizing: border-box; border-radius: var(--r-chip);
+  border: 2px solid var(--muted); background: var(--sheet); }
+.consent-row input:checked::before { border-color: var(--accent); background: var(--accent); }
+/* The tick in the accent's own text colour (ink on the light blue, white on the ink blue), as a drawn L. */
+.consent-row input:checked::after { content: ""; grid-area: 1 / 1; width: 12px; height: 6px; border-left: 3px solid var(--accent-fg); border-bottom: 3px solid var(--accent-fg); transform: translateY(-2px) rotate(-45deg); }
+.consent-row input:focus { outline: none; }
+.consent-row input:focus-visible::before { outline: 2px solid var(--blue); outline-offset: 3px; }
+.consent-row { padding-left: 4px; }
+.consent-row span { padding-left: 8px; }
+.error { margin: 0; padding: 12px 12px; border-radius: var(--r); background: color-mix(in srgb, var(--amber) 16%, transparent); border: 1px solid color-mix(in srgb, var(--amber) 55%, transparent); color: var(--fg); font-size: var(--t-s); }
+/* Content rows: a ruled list, hairline rules and no fill, the title in serif. A row with a due bar is indented past it. */
+.list { display: flex; flex-direction: column; gap: 0; }
+.list > :not(.item, h2, .next-up) { margin-top: 12px; }
+.list h2:first-child { margin-top: 0; }
+.item { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding: 12px 0; }
+:not(.item) + .item, .item:first-child { border-top: 1px solid var(--line); }
+.item.due-now, .item.due, .item.overdue { padding-left: 12px; }
+.item > div { display: flex; flex-direction: column; }
+.item.due-now { box-shadow: inset 4px 0 0 var(--amber); }
+.item button { flex: none; }
+.item:has(.last-done) { flex-wrap: wrap; }
+.last-done { flex: 1 0 100%; margin: 0; padding: 0; border: 0; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.last-done legend { padding: 0; margin-bottom: 8px; font-weight: 600; font-size: var(--t-s); }
+.last-done .choices { display: flex; gap: 8px; }
+.last-done .choices > * { flex: 1; min-height: 48px; min-width: 0; }
+.last-done .choices > .date-pick { flex: 1.5; }
+.last-done input[type="date"] { font: inherit; padding: 0 12px; border-radius: var(--r); border: 1px solid var(--line, var(--muted)); background: var(--sheet); color: var(--fg); color-scheme: inherit; }
+.last-done:disabled { opacity: 0.6; }
+.home .lead { margin-bottom: 4px; }
+.home.has-jobs #watch { order: 1; }
+.home.has-jobs #start { order: 2; }
+.home.has-jobs #home-type { order: 3; }
+.item .item-open { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 12px; text-align: left; background: none; border: 0; padding: 0; color: inherit; font-weight: 400; min-height: 48px; justify-content: flex-start; }
+.item-text, .next-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+/* A full-width row doesn't shrink when pressed: it tints, and its chevron nudges the way it goes. */
+.item .item-open:active, .next-head:active { transform: none; background: color-mix(in srgb, var(--fg) 6%, transparent); }
+.item .item-open .chevron, .next-head .chevron { transition: transform 0.12s var(--ease); }
+.item .item-open:active .chevron, .next-head:active .chevron { transform: translateX(3px); }
+.item-open strong, .next-head strong { font: 600 var(--t-l)/1.2 var(--display); font-optical-sizing: auto; letter-spacing: -0.01em; }
+.item-open .sub, .next-head .sub { overflow-wrap: anywhere; }
+.glyph { width: 28px; height: 28px; flex: none; color: var(--muted); }
+.glyph .lock { stroke: var(--blue); stroke-linecap: square; }
+.chevron { width: 18px; height: 18px; flex: none; color: var(--muted); }
+.item:has(.item-open) { padding-block: 4px; }
+
+/* Home: one primary action (the next job), then the rest by when. Overdue reads as overdue at a glance. */
+/* An empty home: a figure of how a repair goes, in the site's drawn style (crop marks, numbered callouts). */
+.how { display: flex; flex-direction: column; gap: 12px; }
+.how .kicker { margin: 0; }
+.how-plate { margin: 0; padding: 8px 0; border-block: 1px solid var(--line); }
+.how-fig { display: block; width: 100%; height: auto; max-height: 260px; }
+.callouts { list-style: none; margin: 0 0 4px; padding: 0; counter-reset: callout; display: flex; flex-direction: column; gap: 8px; }
+.callouts li { counter-increment: callout; display: flex; gap: 12px; align-items: baseline; }
+.callouts li::before { content: counter(callout); flex: none; display: inline-grid; place-items: center; width: 20px; height: 20px; background: var(--accent); color: var(--accent-fg); font: 500 11px/1 var(--mono); transform: translateY(3px); }
+/* The empty home's one line of framing, above the figure; the callouts under it are the explanation. */
+.home-intro { margin: 4px 0 0; }
+.home-type { align-self: center; min-height: 44px; font: 600 14px/1.2 var(--sans); color: var(--fg); text-decoration: none; }
+/* The next job is the one plate on the page: the kicker and how late it is, the job, Start, and two quiet answers. */
+.next-up { display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); margin-bottom: 12px; }
+.next-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 26px; }
+.next-up .kicker { margin: 0; }
+.due-chip { padding: 3px 10px; border: 1px solid var(--amber); background: color-mix(in srgb, var(--amber) 12%, transparent); color: var(--amber); border-radius: var(--r-chip); font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+body:not(.cam) .due-chip { color: color-mix(in srgb, var(--amber) 60%, var(--fg)); }
+.next-head { display: flex; align-items: center; gap: 12px; text-align: left; background: none; border: 0; padding: 0; color: inherit; font-weight: 400; justify-content: flex-start; min-height: 48px; }
+.next-head strong { font: 600 22px/1.2 var(--display); letter-spacing: -0.01em; }
+.next-head .sub { font-size: 13px; }
+.next-head .glyph { width: 44px; height: 44px; color: var(--fg); }
+.next-head .chevron { display: none; }
+.next-acts { display: flex; margin: -4px 0 -8px; }
+.next-acts > * { flex: 1 1 0; }
+.text-act { min-height: 44px; padding: 0 8px; background: none !important; border: 0; color: var(--fg); font: 600 var(--t-s)/1.2 var(--sans); }
+.text-act:active { opacity: 0.6; }
+.next-acts > .text-act + .text-act { border-left: 1px solid var(--line); border-radius: 0; }
+/* A job's date on the right of its row, in mono, so the title keeps the width. */
+.item .when { flex: none; max-width: 40%; text-align: right; font: 500 11px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.item .when:empty { display: none; }
+.item.overdue .when, .item.due .when { color: var(--fg); }
+/* Section heads on Home are kickers; the screen's title is Keep it running. */
+#home-list h2.group { margin: 24px 0 0; padding-bottom: 8px; border-bottom: 1px solid var(--line); font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+#home-list > h2.way:first-child { margin: 0 0 16px; font: 560 28px/1.1 var(--display); letter-spacing: -0.02em; text-transform: none; color: var(--fg); }
+.all-clear { display: flex; align-items: center; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: var(--r); margin-bottom: 12px; }
+.all-clear .tick { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--green) 18%, transparent); color: var(--green); font-weight: 800; }
+.all-clear strong { display: block; font-size: var(--t-m); }
+.all-clear .sub { margin: 2px 0 0; }
+.item.tool .glyph.tool { color: var(--fg); }
+.item.tool .item-open { text-decoration: none; }
+.item.tool strong { font: 600 var(--t-m)/1.25 var(--sans); letter-spacing: 0; }
+.item.needs .sub { color: color-mix(in srgb, var(--amber) 70%, var(--fg)); }
+.item-model { font: 500 var(--t-xs)/1.3 var(--mono); color: var(--muted); letter-spacing: 0.02em; }
+.item-state.late { color: color-mix(in srgb, var(--amber) 70%, var(--fg)); font-weight: 600; }
+h2.group.overdue { color: var(--fg); display: flex; align-items: center; gap: 8px; }
+h2.group.overdue::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--amber); }
+.item.overdue { box-shadow: inset 4px 0 0 var(--amber); }
+.item.overdue .sub { color: var(--fg); }
+.item.overdue .glyph { color: var(--fg); }
+.item.due { box-shadow: inset 4px 0 0 color-mix(in srgb, var(--amber) 60%, transparent); }
+
+/* A date as a friendly button; the platform's picker sits under it and takes the tap. */
+.date-pick { position: relative; display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 12px; border-radius: var(--r); border: 1.5px solid color-mix(in srgb, var(--fg) 45%, transparent); background: none; color: var(--fg); font-weight: 600; cursor: pointer; overflow: hidden; }
+.date-pick input[type="date"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; min-height: 0; padding: 0; border: 0; cursor: pointer; }
+.date-pick:focus-within { outline: 2px solid var(--blue); outline-offset: 3px; }
+.date-pick-text { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.date-pick-text::before { content: ""; flex: none; width: 14px; height: 13px; border: 1.5px solid currentColor; border-radius: 3px; border-top-width: 3.5px; opacity: 0.7; }
+/* A folded phone: a little more room for the rows, and the date on its own line above Save. */
+@media (max-width: 380px) {
+  .last-done .choices { flex-wrap: wrap; }
+  .last-done .choices > .date-pick { flex: 1 0 100%; }
+}
+
+/* Your appliances and one appliance's page: jobs, the manual and where it came from, how the card was checked, report. */
+.devices h1 { margin: 0; }
+.devices h2 { margin: 16px 0 4px; }
+.devices .list { display: flex; flex-direction: column; gap: 0; }
+.devices .back { align-self: flex-start; min-height: 48px; color: var(--muted); text-decoration: none; }
+/* A row that wants something: an amber mark in the gutter, so nothing in the row moves. */
+.devices .item { position: relative; }
+.devices .item.needs::before { content: ""; position: absolute; left: -12px; top: 12px; bottom: 12px; width: 3px; border-radius: 2px; background: var(--amber); }
+.devices .item-model { font-size: 12px; color: var(--faint); }
+.devices .item-state { font-size: 13px; color: var(--muted); }
+.devices .item.needs .item-state, .devices .item-state.late { color: color-mix(in srgb, var(--amber) 70%, var(--fg)); }
+.devices .item .when.late { color: color-mix(in srgb, var(--amber) 70%, var(--fg)); font-weight: 600; }
+.devices .add-one { align-self: stretch; min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.devices .add-one::before { content: ""; width: 14px; height: 14px; background: linear-gradient(currentColor 0 0) center / 100% 2px no-repeat, linear-gradient(currentColor 0 0) center / 2px 100% no-repeat; }
+.devices-empty { display: flex; flex-direction: column; gap: 12px; }
+.devices-empty .ghosts { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.devices-empty .ghost { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px dashed var(--line); opacity: 0.55; }
+.devices-empty .ghost:nth-child(2) { opacity: 0.38; }
+.devices-empty .ghost:nth-child(3) { opacity: 0.22; }
+.devices-empty .ghost-line { height: 10px; width: 46%; border-radius: 2px; background: color-mix(in srgb, var(--fg) 12%, transparent); }
+.devices-add { display: flex; flex-direction: column; gap: 8px; }
+/* The camera first and full width, typing under it: the add page's own order at every width. */
+.devices-add .row { flex-direction: column; flex-wrap: nowrap; align-items: stretch; margin-top: 8px; }
+.devices-add .row > * { min-height: 48px; }
+.ap-head { display: flex; align-items: center; gap: 12px; }
+.ap-head .glyph { width: 40px; height: 40px; color: var(--fg); }
+.ap-head .sub { margin: 0; }
+.ap-jobs, .ap-refused, .ap-manual, .ap-checked { display: flex; flex-direction: column; gap: 8px; }
+/* Keep it running and Something's wrong: the two ways in, and a job's kind on its row. */
+h2.way { margin: 24px 0 8px; }
+#home-list > h2.way:first-child { margin-top: 0; }
+.way-wrong { display: flex; flex-direction: column; gap: 8px; }
+/* Its heading is the section's first child, so the gap above it is the section's own. */
+.list > .way-wrong { margin-top: 28px; }
+.way-wrong p { margin: 0; }
+.item-text .tag.kind { margin: 0 0 4px; padding: 1px 6px; font-size: 0.6875rem; }
+.ap-wrong h3 { margin: 12px 0 0; font-size: var(--t-s); color: var(--muted); font-weight: 600; }
+.fault { display: flex; flex-direction: column; gap: 8px; }
+.fault-form { margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.fault-form .row { align-items: flex-end; flex-wrap: nowrap; }
+.fault-label { display: flex; flex-direction: column; gap: 4px; flex: 1 1 auto; min-width: 0; font-size: var(--t-s); color: var(--muted); }
+.fault-label input { font: 600 var(--t-m)/1.2 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; min-height: 48px; width: 100%; }
+.fault-form .row > button { flex: none; }
+.fault-form .sub { margin: 0; }
+.fault-answer { display: flex; flex-direction: column; gap: 12px; }
+.fault-match { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-block: 1px solid var(--line); }
+.fault-match p { margin: 0; }
+.fault-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.fault-head .tag { margin: 0; color: var(--fg); }
+.fault .notice-line, .fault-match .fault-unconfirmed, .home .cap-line { margin: 0; padding: 2px 0 2px 12px; box-shadow: inset 4px 0 0 var(--amber); font-size: var(--t-s); }
+.fault-match > p:not(.fault-head) { font-size: var(--t-s); }
+.fault-match .sched-quote .translation { flex-direction: column; gap: 4px; }
+.fault-pick { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.fault-pick .sub { flex: 1 0 100%; }
+button.code-pick { min-width: 72px; font: 600 var(--t-s)/1.2 var(--mono); letter-spacing: 0.06em; }
+.ap-manual p { margin: 0; }
+.ap-manual .manual-title { font-weight: 650; overflow-wrap: anywhere; }
+.ap-manual .button { align-self: flex-start; margin-top: 4px; }
+.ap-manual a.button::after { content: "↗"; font-weight: 400; }
+.ap-refused .refused li { color: var(--fg); }
+.ap-not-built .refused li { color: var(--fg); }
+.ap-not-built .refused li::before { border-color: var(--muted); }
+.ap-not-built strong { font-weight: 600; }
+.ap-refused strong { font-weight: 600; display: block; }
+.ap-refused .sub { display: block; }
+.safety-alert { margin: 0; padding: 12px 16px; border-radius: var(--r); background: color-mix(in srgb, var(--red) 14%, transparent); border: 1px solid var(--red); font-weight: 600; }
+.done-line { margin: 0; padding: 4px 16px; box-shadow: inset 4px 0 0 var(--blue); }
+.notice-line { margin: 0; }
+.checked-lines { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: var(--t-s); }
+.checked-lines li { padding-left: 22px; position: relative; overflow-wrap: anywhere; }
+.checked-lines li::before { content: ""; position: absolute; left: 4px; top: 0.5em; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.cite-link { white-space: nowrap; color: var(--fg); font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.04em; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; background: none; border: 0; padding: 0; min-height: 0; display: inline; }
+a.cite-link::after, #card-maker::after { content: " ↗"; text-decoration: none; display: inline-block; margin-left: 2px; }
+.report { margin: 0; padding: 16px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.report legend { float: left; width: 100%; padding: 0; margin-bottom: 8px; font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.report p { margin: 0; }
+.report-kinds { display: flex; flex-direction: column; }
+.report-kind { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.report-kind input { width: 20px; height: 20px; accent-color: var(--blue); margin: 0; }
+.report-field { display: flex; flex-direction: column; gap: 4px; font-size: var(--t-s); color: var(--muted); }
+.report-field select, .report-field input, .report-field textarea { font: inherit; color: var(--fg); background: var(--sheet); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; min-height: 48px; min-width: 0; max-width: 100%; }
+.report-field textarea { resize: vertical; }
+.report .row { flex-direction: column; align-items: stretch; }
+.report .danger { margin-top: 0; }
+.report:disabled { opacity: 0.6; }
+@media (max-width: 380px) {
+  .report { padding: 12px; }
+}
+
+/* One job's sheet: when, how often (the manual's beside yours), done and snooze, history. */
+.job-sheet h1 { margin-bottom: 0; }
+.job-sheet h2 { margin: 12px 0 4px; }
+.job-sheet .when { margin: 0; font-weight: 600; }
+.job-sheet .when.due-now { padding-left: 12px; box-shadow: inset 4px 0 0 var(--amber); }
+.job-sheet .last-done { flex: none; }
+.job-sheet > .link { align-self: flex-start; min-height: 48px; text-align: left; justify-content: flex-start; }
+.sched { display: flex; flex-direction: column; gap: 8px; }
+.sched-line { margin: 0; display: flex; align-items: baseline; gap: 12px; }
+.sched-line .tag { margin: 0; min-width: 64px; text-align: center; }
+.sched-line .tag.yours { color: var(--fg); border-color: var(--accent); }
+.sched-quote { margin: 0 0 4px; padding: 2px 0 2px 12px; border-left: 3px solid var(--accent); color: var(--muted); font-size: var(--t-s); display: flex; flex-direction: column; gap: 8px; }
+.sched-quote p { margin: 0; }
+.sched-quote .translation { color: var(--fg); display: flex; gap: 8px; align-items: baseline; }
+.sched-quote .translation .tag { margin: 0; flex: none; font-size: var(--t-xs); }
+.sched .link { align-self: flex-start; min-height: 48px; }
+.sched-links { gap: 0 24px; }
+.sched-links > button { flex: none; }
+.sched > .ok { align-self: flex-start; }
+.sched-edit { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sched-edit legend { padding: 0; margin-bottom: 8px; font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.sched-kind { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 48px; }
+.sched-kind input[type="radio"] { width: 24px; height: 24px; min-height: 0; margin: 0; accent-color: var(--accent); }
+.sched-nums { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 1 0 100%; padding-left: 32px; }
+.sched-nums input { width: 4.5em; flex: none; padding: 12px; }
+.sched-nums select { flex: 1 0 auto; font: inherit; min-height: 48px; padding: 0 12px; border-radius: var(--r); border: 1px solid var(--line); background-color: var(--surface); color: var(--fg); }
+.sheet-acts { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.sheet-acts .choices { display: flex; gap: 8px; }
+.sheet-acts .field { display: flex; flex-direction: column; gap: 4px; font-size: var(--t-s); color: var(--muted); }
+.sheet-acts .choices > * { flex: 1; min-width: 0; }
+.sheet-acts input[type="date"] { color-scheme: inherit; }
+.sheet-acts .sub { margin: 0; display: flex; align-items: center; gap: 12px; }
+.sheet-acts .sub .link { min-height: 48px; }
+.changes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.changes li { display: flex; gap: 12px; font-size: var(--t-s); }
+.changes li .sub { flex: none; min-width: 52px; }
+.changes li.undone .what { color: var(--muted); }
+.changes li .tag { margin: 0 0 0 8px; font-size: var(--t-xs); padding: 1px 8px; vertical-align: 1px; }
+.sheet-history > button { align-self: flex-start; margin-top: 8px; }
+.sheet-history { display: flex; flex-direction: column; }
+/* Under Start, Mark done | Later… as text buttons, as on home's next job; the open one is blue and its picks sit
+   under it. Another day… is a whole choice with the platform's date picker laid over it. */
+.sheet-acts > .next-acts { margin: 0; }
+.sheet-acts > .next-acts > [aria-expanded="true"] { color: var(--blue); }
+.other-day { position: relative; }
+.other-day input[type="date"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; min-height: 0; padding: 0; border: 0; cursor: pointer; }
+.other-day:focus-within { outline: 2px solid var(--blue); outline-offset: 3px; }
+/* When it's due, then when it was last done, on one line. */
+.when-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; }
+.when-row > .sub { margin: 0; font-size: 13px; }
+.when-row > .sub::before { content: "· "; }
+/* How often: the interval as a row title, where it comes from under it; the manual's words open on a tap. */
+.sched-row { flex-direction: column; align-items: flex-start; gap: 2px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.sched-row strong { font: 600 19px/1.25 var(--display); }
+.sched-row .sub { margin: 0; font-size: 13px; }
+.quote-fold > summary { display: flex; align-items: center; min-height: 44px; color: var(--muted); font-size: var(--t-s); font-weight: 600; cursor: pointer; list-style: none; }
+.quote-fold > summary::-webkit-details-marker { display: none; }
+.quote-fold > summary::after { content: ""; width: 7px; height: 7px; margin-left: 10px; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(45deg) translateY(-2px); }
+.quote-fold[open] > summary::after { transform: rotate(-135deg); }
+.sheet-acts > .link { align-self: flex-start; min-height: 48px; color: var(--muted); }
+/* A fold opens like a section: its head is a kicker, with the chevron. */
+button.fold { justify-content: space-between; width: 100%; min-height: 52px; padding: 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none; font-weight: 600; color: var(--fg); text-align: left; }
+/* Open, a fold reads as the heading of what it opened. */
+button.fold[aria-expanded="true"] { color: var(--muted); }
+button.fold::after { content: ""; flex: none; width: 8px; height: 8px; margin-right: 4px; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(-45deg); transition: transform 0.15s; opacity: 0.7; }
+button.fold[aria-expanded="true"]::after { transform: rotate(45deg); }
+.sheet-acts button.fold { margin-top: 4px; }
+.sheet-acts .later { display: flex; flex-direction: column; gap: 8px; padding-bottom: 8px; }
+.sheet-acts .later .choices > * { flex: 1 1 0; min-width: 0; }
+.sheet-acts .later .choices > .other-day { padding: 8px; text-align: center; line-height: 1.25; }
+.sheet-acts .later .choices > button { flex-direction: column; gap: 0; line-height: 1.25; padding: 8px; }
+.sheet-acts .later .choices > button .sub { display: block; font-size: var(--t-xs); font-weight: 400; color: var(--muted); }
+.job-settings { display: flex; flex-direction: column; gap: 16px; padding-bottom: 8px; }
+.job-settings > .link, .job-settings > .sched-links { align-self: flex-start; min-height: 48px; margin-top: -8px; }
+
+/* The sheet: everything over the camera sits at the bottom, in thumb reach. */
+.sheet { display: flex; flex-direction: column; gap: 12px; margin-top: auto; pointer-events: none; }
+/* On the camera nothing floats over the picture but the header: notices, the held bar and captions sit on top of
+   the sheet, so the frame between the header and them is the part's own. */
+body.cam #app > .top, body.cam #app > .top.has-head { margin-bottom: auto; }
+body.cam .sheet { margin-top: 0; }
+/* Off the camera (adding a manual from home) the panel sits under the header, not at the foot of an empty screen. */
+body:not(.cam) .sheet { margin-top: 0; }
+.hint { background: var(--sheet); border-radius: var(--r); padding: 12px 16px; color: var(--fg); text-align: center; backdrop-filter: blur(8px); }
+/* Waiting on the server, not asking for anything: a quiet turn beside the words. */
+.hint.wait, .notice.wait { display: flex; align-items: center; justify-content: center; gap: 12px; text-align: left; }
+.hint.wait::before, .notice.wait::before { content: ""; flex: none; width: 16px; height: 16px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--fg) 25%, transparent); border-top-color: var(--fg); animation: spin 0.8s linear infinite; }
+/* The spoken line, as a caption under the header: up while it is read, then it fades and the camera is clear. */
+.caption { display: flex; justify-content: center; }
+.caption:empty { display: none; }
+.caption p { margin: 0; max-width: 36ch; background: var(--sheet); border-radius: var(--r); padding: 6px 14px; font-size: 13px; line-height: 1.4; text-align: center; backdrop-filter: blur(8px); animation: drop 0.25s ease-out; transition: opacity 0.6s ease; }
+.caption.fading p { opacity: 0; }
+.rail { margin: 0; padding: 8px 12px 8px 32px; background: rgba(0, 0, 0, 0.6); border-radius: var(--r); font-size: var(--t-xs); color: var(--muted); }
+
+.card { background: var(--sheet); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 16px 16px; box-shadow: var(--shadow); backdrop-filter: blur(10px); display: flex; flex-direction: column; gap: 8px; animation: rise 0.3s ease-out; }
+.card-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--muted); font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.04em; }
+/* How far through the job: a thin rule along the top of the card. */
+.card-progress { height: 3px; margin: -16px -16px 8px; background: var(--line); border-radius: var(--r) var(--r) 0 0; overflow: hidden; }
+.card-progress > span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.4s var(--ease); }
+.step-no { font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); white-space: nowrap; flex: none; }
+.card-head .cite { min-width: 0; text-align: right; }
+/* No quote to show (a step of our own, or a card with none): no empty bar where it would be. */
+.card blockquote:not(:has(p:not([hidden]))) { display: none; }
+.cite { display: inline-flex; gap: 12px; align-items: center; }
+.cite .link { min-height: 32px; color: var(--fg); font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.04em; }
+/* The page tag as a button: a mono chip with a 44 px target. */
+.page-chip { display: inline-flex; align-items: center; min-height: 44px; margin: -10px 0; padding: 0 10px; border: 1px solid var(--line); border-radius: var(--r); background: none; color: var(--fg); font: 500 var(--t-xs)/1 var(--mono); letter-spacing: 0.04em; text-decoration: none; white-space: nowrap; }
+.mono-page { font: 500 var(--t-xs)/1 var(--mono); letter-spacing: 0.04em; }
+.page-chip:active { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.card-text { font: 560 22px/1.25 var(--display); font-optical-sizing: auto; letter-spacing: -0.01em; margin: 2px 0; }
+/* Camera only: the text tucks away; the header, the controls and the button that brings the text back stay. */
+body.clear .sheet > :not(#controls):not(#unclear), body.clear #notice, body.clear #sentences { display: none !important; }
+/* Camera only under a hold: the step's words go; the hold's own line, the held bar and the controls stay. */
+body.clear-hold #card-text, body.clear-hold #card-said, body.clear-hold #card-answer, body.clear-hold #card .from-manual, body.clear-hold #sentences { display: none !important; }
+body.clear-hold .tuck svg { transform: rotate(180deg); }
+.tuck { order: 2; flex: none; min-height: 32px; min-width: 40px; padding: 0 8px; margin: -6px -8px -6px 0; border: 0; background: none; color: var(--muted); }
+.tuck svg { width: 20px; height: 20px; }
+.card-head:has(.tuck:not([hidden])) .cite { margin-left: auto; }
+.clear-hint { align-self: center; margin: 0; padding: 4px 12px; border-radius: var(--r); background: var(--sheet); font-size: var(--t-xs); color: var(--muted); backdrop-filter: blur(8px); text-align: center; width: auto !important; }
+.unclear { align-self: center; width: auto !important; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 16px; border-radius: 999px; background: var(--sheet); box-shadow: var(--shadow); backdrop-filter: blur(8px); }
+.unclear::after { content: ""; width: 8px; height: 8px; border-left: 2px solid currentColor; border-top: 2px solid currentColor; transform: translateY(2px) rotate(45deg); }
+.unclear-news { background: var(--accent); color: var(--accent-fg); border-radius: 999px; padding: 2px 8px; font-size: var(--t-xs); font-weight: 650; animation: rise 0.25s var(--ease); }
+/* What the guide just said about the step: under the title, never in its place; long lines fold to three. */
+.card-said { margin: 0; font-size: var(--t-s); line-height: 1.4; color: var(--muted); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; animation: rise 0.25s var(--ease); }
+/* The manual's own words, folded: one tap opens the quote and, when the manual is in another language, its gloss. */
+.from-manual:not(:has(blockquote p:not([hidden]), .card-step:not([hidden]))) { display: none; }
+.card-answer { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; min-height: 0; padding: 8px 12px; border: 0; border-left: 3px solid var(--accent); border-radius: 0 var(--r) var(--r) 0; background: color-mix(in srgb, var(--accent) 10%, transparent); text-align: left; font-weight: 400; font-size: var(--t-s); line-height: 1.45; animation: rise 0.25s var(--ease); }
+.card-answer .answer-k { font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.from-manual .card-step { margin: 4px 0 8px; font-size: var(--t-s); line-height: 1.45; color: var(--fg); }
+.from-manual summary { list-style: none; cursor: pointer; min-height: 32px; display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: var(--t-s); font-weight: 600; }
+.from-manual summary::-webkit-details-marker { display: none; }
+.from-manual summary::after { content: "▸"; font-size: var(--t-xs); transition: transform 0.15s ease; }
+.from-manual[open] summary::after { transform: rotate(90deg); }
+.from-manual blockquote { margin: 4px 0 0; }
+.card blockquote { margin: 0; padding: 2px 0 2px 12px; border-left: 3px solid var(--accent); color: var(--muted); font-size: var(--t-s); }
+.card blockquote p { margin: 2px 0; }
+.card blockquote .en { font-style: italic; opacity: 0.85; }
+.card-pause { background: color-mix(in srgb, var(--amber) 18%, transparent); border: 1px solid var(--amber); border-radius: var(--r); padding: 12px 12px; font-weight: 650; }
+.card.paused .card-text, .card.paused blockquote { opacity: 0.45; }
+.checking { display: flex; align-items: center; gap: 12px; color: var(--amber); font-weight: 700; font-size: var(--t-m); padding: 8px 0; }
+.spinner { width: 20px; height: 20px; border-radius: 50%; border: 3px solid color-mix(in srgb, var(--amber) 30%, transparent); border-top-color: var(--amber); animation: spin 0.8s linear infinite; }
+/* While a check runs, the progress rule turns amber and a light runs along it: busy, without a pulsing frame. */
+.card.checking-now .card-progress > span { background: var(--amber); }
+.card.checking-now .card-progress { background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--amber) 55%, transparent), transparent) 0 0 / 40% 100% no-repeat, var(--line); animation: sweep 1.3s linear infinite; }
+/* A new step slides in: the words change place, so the eye sees the step turn over. */
+.card-text.step-in { animation: step-in 0.35s var(--ease); }
+/* A notice with no way forward is the card's state line: an amber rule, the words, and the way on. */
+.state { display: flex; flex-direction: column; gap: 12px; }
+.card .state { margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--line); }
+.state-line { margin: 0; padding: 2px 0 2px 12px; box-shadow: inset 3px 0 0 var(--amber); font-size: var(--t-m); line-height: 1.4; }
+.state .row > * { flex: 1; }
+.verdict { margin: 4px 0 0; padding: 12px 12px; border-radius: var(--r); font-size: var(--t-m); font-weight: 700; display: flex; gap: 12px; align-items: center; }
+/* A check that didn't pass is a note, not an alarm: an amber rule and its mark. Red stays for STOP and red zones. */
+.verdict.cant_see, .verdict.not_done { background: none; border: 0; border-left: 3px solid var(--amber); border-radius: 0; padding: 4px 0 4px 12px; }
+.verdict::before { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-size: var(--t-s); color: #0d1726; }
+.verdict.cant_see::before { content: "!"; background: var(--amber); }
+.verdict.not_done::before { content: "↺"; background: var(--amber); }
+.passed { align-self: center; width: auto !important; background: var(--green); color: var(--done-fg); font-weight: 800; font-size: var(--t-m); border-radius: var(--r); padding: 12px 24px; box-shadow: var(--shadow); animation: pop 1.4s ease-out forwards; }
+.complete { align-items: center; text-align: center; animation: rise 0.4s ease-out; background: var(--sheet); }
+.install { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.install h2 { margin: 4px 0 0; }
+.install .sub { margin: 0; }
+.install-steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: step; }
+.install-steps li { display: flex; align-items: center; gap: 12px; counter-increment: step; }
+.install-steps li::before { content: counter(step); flex: none; font: 500 var(--t-xs)/1 var(--mono); color: var(--muted); width: 1ch; }
+.install-glyph { width: 24px; height: 24px; flex: none; color: var(--blue); }
+.install-other p { margin: 0 0 8px; }
+.install-url { font: 500 var(--t-xs)/1.4 var(--mono); color: var(--fg); user-select: all; -webkit-user-select: all; overflow-wrap: anywhere; }
+.install .link { align-self: flex-start; min-height: 48px; color: var(--muted); }
+/* Job done: the mark's two corners close in, then the tick draws on inside them. No disc, no fill. */
+.done-mark { width: 64px; height: 64px; overflow: visible; }
+.done-mark .dm-a, .done-mark .dm-b { stroke: var(--fg); stroke-width: 5; transform-origin: 32px 32px; animation: dm-close 0.28s var(--ease) 0.15s backwards; }
+.done-mark .dm-tick { stroke: var(--green); stroke-width: 6; stroke-dasharray: 1; animation: dm-draw 0.2s ease-out 0.45s backwards; }
+@keyframes dm-close { from { transform: scale(1.35); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes dm-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.complete h1 { font: 600 26px/1.15 var(--display); margin: 4px 0 0; }
+.complete > .sub { margin: 0; font-size: var(--t-s); color: var(--muted); }
+.proof { list-style: none; margin: 4px 0 0; padding: 0; width: 100%; display: flex; flex-direction: column; text-align: left; }
+.proof li { display: grid; grid-template-columns: 16px 28px 1fr auto; align-items: baseline; gap: 4px; min-height: 23px; padding: 2px 0; font-size: var(--t-s); }
+.proof .n, .proof .pg { font: 500 10px/1 var(--mono); color: var(--faint); letter-spacing: 0.04em; }
+.proof .mark { color: var(--green); font-weight: 800; font-size: 12px; }
+.proof .by-you .mark { color: var(--muted); font: 500 10px/1 var(--mono); text-transform: uppercase; }
+.proof .t { color: var(--fg); min-width: 0; }
+.proof .more { display: block; color: var(--muted); padding-left: 48px; }
+.next-time { width: 100%; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-top: 1px solid var(--line); padding: 12px 0 4px; }
+.next-time strong { font-size: 14px; font-weight: 600; }
+.complete > .ok.big { width: 100%; min-height: 48px; }
+.complete > .text-act { min-height: 44px; font-weight: 600; font-size: 14px; color: var(--fg); background: none; border: 0; }
+.top.is-complete .cam-segs > span { background: var(--green); }
+.top.is-complete .cam-count { color: var(--green); }
+
+.ask { background: var(--sheet); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
+.ask > p:first-child { width: 100%; margin: 0; font: 600 var(--t-l)/1.25 var(--display); font-optical-sizing: auto; letter-spacing: -0.01em; }
+.ask > label { width: 100%; display: flex; flex-direction: column; gap: 8px; font-size: var(--t-s); color: var(--muted); }
+.ask > p { width: 100%; }
+.ask .sub { margin: 0; }
+.status-line { margin: 0; font-weight: 600; }
+.status-line.working:not(:empty)::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 8px; vertical-align: middle; animation: blink 1.2s ease-in-out infinite; }
+/* A PDF shared to the app, waiting for its appliance: a dashed sheet at the top of home. */
+.shared { display: flex; flex-direction: column; gap: 8px; padding: 16px; margin-bottom: 16px; border: 1.5px dashed var(--blue); border-radius: var(--r); }
+.shared h2 { margin: 0; }
+.shared p { margin: 0; }
+.shared-name { font: 560 var(--t-l)/1.25 var(--display); overflow-wrap: anywhere; }
+.shared .link { align-self: flex-start; min-height: 48px; color: var(--muted); }
+.jobs { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.jobs:empty { display: none; }
+.jobs button { width: 100%; justify-content: flex-start; }
+#add-pdf-row { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+#add-pdf-row label { display: flex; flex-direction: column; gap: 8px; font-size: var(--t-s); color: var(--muted); }
+/* The add form ends as every page does: one full-width primary, the way out as text under it. */
+.add-acts { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 4px; }
+.add-acts > .ok { width: 100%; min-height: 48px; }
+.add-acts > .dismiss { align-self: center; }
+/* The wait while the manual is read: a square meter, the manual as soon as it is in, the jobs as they pass. */
+.add-wait { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.meter { height: 10px; border: 1.5px solid var(--line); border-radius: var(--r-chip); background: var(--surface); overflow: hidden; }
+.meter > span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.4s ease; }
+.add-eta { margin: -4px 0 0; font: 500 var(--t-xs)/1.4 var(--mono); color: var(--muted); text-align: right; }
+.add-eta:empty { display: none; }
+.add-manual { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.add-manual img { flex: none; width: 52px; height: 72px; object-fit: cover; object-position: top; border: 1px solid var(--line); border-radius: var(--r-chip); background: #fff; }
+.add-manual > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.add-manual p { margin: 0; overflow-wrap: anywhere; }
+.add-title { font-family: var(--display); font-weight: 560; font-size: var(--t-m); line-height: 1.25; }
+.add-title:empty { display: none; }
+#add-quotes { margin: 0; }
+#add-quotes:empty { display: none; }
+.add-wait h2 { margin: 4px 0 0; }
+.ready, .refused { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.ready { gap: 0; border-top: 1px solid var(--line); }
+.ready:empty, .refused:empty { display: none; }
+.ready li { display: flex; flex-direction: column; gap: 2px; padding: 12px 0 12px 32px; position: relative; border-bottom: 1px solid var(--line); animation: rise 0.3s ease; }
+.ready li::before { content: ""; position: absolute; left: 6px; top: 15px; width: 10px; height: 6px; border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg); }
+.ready-title { font-weight: 600; overflow-wrap: anywhere; }
+.refused li { font-size: var(--t-s); color: var(--muted); padding-left: 22px; position: relative; }
+.refused li::before { content: ""; position: absolute; left: 4px; top: 0.45em; width: 9px; height: 9px; border: 1.5px solid var(--amber); border-radius: 50%; }
+.add-manual-row > .button { flex: 1 1 160px; }
+#add-maker { color: var(--fg); }
+/* The file input is the label's: tapping "Add the PDF" opens the picker. Visually hidden, never display:none, so
+   every browser still opens it from the label. */
+.file-pick { position: relative; background: var(--accent); color: var(--accent-fg); border-color: transparent; font-weight: 700; }
+.file-pick:active { transform: translateY(1px); }
+@media (hover: hover) { .file-pick:hover { background: color-mix(in srgb, var(--fg) 14%, var(--accent)); } }
+.file-pick input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
+.file-pick:focus-within { outline: 2px solid var(--blue); outline-offset: 3px; }
+/* One label/value grid: the label in a fixed column, the value in mono, each wrapping in its own column. */
+.plate-field { width: 100%; display: grid; grid-template-columns: 112px 1fr; gap: 8px 12px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.plate-field > span { color: var(--muted); font-size: 13px; }
+.plate-field strong { font: 500 17px/1.3 var(--mono); letter-spacing: 0.06em; overflow-wrap: anywhere; }
+/* A value with an unsure character: the others step back, the unsure one is underlined in amber. */
+.plate-field strong.has-unsure { color: var(--muted); }
+.plate-field strong mark { background: none; color: var(--fg); text-decoration: underline 2px var(--amber); text-underline-offset: 4px; }
+#plate-fields { width: 100%; }
+.plate > p:first-child { font: 600 19px/1.25 var(--display); }
+/* A character the label left unsure: an amber rule, the question, and the two readings as big cells. */
+.ask-char { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-left: 3px solid var(--amber); padding: 2px 0 2px 12px; font-weight: 600; color: var(--fg); }
+.ask-char > span { flex: 1 1 100%; }
+/* Over the camera too, where every other button takes the dark sheet. */
+.ask-char button, body.cam .ask-char button { flex: none; flex-direction: column; gap: 2px; width: 64px; height: 64px; min-height: 0; padding: 0; backdrop-filter: none; background: var(--surface-2); color: var(--fg); border: 1px solid var(--line); }
+.ask-char button[aria-pressed="true"], body.cam .ask-char button[aria-pressed="true"] { background: color-mix(in srgb, var(--blue) 12%, var(--surface-2)); border: 2px solid var(--blue); }
+.glyph-char { font: 500 32px/1 var(--mono); }
+.glyph-word { font: 500 10px/1 var(--mono); letter-spacing: 0.06em; color: var(--muted); }
+/* That's right and Not this one, 2:1, both 48 px; the second outlined. */
+.plate .row { flex-wrap: nowrap; }
+.plate .row > .ok { flex: 2 1 0; min-height: 48px; }
+.plate .row > .plate-no, body.cam .plate .row > .plate-no { flex: 1 1 0; min-height: 48px; padding: 0 12px; white-space: nowrap; background: none; border: 1.5px solid color-mix(in srgb, var(--fg) 45%, transparent); color: var(--fg); }
+
+.controls { display: flex; flex-direction: column; gap: 8px; }
+/* In a step the card and the controls are one sheet: the card's foot is the talk button and Done. */
+.card:not([hidden]) ~ .controls:not([hidden]) { margin-top: -12px; padding: 12px 16px 16px; background: var(--sheet); border: 1px solid var(--line); border-top: 0; border-radius: 0 0 var(--radius) var(--radius); backdrop-filter: blur(10px); }
+.sheet:has(> .controls:not([hidden])) > .card:not([hidden]) { border-bottom: 0; border-radius: var(--radius) var(--radius) 0 0; box-shadow: none; }
+.act-row { flex-wrap: nowrap; }
+.act-row > .done:not([hidden]) { flex: 1.3 1 0; min-height: 52px; }
+.controls > .did-it:not([hidden]) { width: 100%; min-height: 48px; }
+.act-row:has(> .done:not([hidden])) > .talk, .act-row:has(> .done:not([hidden])) > .listen { min-height: 52px; }
+body.cam .controls button.ok { background: var(--accent); color: var(--accent-fg); }
+.controls .row > * { flex: 1 1 0; }
+.controls .talk { width: 100%; min-height: 60px; font-size: var(--t-m); background: var(--surface-2); border-color: var(--line); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.controls .talk.on { background: var(--stop); border-color: var(--stop); color: var(--stop-fg); animation: glow-red 1s ease-in-out infinite; font-variant-numeric: tabular-nums; }
+.controls .talk.on::before { content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 12px; border-radius: 50%; background: #fff; vertical-align: 1px; animation: blink 1s ease-in-out infinite; }
+/* While held, the button is the whole row, so its count and "release to send" have room; Done (which no one can tap
+   mid-hold) steps aside. */
+.controls .row:has(> .talk.on) > :not(.talk) { display: none; }
+.controls .talk.on { padding-inline: 12px; gap: 12px; text-wrap: balance; }
+.controls .talk.on::before { margin-right: 0; }
+/* Hands-free: a narrow toggle beside the press; on, it is the whole row and says it is listening. */
+.controls .listen { flex: none; min-height: 60px; padding-inline: 12px; font-size: var(--t-s); }
+/* Three in a row on a narrow phone (talk, hands-free, Done): each says its words on one line. */
+.controls .act-row > .talk, .controls .act-row > .listen { white-space: nowrap; }
+.act-row:has(> .done:not([hidden])) > .talk { flex: 1 1 auto; width: auto; padding-inline: 12px; }
+.controls .listen.on { flex: 1; background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.controls .listen.on::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 10px; border-radius: 50%; background: currentColor; animation: blink 1.2s ease-in-out infinite; }
+.controls .row:has(> .listen.on) > .done { flex: none; }
+.plate-btn { cursor: pointer; }
+body.cam .controls button, body.cam .controls .button { background: var(--sheet); backdrop-filter: blur(8px); }
+
+/* The stop: left-aligned, the rule's own line first, the calls, then the script as numbered rows. */
+.stop { position: fixed; inset: 0; background: var(--stop); color: var(--stop-fg); display: flex; flex-direction: column; justify-content: center; align-items: stretch; text-align: left; padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom)); gap: 16px; z-index: 10; overflow-y: auto; animation: flash 0.25s ease-out; }
+.stop > * { width: 100%; max-width: 420px; margin-left: auto; margin-right: auto; }
+.stop-icon { display: block; height: 48px; }
+.stop-icon:empty { display: none; }
+.stop-icon svg { width: 48px; height: 48px; display: block; }
+.stop-word { font-size: 72px; font-weight: 700; margin: 0; letter-spacing: 0.04em; line-height: 1; }
+#stop-text { font: 600 23px/1.3 var(--display); margin: 0; text-wrap: pretty; }
+.stop-steps { list-style: none; counter-reset: stop-step; margin: 4px auto 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 17px; font-weight: 600; line-height: 1.4; }
+.stop-steps:empty { display: none; }
+.stop-steps li { counter-increment: stop-step; display: grid; grid-template-columns: 20px 1fr; column-gap: 8px; }
+.stop-steps li::before { content: counter(stop-step); font: 700 15px/1.6 var(--mono); font-variant-numeric: tabular-nums; opacity: 0.85; }
+.calls { display: flex; flex-direction: column; gap: 12px; }
+.calls:empty { display: none; }
+.call { display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 0 20px; border-radius: var(--r); background: #fff; color: var(--stop); font-weight: 700; font-size: 20px; text-decoration: none; white-space: nowrap; }
+.call svg { width: 24px; height: 24px; flex: none; }
+.stop-who { font-size: 17px; font-weight: 600; line-height: 1.4; margin: 0; }
+.stop-ways { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+.stop-ways button { min-height: 56px; background: none; border: 2px solid currentColor; color: var(--stop-fg); font-size: 17px; }
+.stop-ways button.stop-again { background: #fff; border-color: #fff; color: var(--stop); }
+#app.red .controls { position: fixed; bottom: max(16px, env(safe-area-inset-bottom)); left: 16px; right: 16px; width: auto; z-index: 11; }
+#app.red .controls .row, #app.red .controls .talk { display: none; }
+#app.red .pause { display: none !important; }
+
+.pause { background: var(--sheet); border: 2px solid var(--amber); border-radius: var(--radius); padding: 16px; font-size: 20px; font-weight: 650; text-align: center; }
+.pause p { margin: 0; }
+
+.lang-pick { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0; color: var(--fg); font-weight: 600; }
+.lang-pick select { font: inherit; font-weight: 400; color: var(--fg); background-color: var(--surface); border: 1px solid var(--line); border-radius: var(--r); min-height: 48px; padding: 12px 16px; min-width: 10em; }
+.danger { background: none; border: 1px solid var(--red); color: var(--red); margin-top: 12px; }
+.page-view { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.88); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px; z-index: 5; max-width: none !important; }
+.page-view img { max-width: 100%; max-height: 80vh; background: #fff; border-radius: var(--r); }
+.page-view img[hidden] { display: none; }
+.page-bar { display: flex; align-items: center; gap: 16px; color: #f1ece0; }
+.page-bar p { margin: 0; min-width: 120px; text-align: center; font: 500 var(--t-s)/1.4 var(--mono); }
+.page-bar button { min-width: 48px; font-size: var(--t-l); }
+.page-view > .sub { color: #f1ece0; }
+
+/* The open Fold and wider: camera on the left, the guide on the right; the screens before it centred. */
+@media (min-width: 720px) {
+  body.cam #cam, body.cam .replay-frame, body.cam #overlay { right: 440px; width: calc(100vw - 440px); }
+  body.cam #app { left: auto; width: 440px; background: var(--bg); border-left: 1px solid var(--line); }
+  body.cam #app > *, body.cam .sheet > * { max-width: none; }
+  body.cam .top { background: none; max-width: none; padding: 0; }
+  body.cam #app > .top, body.cam #app > .top.has-head { margin-bottom: 0; }
+  body.cam .sheet { margin-top: auto; }
+  body.cam .sheet > *, body.cam .notice { backdrop-filter: none; }
+  body:not(.cam) #app { padding-top: max(32px, env(safe-area-inset-top)); }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes sweep { from { background-position: -40% 0, 0 0; } to { background-position: 140% 0, 0 0; } }
+@keyframes step-in { from { transform: translateX(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes drop { from { transform: translateY(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes rise { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pop { 0% { transform: scale(0.6); opacity: 0; } 15% { transform: scale(1.08); opacity: 1; } 25% { transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-8px); } }
+@keyframes pop-in { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--amber) 40%, transparent); } 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--amber) 20%, transparent); } }
+/* Once, as the tick lands: a green ring widens and fades. */
+@keyframes ring-out { from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--green) 55%, transparent); } to { box-shadow: 0 0 0 18px color-mix(in srgb, var(--green) 0%, transparent); } }
+@keyframes glow-red { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--red) 50%, transparent); } 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--red) 15%, transparent); } }
+@keyframes blink { 50% { opacity: 0.3; } }
+@keyframes flash { from { opacity: 0.4; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
+
+/* People and alerts: who is in the home, inviting, and your own alerts. The join screen asks only a name. */
+.people-panel h1, .join h1 { margin-bottom: 0; }
+.people-panel h2 { margin: 12px 0 4px; }
+.people-panel p, .join p { margin: 0; }
+.people { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.person { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid var(--line); }
+.person:last-child { border-bottom: 1px solid var(--line); }
+.person-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.person-head strong { font: 600 var(--t-l)/1.2 var(--display); overflow-wrap: anywhere; }
+.person-head .tag { margin: 0; }
+.person-acts { gap: 0 24px; justify-content: flex-start; }
+.person-acts > *, .person .row > * { flex: none; }
+.person-acts .link, .person .row .link { min-height: 48px; }
+.person .row .danger { margin-top: 0; }
+.role-pick { display: flex; flex-direction: column; gap: 4px; font-size: var(--t-s); color: var(--muted); }
+.role-pick select { font: inherit; color: var(--fg); background-color: var(--surface); border: 1px solid var(--line); border-radius: var(--r); min-height: 48px; padding: 0 12px; min-width: 0; max-width: 100%; }
+.role-pick select:disabled { opacity: 0.6; }
+.people-panel .field, .join .field { display: flex; flex-direction: column; gap: 4px; font-size: var(--t-s); color: var(--muted); }
+.invite, .alerts { display: flex; flex-direction: column; gap: 12px; }
+.invite-url { padding: 12px; border-radius: var(--r); background: var(--surface-2); font: 500 var(--t-s)/1.4 var(--mono); overflow-wrap: anywhere; user-select: all; }
+.invite > .link { align-self: flex-start; min-height: 48px; }
+.alerts fieldset { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; min-width: 0; }
+.alerts legend { padding: 0; margin-bottom: 8px; font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.check { display: flex; align-items: center; gap: 12px; min-height: 48px; }
+.check input { width: 22px; height: 22px; min-height: 0; flex: none; margin: 0; padding: 0; accent-color: var(--accent); }
+.follows { display: flex; flex-direction: column; padding-left: 34px; }
+.quiet { flex-wrap: nowrap; }
+.quiet .field { flex: 1; min-width: 0; }
+.quiet input[type="time"] { color-scheme: inherit; padding: 12px 8px; min-width: 0; }
+.people-panel > .ok, .alerts > .ok, .join > .ok { align-self: stretch; }
+.who { display: flex; flex-direction: column; gap: 8px; }
+.conn-calendar, .conn-keys, .conn-new, .conn-made, .conn-secret { display: flex; flex-direction: column; gap: 12px; }
+.conn-calendar > button, .conn-secret > button, .conn-keys > .big { align-self: stretch; }
+.conn-new fieldset { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; min-width: 0; }
+.conn-new legend { padding: 0; margin-bottom: 8px; font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.conn-new .check { align-items: flex-start; padding: 8px 0; }
+.conn-new .check input { margin-top: 1px; }
+.check .help { display: block; margin-top: 2px; }
+.conn-made { padding: 16px; border: 1px solid var(--accent); border-radius: var(--r); }
+.conn-made h2, .conn-secret .sub { margin: 0; }
+/* The feedback form: one answer per tick-box question, shown pressed; a written answer stays as typed. */
+.feedback .fb-q { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.feedback legend { padding: 0; margin-bottom: 8px; font-weight: 600; color: var(--fg); }
+.feedback label.fb-q { font-size: var(--t-m); font-weight: 600; color: var(--fg); }
+.feedback label.fb-q textarea { font-weight: 400; }
+.fb-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.fb-choices button { flex: 1 1 0; min-width: 72px; padding-inline: 8px; }
+.fb-choices button[aria-pressed="true"] { background: var(--accent); border-color: transparent; color: var(--accent-fg); }
+.fb-quote { display: flex; flex-direction: column; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.fb-quote fieldset { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.fb-quote legend { padding: 0; margin-bottom: 8px; font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.fb-read { font-size: var(--t-s); }
+.feedback > .link { align-self: center; min-height: 48px; }
+.fb-offer > .ok { align-self: stretch; }
+.fb-offer > .link { align-self: flex-start; min-height: 48px; }
+.conn-once { color: var(--fg); font-weight: 600; }
+.conn .who strong { font: 600 var(--t-l)/1.2 var(--display); overflow-wrap: anywhere; }
+@media (max-width: 380px) {
+}
+
+/* Over the camera a screen floats on video, so it keeps its sheet: Job done. */
+.sheet .panel { background: var(--sheet); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
+
+/* The way around a home: three tabs at the foot, off camera, and Settings in the header. The page scrolls clear of
+   the tabs. */
+#app > .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; max-width: none; margin: 0; display: flex; background: var(--bg); border-top: 1px solid var(--line); padding: 0 8px env(safe-area-inset-bottom); }
+#app:has(> .tabs:not([hidden])) { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+/* The current tab: blue icon and label, its shapes filled at 20%, and a short bar centred under the label. */
+.tab { position: relative; flex: 1; flex-direction: column; gap: 4px; min-height: 64px; padding: 8px 4px 14px; border: 0; border-radius: 0; background: none; color: var(--muted); font: 600 11px/1.2 var(--sans); letter-spacing: 0.01em; }
+.tab svg { width: 24px; height: 24px; }
+.tab[aria-current="page"] { color: var(--blue); }
+.tab[aria-current="page"]::after { content: ""; position: absolute; left: 50%; bottom: 6px; width: 32px; height: 3px; margin-left: -16px; border-radius: 2px; background: var(--blue); }
+.tab[aria-current="page"] svg :is(rect, circle, path:nth-of-type(2)) { fill: color-mix(in srgb, var(--blue) 20%, transparent); }
+@media (prefers-color-scheme: light) { .tab:not([aria-current]) { color: color-mix(in srgb, var(--fg) 70%, transparent); } }
+@media (hover: hover) { .tab:hover { background: none; color: var(--fg); } }
+.gear { min-height: 44px; min-width: 44px; padding: 10px; margin: -4px -10px -4px 0; border: 0; background: none; color: var(--fg); }
+.gear svg { width: 24px; height: 24px; }
+.gear[aria-current="page"] { color: var(--blue); }
+.settings h2 { margin-top: 24px; }
+.settings > p { color: var(--muted); font-size: var(--t-s); }
+.settings h3 { font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 24px 0 8px; }
+.settings .another { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+
+/* The lockup heads Home only. A tab page's title is its header, with Settings at its right; a pushed page's back bar
+   is its only header (the app bar goes unless a TEST ZONE tag has to show). */
+#app[data-page="tab"] > .top .brand, #app[data-page="pushed"] > .top .brand, #app[data-page="pushed"] .gear { display: none; }
+#app[data-page="tab"] > .top { position: absolute; top: max(12px, env(safe-area-inset-top)); right: 16px; left: auto; width: auto; max-width: none; margin: 0; min-height: 0; z-index: 2; }
+#app[data-page="tab"] > :is(section, div):not([hidden]) > h1:first-of-type { padding-right: 48px; }
+#app[data-page="pushed"] > .top:not(:has(.chips > .chip:not([hidden]), .chip-button:not([hidden]))) { display: none; }
+/* A pushed page (Connections, a job, an appliance) opens with its way back: a chevron and where it goes, 44 px. */
+.page-back { display: inline-flex; align-self: flex-start; align-items: center; gap: 2px; min-height: 44px; margin: -8px 0 -12px -8px; padding: 0 12px 0 2px; border: 0; border-radius: var(--r); background: none; color: var(--muted); font: 500 14px/1.2 var(--sans); text-decoration: none; }
+.page-back .back-mark { width: 24px; height: 24px; flex: none; }
+.page-back:active { color: var(--fg); background: var(--surface-2); }
+/* A row's actions fold behind its ⋯: a small menu under it, Remove last and in red. */
+.person { position: relative; }
+.person-head { padding-right: 48px; }
+.row-more { position: absolute; top: 6px; right: -10px; }
+.row-more > summary { list-style: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--r); color: var(--muted); cursor: pointer; }
+.row-more > summary::-webkit-details-marker { display: none; }
+.row-more[open] > summary { color: var(--fg); background: var(--surface-2); }
+.more-mark { width: 22px; height: 22px; }
+.row-menu { position: absolute; top: 46px; right: 10px; z-index: 6; width: min(260px, calc(100vw - 48px)); display: flex; flex-direction: column; padding: 4px 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: 0 12px 32px rgb(0 0 0 / 0.32); }
+.row-menu > * + * { border-top: 1px solid var(--line); }
+.row-menu > .menu-item { justify-content: flex-start; width: 100%; min-height: 48px; padding: 0 16px; border: 0; border-radius: 0; background: none; color: var(--fg); font-weight: 500; text-align: left; text-decoration: none; }
+.row-menu > * + .menu-item { border-top: 1px solid var(--line); }
+.row-menu > .menu-item:active { background: var(--surface-2); }
+.row-menu > .gone { color: var(--red); }
+.row-menu .role-pick { padding: 8px 16px 12px; }
+/* Selects are ours: a filled field with our own chevron, never the browser's. */
+select, .report-field select { appearance: none; -webkit-appearance: none; background-color: var(--surface-2); background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 21px) 50%, calc(100% - 15px) 50%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 44px !important; }
+/* The gas-tap question, asked once in the card: Yes leads to the STOP, so it is red; No is outlined, at 2:1. While
+   it asks, the spoken line above it stays off the screen. */
+#gas-tap > .sub { margin: -4px 0 0; }
+.gas-acts { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; width: 100%; }
+.gas-acts > button { min-height: 48px; min-width: 0; }
+body.cam .gas-acts > .yes-gas { background: var(--stop); border-color: var(--stop); color: var(--stop-fg); backdrop-filter: none; }
+body:has(#gas-tap:not([hidden])) #sentences { display: none; }
+/* Adding an appliance, off the camera, is a page and not a card on one: its title the page's, its wait a list of
+   stages (a tick when done, a live dot on the one under way, the rest to come), its ready line a tick. */
+body:not(.cam) #add { background: none; border: 0; box-shadow: none; backdrop-filter: none; padding: 0; gap: 16px; }
+/* Off the camera the add flow is a pushed page: its way out is the back at its top; over the camera, the sheet's Close. */
+body.cam #add > .page-back, body:not(.cam) #add .add-close { display: none; }
+body:not(.cam) #add > .add-head { font: 600 var(--t-xl)/1.15 var(--display); }
+body:not(.cam) #add > .add-head + .sub { margin-top: -8px; font: 500 var(--t-xs)/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; }
+.stages { list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column; }
+.stages li { position: relative; display: flex; align-items: center; gap: 12px; min-height: 40px; padding-left: 32px; color: var(--muted); }
+.stages li::before { content: ""; position: absolute; left: 4px; width: 14px; height: 14px; background: var(--bg); border-radius: 50%; border: 1.5px solid var(--line); box-sizing: border-box; }
+.stages li + li::after { content: ""; position: absolute; left: 10.25px; top: -13px; height: 26px; border-left: 1.5px solid var(--line); z-index: -1; }
+.stages li.done { color: var(--fg); }
+.stages li.done::before { content: "✓"; display: grid; place-items: center; width: 16px; height: 16px; left: 3px; border: 0; background: var(--accent); color: var(--accent-fg); font: 700 10px/1 var(--sans); }
+.stages li.now { color: var(--fg); font-weight: 600; }
+.stages li.now::before { border-color: var(--accent); background: radial-gradient(circle, var(--accent) 0 3px, transparent 3.5px); animation: blink 1.2s ease-in-out infinite; }
+.status-line.ready, body.cam .status-line.ready { font: 600 var(--t-l)/1.25 var(--display); display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 10px; text-align: left; border: 0; padding: 0; }
+.status-line.ready::before { content: "✓"; flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--accent-fg); font: 700 16px/1 var(--sans); }
+
+/* The job up front, before the camera: on the camera screen it is a sheet of its own that scrolls, every step in full. */
+body.cam .preview { background: var(--sheet); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 20px 24px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
+.preview h1 { margin: 0; }
+.preview h2 { margin: 8px 0 0; }
+.preview .sub { margin: 0; }
+.preview blockquote { margin: 4px 0 0; padding: 2px 0 2px 12px; border-left: 3px solid var(--accent); color: var(--muted); font-size: var(--t-s); }
+.preview blockquote p { margin: 0; }
+.preview blockquote .en { margin-top: 4px; }
+.preview .needs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.preview .need { display: flex; gap: 12px; align-items: center; min-height: 44px; cursor: pointer; }
+.preview .need input { flex: none; align-self: center; width: 24px; height: 24px; min-height: 0; margin: 0; padding: 0; accent-color: var(--accent); }
+.preview .need .mono-page { color: var(--muted); margin-left: 4px; }
+.preview .needs blockquote { margin-left: 36px; }
+.preview-steps { margin: 0; padding: 0 0 0 24px; display: flex; flex-direction: column; gap: 16px; }
+.preview-steps > li::marker { font: 600 var(--t-m)/1 var(--display); color: var(--accent); }
+.preview-step { margin: 0; font: 560 var(--t-m)/1.3 var(--display); }
+.preview-meta { margin: 4px 0 0; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; color: var(--muted); font-size: var(--t-xs); }
+.preview-meta .cam-mode { font-weight: 600; }
+.preview-meta .cam-mode.none { color: var(--fg); }
+.preview-warn { margin: 6px 0 0; padding: 4px 0 4px 12px; font-size: var(--t-s); box-shadow: inset 4px 0 0 var(--amber); }
+.preview-warn.zone { box-shadow: inset 4px 0 0 var(--stop); font-weight: 600; }
+.preview-ask { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.preview-ask h2 { font: 560 var(--t-l)/1.2 var(--display); text-transform: none; letter-spacing: -0.01em; color: var(--fg); margin: 0; }
+/* While the preview is up the camera has not started: nothing else on that screen but the header. */
+body.cam:has(#preview:not([hidden])) #app > .top { margin-bottom: 0; }

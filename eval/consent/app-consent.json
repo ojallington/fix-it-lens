@@ -1,0 +1,12 @@
+{
+  "form": "eval/consent/in-app-consent.md",
+  "form_version": 1,
+  "signed": true,
+  "approved": {
+    "at": "2026-10-27",
+    "text_at": "433fc48",
+    "by": "the maintainer"
+  },
+  "en": "Before you start\n\nWhile you do a job, the app sends camera pictures and short clips to Meta's AI service, to see your appliance and check each step. Meta does not train its AI on them, but may keep them to check for misuse.\n\nWe store your household's appliances, jobs and the result of each step. Photos of type plates are kept privately.\n\nYou can delete it all at any time in the app, or by emailing pilot@craftycast.com.\n\nI am 18 or older and agree to this.",
+  "nl": "Voordat je begint\n\nTerwijl je een taak doet, stuurt de app camerabeelden en korte clips naar de AI-dienst van Meta, die je apparaat bekijkt en elke stap controleert. Meta traint zijn AI er niet mee, maar mag ze bewaren om op misbruik te controleren.\n\nWij bewaren de apparaten van je huishouden, je taken en de uitkomst van elke stap. Foto's van typeplaatjes bewaren wij privé.\n\nJe kunt alles altijd laten wissen: in de app of via pilot@craftycast.com.\n\nIk ben 18 jaar of ouder en ga hiermee akkoord."
+}

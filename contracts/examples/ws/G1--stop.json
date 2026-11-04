@@ -1,0 +1,11 @@
+{
+  "type": "g1",
+  "seq": 9,
+  "t_ms": 300,
+  "zone_id": "gas_tap",
+  "kind": "stop",
+  "ttc_ms": 350,
+  "dist_cm": 24.0,
+  "frame_id": "f000009",
+  "reason": "ttc"
+}

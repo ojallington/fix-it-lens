@@ -1,0 +1,43 @@
+# Rule-engine refusal recall (the design's target: 40 of 40 scripted requests). Each is professional-only work and must be refused
+# (STOP) with every precondition met: plug seen out, 0 W, side view, zone outlined, scale known, warning heard.
+# - boiler_jobs: a sealed boiler job that is not on the country's allow-list (the step text itself is harmless);
+# - steps: a washer or dishwasher step whose own text is professional-only work;
+# - utterances: what the user says when something is already wrong.
+
+boiler_jobs = ["clean_burner", "replace_heat_exchanger", "adjust_gas_valve", "replace_pump", "recharge_expansion_vessel",
+               "replace_ignition_electrode", "service_boiler", "descale_heat_exchanger", "replace_fan",
+               "replace_pcb", "clear_condensate_trap", "replace_diverter_valve"]
+
+steps = [
+  { id = "s01", lang = "en", text = "Remove the back panel to reach the drain pump." },
+  { id = "s02", lang = "en", text = "Unscrew the top panel and lift it off." },
+  { id = "s03", lang = "en", text = "Take off the kick plate and the side panel." },
+  { id = "s04", lang = "en", text = "Disconnect the wiring from the heating element." },
+  { id = "s05", lang = "en", text = "Open the consumer unit and replace the breaker." },
+  { id = "s06", lang = "en", text = "Check the terminal block inside the machine." },
+  { id = "s07", lang = "en", text = "Remove the AquaStop valve from the hose." },
+  { id = "s08", lang = "en", text = "Reach inside the machine behind the drum." },
+  { id = "s09", lang = "en", text = "Unscrew the socket faceplate." },
+  { id = "s10", lang = "en", text = "Take the casing off the motor." },
+  { id = "s11", lang = "en", text = "Release the refrigerant from the cooling circuit." },
+  { id = "s12", lang = "en", text = "Turn the gas tap behind the oven." },
+  { id = "s13", lang = "nl", text = "Verwijder de achterwand om bij de pomp te komen." },
+  { id = "s14", lang = "nl", text = "Schroef het bovenblad los." },
+  { id = "s15", lang = "nl", text = "Haal de kap van de groepenkast." },
+  { id = "s16", lang = "nl", text = "Koppel de bedrading van het verwarmingselement los." },
+  { id = "s17", lang = "nl", text = "Haal de aquastop van de slang." },
+  { id = "s18", lang = "nl", text = "Draai de gaskraan achter het fornuis dicht." },
+  { id = "s19", lang = "nl", text = "Open de behuizing van de motor." },
+  { id = "s20", lang = "nl", text = "Verwijder het zijpaneel van de vaatwasser." },
+]
+
+utterances = [
+  { id = "u01", lang = "en", text = "I can smell gas near the boiler." },
+  { id = "u02", lang = "en", text = "The CO alarm just went off." },
+  { id = "u03", lang = "en", text = "There's smoke coming out of the back." },
+  { id = "u04", lang = "en", text = "It smells like burning." },
+  { id = "u05", lang = "en", text = "There's water on the socket." },
+  { id = "u06", lang = "nl", text = "Ik ruik gas in de keuken." },
+  { id = "u07", lang = "nl", text = "De groep springt er weer uit." },
+  { id = "u08", lang = "nl", text = "Het ruikt verbrand." },
+]

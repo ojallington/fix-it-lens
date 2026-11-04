@@ -1,0 +1,1397 @@
+openapi: 3.1.0
+info:
+  title: Fix-It Lens REST API
+  version: 1.50.0
+  description: >
+    The REST surface. The live repair runs over the WebSocket (ws.schema.json, at /ws).
+    Every household route needs a bearer token: the household token from POST /households (from an invite code,
+    which speaks for the home's first admin), a person's token from POST /household/join, or a token an admin made
+    for an agent, Home Assistant or a calendar (POST /household/tokens). Who a change is "by" comes from the token,
+    never from the body.
+    Roles, as Google Home and Apple Home have them: an admin may do everything, including people, invites, tokens
+    and deleting the home; a member sees everything, adds items, changes the schedule (schedule, done, last-done,
+    snooze, assignee, undo) and sets their own alerts; a member with view_only reads and sets their own alerts only.
+    A read-scope token gets 403 on every write; a write-scope agent or ha token may change the schedule only. No token of any kind clears a stop, marks a repair step done or changes a card: those live on the WebSocket,
+    which takes only the household token or an app token, never an agent, ha or feed token.
+    the schedule's feeds: the .ics feed (by a per-household feed secret in the URL), Web Push and reminder opens.
+    /preflight/* is tailnet only; the public pilot door never routes /preflight/*.
+servers:
+  - url: /api/v1
+security:
+  - household: []
+components:
+  securitySchemes:
+    household:
+      type: http
+      scheme: bearer
+  parameters:
+    ApplianceId: {name: appliance_id, in: path, required: true, schema: {type: string}}
+    SessionId: {name: session_id, in: path, required: true, schema: {type: string, pattern: "^[A-Za-z0-9_-]+$"}}
+    JobId: {name: job_id, in: path, required: true, schema: {type: string}}
+  schemas:
+    ReplaySummary:
+      type: object
+      description: What the replay shows, for its title line. Each field is null when the recording does not say.
+      additionalProperties: false
+      properties:
+        appliance_alias: {type: [string, "null"]}
+        job_title: {type: [string, "null"]}
+        steps_total: {type: [integer, "null"], minimum: 0}
+    Error:
+      type: object
+      required: [error]
+      properties: {error: {type: string}, detail: {type: string}}
+    Household:
+      type: object
+      required: [id, country, lang, pilot]
+      properties:
+        id: {type: string}
+        country: {type: string, pattern: "^[a-z]{2}$"}
+        lang: {type: string, pattern: "^[a-z]{2}$"}
+        cap_usd_day: {type: number}
+        name: {type: [string, "null"], minLength: 1, maxLength: 40, description: "e.g. Demo home; null shows the usual wording"}
+        renter: {type: [boolean, "null"], description: "The household rents its home; null until someone says. Decides FaultMeaning.landlord"}
+        pilot: {type: boolean, description: "The home is in the store's pilot_cohort view, the homes asked for feedback; only then does the app offer the form (POST /household/feedback)"}
+    HouseholdPatch:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        renter: {type: [boolean, "null"]}
+    FeedbackIn:
+      type: object
+      description: >
+        One filled feedback form: feedback.schema.json's FeedbackRecord without what the server sets (id, household,
+        at, source app, form_version, withdrawn_at). Written answers are kept as typed. quote_name is a name exactly
+        when quote is named; an absent quote_name is null.
+      required: [lang, answers, quote]
+      additionalProperties: false
+      properties:
+        lang: {type: [string, "null"], enum: [nl, en, null]}
+        answers: {$ref: "feedback.schema.json#/properties/answers"}
+        quote: {type: string, enum: [none, anonymous, named]}
+        quote_name: {type: [string, "null"], minLength: 1, maxLength: 2000}
+      if: {properties: {quote: {const: named}}}
+      then: {required: [quote_name], properties: {quote_name: {type: string}}}
+      else: {properties: {quote_name: {type: "null"}}}
+    CapError:
+      type: object
+      required: [error, reopens_at]
+      description: >
+        A 429 body: a spend cap was reached, or (judges_full) a judges' link has opened all the homes it may, which
+        does not reopen. The WebSocket closes with code 4429 and the same JSON as its reason (ws.schema.json
+        CapClose); judges_full is only ever an answer to POST /households/try, and door_cap and address_cap only to
+        POST /households without an invite code (today's new door homes are used up server-wide, or this client
+        address has opened today's; both limits are server config). reopens_at is the next UTC midnight for
+        home_cap, door_cap and address_cap; null for judges_cap (the link's spend is a total, ever) and judges_full,
+        which do not reopen; and for global_cap when no reopening time is known (a one-off credit pool).
+      properties:
+        error: {type: string, enum: [home_cap, global_cap, judges_cap, judges_full, door_cap, address_cap]}
+        reopens_at: {type: [string, "null"], format: date-time}
+        detail: {type: string}
+      if: {properties: {error: {enum: [home_cap, door_cap, address_cap]}}}
+      then: {properties: {reopens_at: {type: string}}}
+      else:
+        if: {properties: {error: {enum: [judges_cap, judges_full]}}}
+        then: {properties: {reopens_at: {type: "null"}}}
+    DoorState:
+      type: object
+      description: >
+        Whether POST /households without an invite code would open a home now. shut: the latest door_log row is not
+        open (or there is none). capped: the door is open but a new door home would be refused now, because the
+        public credits are out (global_cap; reopens_at as the credit pool gives it, often null), today's door homes
+        are used up (door_cap) or this caller's address has opened today's (address_cap; both next UTC midnight).
+        The phone uses it to offer the replay before it asks for consent.
+      required: [state, reopens_at]
+      additionalProperties: false
+      properties:
+        state: {type: string, enum: [open, shut, capped]}
+        reopens_at: {type: [string, "null"], format: date-time}
+      if: {properties: {state: {enum: [open, shut]}}}
+      then: {properties: {reopens_at: {type: "null"}}}
+    HouseholdCreated:
+      allOf:
+        - $ref: "#/components/schemas/Household"
+        - type: object
+          required: [token]
+          properties: {token: {type: string, description: "Shown once; the phone keeps it"}}
+    ApplianceIn:
+      type: object
+      required: []
+      description: >
+        Added by plate photo (plate_photo_id from the WS) or by typed model code; one of the two is required (422
+        otherwise). kind comes from the card and alias defaults from kind. Posting again under an alias whose card is
+        failed or pages_only re-runs the ingest.
+      anyOf:
+        - {required: [model], properties: {model: {type: string, minLength: 1}}}
+        - {required: [plate_photo_id], properties: {plate_photo_id: {type: string, minLength: 1}}}
+      properties:
+        alias: {type: string, maxLength: 40}
+        kind: {type: string}
+        brand: {type: [string, "null"]}
+        model: {type: [string, "null"]}
+        plate_photo_id: {type: [string, "null"]}
+        pdf_url:
+          type: [string, "null"]
+          format: uri
+          description: >
+            The manual's URL, posted again after a lookup miss. The server fetches it only over https from a lookup
+            maker's own domain (contracts/lookup_makers.json); anything else is a 422, never a fetch.
+    IngestNotice:
+      type: object
+      required: [kind, text]
+      description: Fixed, code-written text; never model text.
+      properties:
+        kind: {type: string, enum: [lookup_failed, ingest_failed, plate_unreadable]}
+        text: {type: object, properties: {en: {type: string}, nl: {type: string}}}
+        maker_page: {type: [string, "null"], format: uri}
+        reason:
+          type: string
+          description: Why, as a code; the phone words each one. No free text.
+          enum: [no_manual, site_blocked, scanned_unreadable, too_large, not_a_manual, wrong_language, timeout,
+                 cap_reached, build_failed, maker_terms, not_mine]
+          x-reason-notes:
+            maker_terms: "A maker whose terms do not allow it (Samsung): refused before any lookup, fetch or model call"
+            not_mine: "The household said the linked card is not their appliance (POST .../not-mine); the upload or manual link path takes over"
+    Ingest:
+      type: object
+      required: [stage]
+      description: >
+        Present while card_status is not checked. Every progress field is optional and written by code: what the
+        server knows so far, never a model's guess.
+      properties:
+        stage: {type: string, enum: [plate, lookup, fetch, ingest, done], description: "ingest covers reading and checking"}
+        progress: {type: number, minimum: 0, maximum: 1, description: "code-computed; never goes backwards within one ingest"}
+        elapsed_s: {type: integer, minimum: 0}
+        manual:
+          type: object
+          description: The manual, as soon as it is fetched or uploaded.
+          required: [pages, lang]
+          additionalProperties: false
+          properties:
+            pages: {type: integer, minimum: 1}
+            lang: {type: string, pattern: "^[a-z]{2}$"}
+            user_lang: {type: boolean, description: "the manual is in the household's language"}
+            title:
+              type: [string, "null"]
+              maxLength: 200
+              description: >
+                Model-free: the PDF's own metadata title. It is untrusted text from the file, so the server passes it
+                through G0 and serves null when it is held.
+            thumb_url:
+              type: [string, "null"]
+              description: "GET /appliances/{appliance_id}/manual/pages/{n}.png: the household's own copy, never a card's"
+        eta_s: {type: [integer, "null"], minimum: 0, description: "seconds left, code's estimate from the page count; never a model's"}
+        quotes:
+          type: object
+          description: The citation check so far.
+          required: [checked, passed]
+          additionalProperties: false
+          properties:
+            checked: {type: integer, minimum: 0}
+            passed: {type: integer, minimum: 0}
+        jobs_ready:
+          type: array
+          description: >
+            The jobs whose quotes have passed the citation check so far, in the order they passed. Titles are
+            model-written, so they go through G0 before they are served, as a card's do.
+          items:
+            type: object
+            required: [id, title, steps, page, duration_min, kind, startable]
+            additionalProperties: false
+            properties:
+              id: {type: string}
+              title: {type: object, minProperties: 1, additionalProperties: false, properties: {en: {type: string}, nl: {type: string}}}
+              steps: {type: integer, minimum: 1}
+              page: {type: integer, minimum: 1}
+              duration_min: {type: [integer, "null"], minimum: 1}
+              kind: {type: string, enum: [upkeep, fix]}
+              startable: {type: boolean, description: "false until the whole card is checked (in this version)"}
+        jobs_refused:
+          type: array
+          description: >
+            Jobs the rule engine refused. No title: a refused job's title may be the very text that was held.
+          items:
+            type: object
+            required: [id, reason]
+            additionalProperties: false
+            properties:
+              id: {type: string}
+              reason: {type: string, enum: [gas, mains, needs_professional, other]}
+        notice:
+          oneOf:
+            - {type: "null"}
+            - {$ref: "#/components/schemas/IngestNotice"}
+    Appliance:
+      type: object
+      required: [id, alias, kind, brand, model, plate_confirmed, card_status]
+      properties:
+        id: {type: string}
+        alias: {type: string}
+        kind: {type: string}
+        brand: {type: string}
+        model: {type: string}
+        plate_confirmed: {type: boolean}
+        card_status: {type: string, enum: [checked, draft, pages_only, failed, pending]}
+        ingest: {$ref: "#/components/schemas/Ingest"}
+    LastDone:
+      type: object
+      required: [source]
+      description: The answer to "When did you last do this?"
+      properties:
+        date: {type: [string, "null"], format: date}
+        source: {type: string, enum: [user, checked, never, unknown]}
+    Due:
+      type: object
+      required: [appliance_id, job_id, title, due_on, last_done, interval_quote, reason, manual, schedule, window_end,
+                 status, snoozed_until, assignee]
+      properties:
+        appliance_id: {type: string}
+        job_id: {type: string}
+        title: {type: string}
+        due_name: {type: string, minLength: 1, description: "The job in a few words, as its reminder names it: the card's Job.due_name in the household's language, else derived from the title. Absent from an older server; a client derives it the same way"}
+        due_on: {type: [string, "null"], format: date, description: "null when the last date is unknown and the user has not answered"}
+        last_done: {$ref: "#/components/schemas/LastDone"}
+        interval_quote: {type: [string, "null"], description: "e.g. 'from your manual, p. 43'; null when the manual gives no interval"}
+        page: {type: [integer, "null"]}
+        reason:
+          type: string
+          enum: [scheduled, never, unknown, unanswered, cycle]
+          description: >-
+            Why due_on is what it is: scheduled (from the last date and the interval), never (not done yet, due now),
+            unknown (the user said they do not know), unanswered (nobody has answered "when did you last do this?";
+            last_done.source still reads unknown), cycle (the interval counts wash cycles, so there is no date)
+        quote: {type: [string, "null"], description: "The card's interval quote, verbatim and in the manual's language; null when the manual gives no interval"}
+        duration_min: {type: [number, "null"], description: "Minutes the job takes, only when the card cites a source for it"}
+        manual:
+          description: >
+            The manual's interval, cited. null for an upkeep job whose manual gives no interval: such a job is on
+            /due only once a person in the app has set the household's own schedule, so schedule is then set and
+            interval_quote, quote and page are null.
+          oneOf:
+            - {type: "null"}
+            - $ref: "#/components/schemas/ManualInterval"
+        schedule:
+          description: The household's own, or null to follow the manual. due_on comes from it when set.
+          oneOf:
+            - {type: "null"}
+            - $ref: "#/components/schemas/Schedule"
+        window_end: {type: [string, "null"], format: date, description: "a window's last date (last done + max); null otherwise and while snoozed"}
+        status:
+          type: string
+          enum: [upcoming, due, overdue, none]
+          description: >
+            Computed by code in the household's time: upcoming before due_on; due from due_on to window_end (a window)
+            or on due_on (otherwise); overdue after that; none when due_on is null.
+        snoozed_until: {type: [string, "null"], format: date, description: "set: due_on reads this date until the job is done"}
+        assignee: {type: [string, "null"], description: "the person the job is assigned to"}
+      if: {properties: {manual: {type: "null"}}, required: [manual]}
+      then:
+        properties:
+          schedule: {$ref: "#/components/schemas/Schedule"}
+          interval_quote: {type: "null"}
+          quote: {type: "null"}
+          page: {type: "null"}
+      else:
+        properties:
+          interval_quote: {type: string}
+          quote: {type: string}
+    HistoryEntry:
+      type: object
+      required: [kind, on_date]
+      properties:
+        id: {type: integer}
+        appliance_id: {type: [string, "null"]}
+        kind: {type: string, enum: [voice_note, job_done, user_entry, fault, stop]}
+        job_id: {type: [string, "null"]}
+        session_id: {type: [string, "null"]}
+        text: {type: [string, "null"]}
+        on_date: {type: string, format: date}
+    LangText:
+      type: object
+      description: Text per language, as card.schema.json's LangText
+      minProperties: 1
+      propertyNames: {pattern: "^[a-z]{2}$"}
+      additionalProperties: {type: string, minLength: 1}
+    FaultMeaning:
+      type: object
+      description: >
+        What a code or light means, from this appliance's checked card only (card.troubleshooting and the jobs'
+        fault_codes). Every match carries its page and a quote the citation check passed; nothing is generated.
+      required: [code, matches, candidates, refused, table_page, notice, landlord]
+      additionalProperties: false
+      properties:
+        code:
+          type: [string, "null"]
+          minLength: 1
+          maxLength: 20
+          description: "The code as the caller typed it, trimmed; null only on POST /display when the camera read a light (read.code null)"
+        matches:
+          type: array
+          description: "Rows whose code equals the normalised code (case, spaces and dashes ignored); empty when none"
+          items:
+            type: object
+            required: [code, job_id, title, page, quote, unconfirmed]
+            additionalProperties: false
+            properties:
+              code: {type: [string, "null"], minLength: 1, maxLength: 12, description: "The code as the manual prints it; null only for an indicator row with no codes"}
+              job_id: {type: [string, "null"], description: "The fix job that clears it; null when the remedy is a call"}
+              title: {$ref: "#/components/schemas/LangText"}
+              page: {type: integer, minimum: 1}
+              quote: {type: string, minLength: 1}
+              quote_en: {type: string, minLength: 1}
+              row_id: {type: string, pattern: "^[a-z0-9][a-z0-9_-]*$", maxLength: 60, description: "The troubleshooting row; absent on a match from a job's fault_codes"}
+              meaning: {$ref: "#/components/schemas/LangText"}
+              cause: {oneOf: [{$ref: "#/components/schemas/LangText"}, {type: "null"}]}
+              remedy: {$ref: "#/components/schemas/LangText"}
+              remedy_kind: {type: string, enum: [user, technician, installer]}
+              escalate_to: {type: [string, "null"], enum: [technician, installer, null]}
+              unconfirmed: {type: boolean, description: "True when the row's code was read from a drawing in the manual and no person has confirmed it yet: the phone says so beside the code. Always false on a match from a job's fault_codes"}
+              symbol:
+                oneOf:
+                  - {type: "null"}
+                  - type: object
+                    required: [page, bbox]
+                    additionalProperties: false
+                    properties:
+                      page: {type: integer, minimum: 1}
+                      bbox: {type: array, minItems: 4, maxItems: 4, items: {type: number, minimum: 0, maximum: 1}, description: "[x0, y0, x1, y1], page fractions, origin top left"}
+            description: >
+              A row match (row_id set) carries the row's own page and quote, and its meaning, cause, remedy, remedy_kind,
+              escalate_to and symbol; title is the job's title when the row names a job, else the row's meaning. A
+              technician's or installer's remedy has no job and no escalate_to.
+            if: {required: [row_id]}
+            then: {required: [meaning, cause, remedy, remedy_kind, escalate_to, symbol]}
+            else: {properties: {code: {type: string}, unconfirmed: {const: false}}, not: {anyOf: [{required: [meaning]}, {required: [cause]}, {required: [remedy]}, {required: [remedy_kind]}, {required: [escalate_to]}, {required: [symbol]}]}}
+            dependentSchemas:
+              remedy_kind:
+                if: {properties: {remedy_kind: {enum: [technician, installer]}}}
+                then: {properties: {job_id: {type: "null"}, escalate_to: {type: "null"}}}
+        candidates:
+          type: array
+          description: "With no match: the card's codes closest to what was typed (a misread E2O for E20), at most 5"
+          maxItems: 5
+          items: {type: string, minLength: 1, maxLength: 12}
+        refused:
+          type: array
+          description: "Codes whose remedy is a technician's or an installer's: the answer names who to call, no steps"
+          items: {type: string, minLength: 1, maxLength: 12}
+        table_page: {type: [integer, "null"], minimum: 1, description: "The manual's fault table, to open on the phone"}
+        notice: {type: [string, "null"], description: "Why nothing matched, in the household's language; null on a match"}
+        landlord:
+          type: boolean
+          description: "True when Household.renter is true and the rules file names this job the landlord's: the phone says to ask the landlord. false while renter is null"
+        read:
+          type: object
+          description: "Only on POST /appliances/{appliance_id}/display: what the camera read, before the same lookup ran"
+          required: [code, row_id, uncertain]
+          additionalProperties: false
+          properties:
+            code: {type: [string, "null"], minLength: 1, maxLength: 12, description: "One of the card's codes, or null"}
+            row_id: {type: [string, "null"], pattern: "^[a-z0-9][a-z0-9_-]*$", maxLength: 60, description: "An indicator row, or null"}
+            uncertain: {type: boolean, description: "The phone shows the candidates or asks for another photo"}
+          if: {properties: {code: {type: "null"}, row_id: {type: "null"}}}
+          then: {properties: {uncertain: {const: true}}}
+      dependentSchemas:
+        read:
+          if: {properties: {read: {properties: {code: {type: string}}}}}
+          then: {properties: {code: {type: string}}}
+    CardRecord:
+      type: object
+      description: >
+        "How this card was checked", the part GET .../card does not carry: from the card library, the check record and
+        the store only, never a model. The panel reads it beside the card (manual, refused jobs, checks). An open
+        safety report is said at the top of the card.
+      required: [card_sha256, version, built_at, shared, private_reason, reviewed, homes, quotes, reports_open, unconfirmed_codes, unaccepted_steps]
+      additionalProperties: false
+      properties:
+        card_sha256: {type: string, pattern: "^[0-9a-f]{64}$", description: "This card version (never a file path)"}
+        version: {type: integer, minimum: 1, description: "1 for the model's first card, counting each new manual file"}
+        built_at: {type: string, format: date-time}
+        shared: {type: boolean, description: "Other homes with this model get this card"}
+        private_reason:
+          type: [string, "null"]
+          enum: [uploaded, no_model_list, model_not_in_list, maker_terms, version_conflict, codes_unconfirmed, steps_unaccepted, null]
+          description: "null when shared. version_conflict: a fetched manual whose file differs from the shared card's, private until a review. codes_unconfirmed: fault codes read from a drawing wait for a person to confirm them. steps_unaccepted: a restore step ingest code added waits for a person to accept it"
+        reviewed:
+          type: object
+          description: "Whether a person read this card version against the manual (a reviewed pull request for a repo card); never who"
+          required: [by_person, at]
+          additionalProperties: false
+          properties:
+            by_person: {type: boolean}
+            at: {type: [string, "null"], format: date}
+          if: {properties: {by_person: {const: true}}}
+          then: {properties: {at: {type: string}}}
+          else: {properties: {at: {type: "null"}}}
+        homes: {type: integer, minimum: 1, description: "Homes linked to this card version, this one included; test homes left out"}
+        quotes:
+          type: object
+          description: "Code checked every quote the draft made against the PDF's text on its cited page; the card keeps the ones that passed"
+          required: [checked, passed]
+          additionalProperties: false
+          properties:
+            checked: {type: integer, minimum: 0}
+            passed: {type: integer, minimum: 0}
+        reports_open:
+          type: object
+          description: "Open reports on this version from every home, as counts: no note leaves the home that wrote it"
+          required: [total, safety]
+          additionalProperties: false
+          properties:
+            total: {type: integer, minimum: 0}
+            safety: {type: integer, minimum: 0, description: "Open unsafe reports"}
+        unconfirmed_codes: {type: integer, minimum: 0, description: "Fault codes read from a drawing that no person has confirmed yet; a card with any is not shared"}
+        unaccepted_steps: {type: integer, minimum: 0, description: "Restore steps ingest code added (origin fixit, added_by ingest) that no person has accepted yet; a card with any is not shared"}
+      allOf:
+        - if: {properties: {shared: {const: true}}}
+          then: {properties: {private_reason: {type: "null"}, unconfirmed_codes: {const: 0}, unaccepted_steps: {const: 0}}}
+          else: {properties: {private_reason: {type: string}}}
+    ReportIn:
+      type: object
+      description: >
+        A person's report on the card linked to this appliance, or on one of its jobs or steps. It never edits a card:
+        it waits for a reviewer, and a correction lands only as a new card version that passes the same code checks
+        and G0. A suggested correction names its manual page in page. "Not my appliance" is POST .../not-mine.
+      required: [kind]
+      additionalProperties: false
+      properties:
+        kind: {type: string, enum: [wrong_step, wrong_page, unsafe, other]}
+        note: {type: [string, "null"], minLength: 1, maxLength: 500, description: "The person's own words: kept in the store only, shown whole to reviewers (marked when it fails G0) and to this home, never to another home, never sent to a model"}
+        job_id: {type: [string, "null"]}
+        step_id: {type: [string, "null"]}
+        page: {type: [integer, "null"], minimum: 1}
+      allOf:
+        - if: {properties: {kind: {const: wrong_step}}}
+          then: {required: [step_id], properties: {step_id: {type: string}}}
+        - if: {properties: {kind: {const: wrong_page}}}
+          then: {required: [page], properties: {page: {type: integer}}}
+        - if: {properties: {kind: {const: other}}}
+          then: {required: [note], properties: {note: {type: string}}}
+    NotMineIn:
+      type: object
+      additionalProperties: false
+      properties:
+        note: {type: [string, "null"], minLength: 1, maxLength: 500}
+    Report:
+      type: object
+      required: [id, appliance_id, kind, job_id, step_id, note, page, card_sha256, status, resolution, created_at, closed_at, by]
+      additionalProperties: false
+      properties:
+        id: {type: string}
+        appliance_id: {type: [string, "null"], description: "null once the appliance is deleted"}
+        kind: {type: string, enum: [wrong_step, wrong_page, wrong_appliance, unsafe, other]}
+        job_id: {type: [string, "null"]}
+        step_id: {type: [string, "null"]}
+        note: {type: [string, "null"]}
+        page: {type: [integer, "null"], minimum: 1}
+        card_sha256: {type: string, pattern: "^[0-9a-f]{64}$", description: "The card version reported"}
+        status: {type: string, enum: [open, closed]}
+        resolution: {type: [string, "null"], description: "The reviewer's words when closed, e.g. fixed in a new card version"}
+        created_at: {type: string, format: date-time}
+        closed_at: {type: [string, "null"], format: date-time}
+        by: {$ref: "#/components/schemas/By"}
+      if: {properties: {status: {const: open}}}
+      then: {properties: {resolution: {type: "null"}, closed_at: {type: "null"}}}
+      else: {properties: {resolution: {type: string}, closed_at: {type: string}}}
+    SessionSummary:
+      type: object
+      required: [id, mode, started_at]
+      properties:
+        id: {type: string}
+        appliance_id: {type: [string, "null"]}
+        job_id: {type: [string, "null"]}
+        mode: {type: string, enum: [api, local, capture, replay]}
+        started_at: {type: string, format: date-time}
+        ended_at: {type: [string, "null"], format: date-time}
+        outcome: {type: [string, "null"], enum: [done, stopped, ended, abandoned, failed, null]}
+        usd: {type: number}
+    TechnicianNoteIn:
+      type: object
+      required: [photo_frame_ids]
+      properties:
+        photo_frame_ids: {type: array, items: {type: string}, description: "The photos the user picked"}
+        renter: {type: boolean, default: false}
+    TechnicianNote:
+      type: object
+      required: [text, photos, landlord_jobs]
+      description: Built on the server, shared by the phone's share sheet. Nothing leaves the phone until the user sends it.
+      properties:
+        text: {type: string}
+        photos: {type: array, items: {type: string, description: "URL path to a frame"}}
+        landlord_jobs: {type: array, items: {type: string}}
+    ManualInterval:
+      type: object
+      description: The card's interval with its page and quote, always shown beside the household's own.
+      required: [every, unit, page, quote]
+      additionalProperties: false
+      properties:
+        every: {type: integer, minimum: 1}
+        unit: {type: string, enum: [day, week, month, year, cycle]}
+        page: {type: integer}
+        quote: {type: string}
+    Schedule:
+      description: >
+        The household's own schedule for one job; the card is never changed. every: due every N units after the last
+        done. window: due from min after the last done, overdue after max ("every 3 to 6 months"). A time only, never
+        cycles; a job the manual counts in cycles may still be given a time, and then has a date. 422 when min >= max.
+      oneOf:
+        - type: object
+          required: [kind, every, unit]
+          additionalProperties: false
+          properties:
+            kind: {const: every}
+            every: {type: integer, minimum: 1, maximum: 3650}
+            unit: {type: string, enum: [day, week, month, year]}
+        - type: object
+          required: [kind, min, max, unit]
+          additionalProperties: false
+          properties:
+            kind: {const: window}
+            min: {type: integer, minimum: 1, maximum: 3650}
+            max: {type: integer, minimum: 2, maximum: 3650}
+            unit: {type: string, enum: [day, week, month, year]}
+    ScheduleIn:
+      description: 'A Schedule, or {"kind": "manual"} to go back to the manual''s interval.'
+      oneOf:
+        - $ref: "#/components/schemas/Schedule"
+        - {type: object, required: [kind], additionalProperties: false, properties: {kind: {const: manual}}}
+    JobState:
+      type: object
+      description: What a change touches; a Change holds it before and after, and undo puts the before back.
+      required: [last_done, last_done_source, schedule, snoozed_until, assignee]
+      additionalProperties: false
+      properties:
+        last_done: {type: [string, "null"], format: date}
+        last_done_source: {type: [string, "null"], enum: [user, checked, never, unknown, null], description: "null: unanswered"}
+        schedule:
+          oneOf:
+            - {type: "null"}
+            - $ref: "#/components/schemas/Schedule"
+        snoozed_until: {type: [string, "null"], format: date}
+        assignee: {type: [string, "null"], description: "a person id"}
+    By:
+      type: object
+      description: Who made a change, read from the token that made the call.
+      required: [kind, person_id, label]
+      additionalProperties: false
+      properties:
+        kind: {type: string, enum: [app, agent, ha], description: "app: a person on the phone or the REST API"}
+        person_id: {type: [string, "null"], description: "set when kind is app"}
+        label:
+          type: string
+          minLength: 1
+          description: >-
+            The person's name, or the token's label, as it was at the time; never empty. The household token speaks
+            for the first admin, so its changes carry that person's name ("Admin" until they rename themselves).
+    Change:
+      type: object
+      required: [id, at, appliance_id, job_id, kind, by, before, after, undone]
+      additionalProperties: false
+      properties:
+        id: {type: integer}
+        at: {type: string, format: date-time}
+        appliance_id: {type: string}
+        job_id: {type: string}
+        kind: {type: string, enum: [done, last_done, schedule, snooze, assignee, undo]}
+        by: {$ref: "#/components/schemas/By"}
+        before: {$ref: "#/components/schemas/JobState"}
+        after: {$ref: "#/components/schemas/JobState"}
+        undone: {type: boolean, description: "true once an undo reverted it; an undo is never undoable"}
+    Person:
+      type: object
+      required: [id, name, role, view_only, me]
+      additionalProperties: false
+      properties:
+        id: {type: string}
+        name: {type: string, minLength: 1, maxLength: 40}
+        role: {type: string, enum: [admin, member]}
+        view_only: {type: boolean, description: "a member who reads only; never an admin"}
+        me: {type: boolean, description: "the caller"}
+    Invite:
+      type: object
+      required: [code, join_url, role, view_only, email, expires_at]
+      additionalProperties: false
+      properties:
+        code: {type: string, description: "Shown once, to the admin who made it; stored only as a hash"}
+        join_url: {type: string, pattern: "^https?://[^/#]+/#join/[^/#]+$", description: "<origin>/#join/<code>, built from the request's origin as for #return/<code>: the code rides in the fragment, so it reaches no server log or Referer. The phone shares it"}
+        role: {type: string, enum: [admin, member]}
+        view_only: {type: boolean}
+        email: {type: [string, "null"], description: "whom it is for; the server sends no mail, the phone opens a mail to it"}
+        expires_at: {type: string, format: date-time}
+    Token:
+      type: object
+      required: [id, by_kind, scope, label, created_at, last_used_at]
+      additionalProperties: false
+      properties:
+        id: {type: string}
+        by_kind: {type: string, enum: [agent, ha, feed]}
+        scope: {type: string, enum: [read, write], description: "a feed token is read only"}
+        label: {type: string, minLength: 1, maxLength: 60}
+        created_at: {type: string, format: date-time}
+        last_used_at: {type: [string, "null"], format: date-time}
+    Alerts:
+      type: object
+      description: >
+        One person's alerts, set by them on their own phone. Defaults: push and calendar on, hub on, every item, no
+        quiet hours; push still reaches them only once they allow it in their own browser. An assigned job alerts only
+        its assignee; an unassigned one alerts everyone who follows its item. Quiet hours are in the household's
+        time, from inclusive and to exclusive; from later than to runs past midnight (22:00 to 07:00), and from equal
+        to to means no quiet hours, the same as null. A reminder due in them waits for their end. A STOP is never an alert and never waits.
+      required: [push, calendar, hub, items, follows, quiet]
+      additionalProperties: false
+      properties:
+        push: {type: boolean}
+        calendar: {type: boolean, description: "their own feed (GET /household/feeds) carries what they follow"}
+        hub: {type: boolean, description: "Home Assistant events and other hubs name them"}
+        items: {type: string, enum: [all, chosen], description: "chosen: the appliances in follows"}
+        follows: {type: array, items: {type: string}, uniqueItems: true, description: "appliance ids"}
+        quiet:
+          oneOf:
+            - {type: "null"}
+            - type: object
+              required: [from, to]
+              additionalProperties: false
+              properties:
+                from: {type: string, pattern: "^([01][0-9]|2[0-3]):[0-5][0-9]$"}
+                to: {type: string, pattern: "^([01][0-9]|2[0-3]):[0-5][0-9]$"}
+    PreflightLine:
+      type: object
+      required: [check, ok, detail]
+      properties: {check: {type: string}, ok: {type: boolean}, detail: {type: string}}
+paths:
+  /households:
+    post:
+      summary: Open a household, from an invite code or through the open door
+      description: >
+        With invite_code, the pilot's single-use code. Without it, the open door, when an operator has opened it
+        (the latest store door_log row is open; no row means closed), with age_ok then required; with the door shut
+        that is 403 door_closed.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [consent]
+              properties:
+                invite_code: {type: string}
+                consent: {type: boolean, const: true}
+                age_ok: {type: boolean, const: true}
+                country: {type: string, pattern: "^[a-z]{2}$"}
+                lang: {type: string, pattern: "^[a-z]{2}$"}
+              if: {not: {required: [invite_code]}}
+              then: {required: [age_ok]}
+      responses:
+        "201": {description: Created, content: {application/json: {schema: {$ref: "#/components/schemas/HouseholdCreated"}}}}
+        "403": {description: "Bad or used invite code, or door_closed", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "429": {description: "global_cap; without an invite code also door_cap or address_cap", content: {application/json: {schema: {$ref: "#/components/schemas/CapError"}}}}
+  /households/door:
+    get:
+      summary: Whether the open door would open a home now
+      description: >
+        Read-only: no household, no model call, nothing counted or logged per caller. It reads the latest door_log
+        row and the public credit check the door itself uses.
+      security: []
+      responses:
+        "200": {description: "The door's state", content: {application/json: {schema: {$ref: "#/components/schemas/DoorState"}}}}
+  /households/try:
+    post:
+      summary: Open a household from a judges' link (the page /try#k=<code> reads the code from the fragment and calls this)
+      description: >
+        The link is multi-use: each use opens its own household, marked with the link. It is a real home, not a test
+        home: reminders are sent and its spend is the pilot's, under the link's caps; pilot counts leave it out by
+        invite_link_id. The code rides in the URL fragment, so it reaches no access log or Referer; only its hash is
+        stored.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, consent, age_ok]
+              additionalProperties: false
+              properties:
+                code: {type: string, minLength: 1}
+                consent: {type: boolean, const: true}
+                age_ok: {type: boolean, const: true}
+                country: {type: string, pattern: "^[a-z]{2}$"}
+                lang: {type: string, pattern: "^[a-z]{2}$"}
+      responses:
+        "201": {description: Created, content: {application/json: {schema: {$ref: "#/components/schemas/HouseholdCreated"}}}}
+        "404": {description: "Unknown, expired or revoked code (one answer for all three)"}
+        "429": {description: "judges_cap, judges_full or global_cap", content: {application/json: {schema: {$ref: "#/components/schemas/CapError"}}}}
+  /households/return:
+    post:
+      summary: Come back to a household on another device from a return link
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              additionalProperties: false
+              properties: {code: {type: string, minLength: 1}}
+      responses:
+        "201": {description: "A new app token (scope write, label phone) for the person who made the link, in the same household", content: {application/json: {schema: {$ref: "#/components/schemas/HouseholdCreated"}}}}
+        "404": {description: "Used, expired or unknown (one answer for all three)"}
+  /household/return-link:
+    post:
+      summary: Make a link to open this household on another device
+      description: >
+        The url is <origin>/#return/<code>: single-use, valid 15 minutes, and for the person whose token makes it
+        (never the home's first admin on a member's behalf); a new one replaces that person's link before. Only the
+        code's hash is stored.
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url, expires_at]
+                additionalProperties: false
+                properties:
+                  url: {type: string, format: uri}
+                  expires_at: {type: string, format: date-time}
+        "403": {description: "A view-only member, or any token but the household's or an app token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /household:
+    get:
+      summary: This household
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {$ref: "#/components/schemas/Household"}}}}
+    patch:
+      summary: Change this household's settings (admins only); asked when a home is claimed, and in settings
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/HouseholdPatch"}}}}
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {$ref: "#/components/schemas/Household"}}}}
+        "403": {description: "Not an admin, or an agent, ha or feed token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+    delete:
+      summary: Delete this household and all its data (admins only)
+      description: >
+        Admins only, the same check as PATCH /household: anyone else, and an agent, ha or feed token, gets 403. Every
+        open WebSocket session of the household is closed first, with code 4410 and reason
+        {"error": "household_deleted"} (ws.schema.json GoneClose), and a later hello for it is closed the same way;
+        then its files go. Its spend-ledger lines stay, with no household or session id.
+      responses:
+        "204": {description: Deleted}
+        "403": {description: "Not an admin, or an agent, ha or feed token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /household/feedback:
+    post:
+      summary: A pilot household's answers to the feedback form (any person's own token); the id is the one to withdraw it by
+      description: >
+        Only a home in the pilot_cohort view (Household.pilot) sends one; at most 20 per household. The line goes to
+        FIXIT_PRIVATE/feedback/feedback.jsonl (FeedbackRecord, source app) and goes with the household when it is
+        deleted. No route reads feedback back.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/FeedbackIn"}}}}
+      responses:
+        "201":
+          description: Kept
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id]
+                additionalProperties: false
+                properties: {id: {type: string, pattern: "^fb-[0-9a-f]{12}$"}}
+        "403": {description: "not_pilot: the home is not in the pilot; or forbidden: an agent, ha or feed token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "410": {description: "household_deleted: the home is being deleted, and nothing was kept", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "422": {description: "invalid: not a FeedbackIn, or a quote_name without quote named (or named without one)", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "429": {description: "too_many: this home has sent 20 already", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "503": {description: "unavailable: this server takes no feedback (it has no private folder)", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /household/feedback/{feedback_id}/withdraw:
+    parameters: [{name: feedback_id, in: path, required: true, schema: {type: string}}]
+    post:
+      summary: Withdraw this home's answer's quote (any person's own token); its words are never printed again
+      description: >
+        Sets withdrawn_at (kept from the first time, so twice is fine) and blanks quote_name. The answers stay.
+      responses:
+        "204": {description: Withdrawn}
+        "403": {description: "forbidden: an agent, ha or feed token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "404": {description: "not_found: no such answer from this home", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "503": {description: "unavailable: this server takes no feedback", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /household/feeds:
+    get:
+      summary: The caller's own feed URLs (a person's feed carries the items they follow)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {type: object, required: [ics_url], properties: {ics_url: {type: string}}}
+  /household/people:
+    get:
+      summary: The people in this home
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/Person"}}}}}
+  /household/people/{person_id}:
+    parameters: [{name: person_id, in: path, required: true, schema: {type: string}}]
+    patch:
+      summary: Rename a person (an admin, or the person themselves), or change their role or view_only (an admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              additionalProperties: false
+              properties:
+                name: {type: string, minLength: 1, maxLength: 40}
+                role: {type: string, enum: [admin, member]}
+                view_only: {type: boolean}
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {$ref: "#/components/schemas/Person"}}}}
+        "403": {description: Not an admin, content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "409": {description: "last_admin: a home keeps at least one admin; view_only on an admin is a 422; or name_taken", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+    delete:
+      summary: Remove a person (an admin, or the person leaving); their tokens are revoked and their jobs unassigned
+      responses:
+        "204": {description: Removed}
+        "403": {description: Not an admin, content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "409": {description: "last_admin", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /household/invites:
+    post:
+      summary: Invite someone into this home by link or email (admins only); the code is shown once
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              additionalProperties: false
+              properties:
+                role: {type: string, enum: [admin, member]}
+                view_only: {type: boolean, default: false}
+                email: {type: [string, "null"], format: email}
+                expires_in_days: {type: integer, minimum: 1, maximum: 14, default: 7}
+      responses:
+        "201": {description: Created, content: {application/json: {schema: {$ref: "#/components/schemas/Invite"}}}}
+        "403": {description: Not an admin, content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /household/join:
+    post:
+      summary: Join a home with a people invite; returns this person's app token (shown once)
+      description: Separate from POST /households, whose pilot invite codes open new households.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, name]
+              additionalProperties: false
+              properties:
+                code: {type: string}
+                name: {type: string, minLength: 1, maxLength: 40}
+      responses:
+        "201":
+          description: Joined
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [token, person, household]
+                properties:
+                  token: {type: string, description: "Shown once; the phone keeps it"}
+                  person: {$ref: "#/components/schemas/Person"}
+                  household: {$ref: "#/components/schemas/Household"}
+        "403": {description: "A bad, used or expired invite", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "409": {description: "name_taken", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /household/tokens:
+    get:
+      summary: This home's agent, Home Assistant and calendar tokens, never their secrets (admins only)
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/Token"}}}}}
+        "403": {description: Not an admin, content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+    post:
+      summary: Make a token for an agent or Home Assistant (admins only); the token is shown once. A calendar address comes from GET /household/feeds
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [by_kind, scope, label]
+              additionalProperties: false
+              properties:
+                by_kind: {type: string, enum: [agent, ha]}
+                scope: {type: string, enum: [read, write]}
+                label: {type: string, minLength: 1, maxLength: 60}
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: {type: object, required: [id, token], properties: {id: {type: string}, token: {type: string}}}
+        "403": {description: Not an admin, content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "422": {description: "A by_kind other than agent or ha (a calendar address comes from GET /household/feeds), or a bad scope or label", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /household/tokens/{token_id}:
+    parameters: [{name: token_id, in: path, required: true, schema: {type: string}}]
+    delete:
+      summary: Revoke a token (admins only); it fails from the next call
+      responses:
+        "204": {description: Revoked}
+        "403": {description: Not an admin, content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "404": {description: Not found}
+  /me/alerts:
+    get:
+      summary: The caller's alerts (an app token's person; the household token's first admin)
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {$ref: "#/components/schemas/Alerts"}}}}
+    put:
+      summary: Set the caller's own alerts (any role; agent, ha and feed tokens get 403)
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/Alerts"}}}}
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {$ref: "#/components/schemas/Alerts"}}}}
+        "403": {description: "Not a person's token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "422": {description: "An appliance in follows that is not in this home", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /feeds/{feed_token}.ics:
+    parameters: [{name: feed_token, in: path, required: true, schema: {type: string, pattern: "^[A-Za-z0-9_-]+$"}}]
+    get:
+      summary: The household's upkeep calendar. The token is a per-household feed secret; a bad one is a 404.
+      security: []
+      responses:
+        "200": {description: iCalendar, content: {text/calendar: {}}}
+        "404": {description: Not found}
+  /push/vapid-public-key:
+    get:
+      summary: The VAPID public key for PushManager.subscribe
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {type: object, required: [key], properties: {key: {type: string}}}
+  /push/subscriptions:
+    post:
+      summary: Save this browser's push subscription (the PushSubscription JSON)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [endpoint, keys]
+              properties:
+                endpoint: {type: string}
+                expirationTime: {type: [number, "null"]}
+                keys:
+                  type: object
+                  required: [p256dh, auth]
+                  properties: {p256dh: {type: string}, auth: {type: string}}
+      responses:
+        "201": {description: Saved}
+    delete:
+      summary: Remove a push subscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [endpoint], properties: {endpoint: {type: string}}}
+      responses:
+        "204": {description: Removed}
+  /reminders/{reminder_key}/opened:
+    parameters:
+      - {name: reminder_key, in: path, required: true, description: "<appliance_id>:<job_id>:<due_on>", schema: {type: string}}
+    post:
+      summary: Record that a reminder was opened (pilot_events reminder_opened)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [channel]
+              properties: {channel: {type: string, enum: [push, ics, caldav, ha, app]}}
+      responses:
+        "204": {description: Recorded}
+  /reminders/{reminder_key}/snooze:
+    parameters:
+      - {name: reminder_key, in: path, required: true, description: "<appliance_id>:<job_id>:<due_on>", schema: {type: string}}
+    post:
+      summary: Snooze a reminder (pilot_events reminder_snoozed with snooze_until)
+      description: >
+        The push loop sends this reminder once more after the snooze. It never changes due_on or last_done.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties: {hours: {type: integer, minimum: 1, maximum: 72, default: 24}}
+      responses:
+        "204": {description: Snoozed}
+        "404": {description: No such reminder for this household, content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /appliances:
+    get:
+      summary: List appliances
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/Appliance"}}}}}
+    post:
+      summary: Add an appliance (plate photo or typed model); starts lookup and ingest
+      description: >
+        The household's own token, a person's app token, or the home's Home Assistant token with write scope (its
+        list of the appliances it knows, sent only for the ones the user ticks). Home Assistant sends a brand, a
+        model, a kind and a name only: a model the card library has links its card at once, and any other gets its
+        manual's pages and no card, so an add from Home Assistant never builds a card or calls a model.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/ApplianceIn"}}}}
+      responses:
+        "201": {description: Created, content: {application/json: {schema: {$ref: "#/components/schemas/Appliance"}}}}
+        "403": {description: "A view-only member, or a read-scope Home Assistant token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "409": {description: "alias_taken: that alias already has a checked card", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "422": {description: "A plate_photo_id or pdf_url from Home Assistant, no model and no plate_photo_id, a pdf_url off the makers' domains, or brand_needed (a typed model with no brand that looks like a Samsung code: WW, DV or DW, two digits, a letter)", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /appliances/{appliance_id}:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}]
+    get:
+      summary: One appliance
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {$ref: "#/components/schemas/Appliance"}}}}
+        "404": {description: Not found}
+    delete:
+      summary: Take the appliance out of this home (a dead add, or one the home no longer has)
+      description: >
+        A soft delete: the appliance leaves every list, due date, reminder and feed of this home, and its name is
+        free again. Its history, sessions and reports stay (a report then shows no appliance), and the card library
+        is not touched. Only this home's own appliance: another home's id is a 404, never a 403.
+      responses:
+        "204": {description: Removed}
+        "401": {description: No or bad household token}
+        "403": {description: "A view-only member, or a read-scope token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "404": {description: No such appliance in this household (or already removed)}
+  /appliances/{appliance_id}/manual:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}]
+    post:
+      summary: Upload the manual's PDF from the phone; re-runs the ingest, as a pdf_url re-post does
+      description: >
+        After a lookup miss, or from the Android share target (the phone holds the shared file until the appliance
+        exists). The bytes stay in the private store and never enter a card or the repo; a card keeps quotes and
+        page numbers only.
+      requestBody:
+        required: true
+        content:
+          application/pdf:
+            x-max-bytes: 52428800
+            schema: {type: string, format: binary, maxLength: 52428800}
+      responses:
+        "201": {description: "The ingest restarted", content: {application/json: {schema: {$ref: "#/components/schemas/Appliance"}}}}
+        "403": {description: "A view-only member, or a read-scope token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "404": {description: No such appliance in this household}
+        "413": {description: "too_large: over 50 MB", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "415": {description: "not_a_pdf: the bytes do not start a PDF", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /appliances/{appliance_id}/manual/pages/{page}.png:
+    parameters:
+      - {$ref: "#/components/parameters/ApplianceId"}
+      - {name: page, in: path, required: true, schema: {type: integer, minimum: 1}}
+    get:
+      summary: One page of this household's own copy of the manual, rendered as a PNG
+      description: Served from the private store to this household only; never cached publicly, never in a card.
+      responses:
+        "200": {description: OK, content: {image/png: {schema: {type: string, format: binary}}}}
+        "404": {description: "No such appliance, no manual yet, or no such page"}
+  /appliances/{appliance_id}/meaning:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}]
+    get:
+      summary: What a fault code or light means, from the checked card
+      description: >
+        Read-only. Any token of the household may call it, agent and ha tokens included: the answer is the card's own
+        cited rows, so an agent asked "what is E24?" quotes the manual instead of guessing.
+      parameters:
+        - {name: code, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 20}, description: "As typed"}
+      responses:
+        "200":
+          description: OK; never a read
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - {$ref: "#/components/schemas/FaultMeaning"}
+                  - {not: {required: [read]}, properties: {code: {type: string}}}
+        "404": {description: "No such appliance in this household, or it has no checked card", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "422": {description: "An empty code, or one over 20 characters", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /appliances/{appliance_id}/display:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}]
+    post:
+      summary: Read the appliance's display or lights from a photo, then answer as GET .../meaning does
+      description: >
+        The household token or a person's app token, write scope (the photo costs a model call). A model reads the
+        display with its answer constrained to the card's codes and its indicator rows' ids; then code runs the same
+        lookup as GET .../meaning. The photo is kept in the private store as a plate photo is, sent with store false,
+        and never enters a card or the repo.
+      requestBody:
+        required: true
+        content:
+          image/jpeg:
+            x-max-bytes: 8388608
+            schema: {type: string, format: binary, maxLength: 8388608}
+      responses:
+        "200":
+          description: OK; read is always present
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - {$ref: "#/components/schemas/FaultMeaning"}
+                  - {required: [read]}
+        "403": {description: "A view-only member, or a read-scope token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "404": {description: "No such appliance in this household, or it has no checked card", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "413": {description: "too_large: over 8 MB", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "415": {description: "not_an_image: the bytes do not start a JPEG", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "429": {description: "home_cap, judges_cap or global_cap", content: {application/json: {schema: {$ref: "#/components/schemas/CapError"}}}}
+  /appliances/{appliance_id}/card/record:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}]
+    get:
+      summary: How the card linked to this appliance was checked (the panel, beside GET .../card)
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {$ref: "#/components/schemas/CardRecord"}}}}
+        "404": {description: "No such appliance in this household, or no card linked", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /appliances/{appliance_id}/reports:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}]
+    post:
+      summary: Report a problem with the card linked to this appliance, or with one of its jobs or steps
+      description: >
+        A person's word: the household token or a person's app token, any role (a viewer may report too); agent, ha
+        and feed tokens get 403. Filed against the card version linked now; the card does not change. At most 20 open
+        reports per home.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/ReportIn"}}}}
+      responses:
+        "201": {description: Filed, content: {application/json: {schema: {$ref: "#/components/schemas/Report"}}}}
+        "403": {description: "An agent, ha or feed token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "404": {description: "No such appliance in this household", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "409": {description: "no_card: nothing is linked to report on", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "422": {description: "unknown_job or unknown_step on the linked card, or a body the schema refuses", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "429": {description: "too_many_reports: this home has 20 open reports", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /appliances/{appliance_id}/not-mine:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}]
+    post:
+      summary: "\"This isn't my appliance\": unlink the card for this household only, and file a wrong_appliance report"
+      description: >
+        An admin or a member (it unlinks for the whole home, so a viewer gets 403, as do agent, ha and feed tokens).
+        It files a wrong_appliance report, counted in the 20. The link goes; card_status becomes failed with
+        ingest.notice {kind: lookup_failed, reason: not_mine}, so the manual upload and manual link path takes over. The appliance's jobs leave /due, and
+        that card file is never linked to this appliance again on its own; history and last-done dates stay. Other
+        homes keep the card, and an upload made after it builds a private card, never the shared one.
+      requestBody: {required: false, content: {application/json: {schema: {$ref: "#/components/schemas/NotMineIn"}}}}
+      responses:
+        "200": {description: "Unlinked; card_status is failed, reason not_mine", content: {application/json: {schema: {$ref: "#/components/schemas/Appliance"}}}}
+        "403": {description: "A viewer, or an agent, ha or feed token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "404": {description: "No such appliance in this household", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "409": {description: "no_card: nothing is linked", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "429": {description: "too_many_reports: this home has 20 open reports", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /reports:
+    get:
+      summary: This household's own reports, newest first (review itself is a server CLI, not an API)
+      parameters:
+        - {name: appliance_id, in: query, schema: {type: string}}
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/Report"}}}}}
+  /appliances/{appliance_id}/card:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}]
+    get:
+      summary: The appliance's card, with checks filled by the loader
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {$ref: "card.schema.json"}}}}
+        "404": {description: No card yet}
+  /appliances/{appliance_id}/jobs/{job_id}/last-done:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}, {$ref: "#/components/parameters/JobId"}]
+    put:
+      summary: Answer "When did you last do this?" (a Change of kind last_done)
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/LastDone"}}}}
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {$ref: "#/components/schemas/Due"}}}}
+  /appliances/{appliance_id}/jobs/{job_id}/schedule:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}, {$ref: "#/components/parameters/JobId"}]
+    put:
+      summary: Set the household's own schedule for this job, or go back to the manual's ({"kind":"manual"})
+      description: >
+        Any upkeep job: one with the manual's interval, and one whose manual gives none. For the second, only a
+        person in the app may set it (an app token: the household's or a person's); no agent or Home Assistant token
+        may, since no model or automation proposes an interval the manual does not give. {"kind":"manual"} on such
+        a job takes it off /due again (204): there is no manual interval to go back to. A fault fix has no schedule.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/ScheduleIn"}}}}
+      responses:
+        "200": {description: "The job's new Due", content: {application/json: {schema: {$ref: "#/components/schemas/Due"}}}}
+        "204": {description: "The job left /due: {kind: manual} on a job whose manual gives no interval"}
+        "403": {description: "A viewer, a read-scope token, or person_only (an agent or ha token on a job whose manual gives no interval)", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "404": {description: No such appliance or job}
+        "422": {description: "A window with min >= max, a cycle unit, or fix_has_no_schedule (a fault fix)", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /appliances/{appliance_id}/jobs/{job_id}/done:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}, {$ref: "#/components/parameters/JobId"}]
+    post:
+      summary: Mark the job done, today or on a past date
+      description: Sets last_done (source user), clears the snooze, adds a history job_done and a Change.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {type: object, additionalProperties: false, properties: {date: {type: string, format: date}}}
+      responses:
+        "200": {description: "The job's new Due", content: {application/json: {schema: {$ref: "#/components/schemas/Due"}}}}
+        "403": {description: "A viewer, or a read-scope token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "422": {description: "A date after today", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /appliances/{appliance_id}/jobs/{job_id}/snooze:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}, {$ref: "#/components/parameters/JobId"}]
+    put:
+      summary: Snooze the job to a date, or clear the snooze with {"until":null}
+      description: >
+        Moves due_on (and the reminder) to until, and never changes last_done or the schedule. Done clears it.
+        Apart from /reminders/{reminder_key}/snooze, which only sends a push again later.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [until]
+              additionalProperties: false
+              properties: {until: {type: [string, "null"], format: date}}
+      responses:
+        "200": {description: "The job's new Due", content: {application/json: {schema: {$ref: "#/components/schemas/Due"}}}}
+        "403": {description: "A viewer, or a read-scope token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "422": {description: "until is not after today, or not after the current due_on", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /appliances/{appliance_id}/jobs/{job_id}/assignee:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}, {$ref: "#/components/parameters/JobId"}]
+    put:
+      summary: Assign the job to a person in this home, or to nobody
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [person_id]
+              additionalProperties: false
+              properties: {person_id: {type: [string, "null"]}}
+      responses:
+        "200": {description: "The job's new Due", content: {application/json: {schema: {$ref: "#/components/schemas/Due"}}}}
+        "403": {description: "A viewer, or a read-scope token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "422": {description: "Not a person in this home", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /appliances/{appliance_id}/jobs/{job_id}/changes:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}, {$ref: "#/components/parameters/JobId"}]
+    get:
+      summary: This job's changes, newest first (at most 20)
+      description: >
+        Works for any job with changes, including an upkeep job whose manual gives no interval while it is off /due,
+        so the job's sheet can show and undo its history.
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/Change"}}}}}
+  /appliances/{appliance_id}/jobs/{job_id}/undo:
+    parameters: [{$ref: "#/components/parameters/ApplianceId"}, {$ref: "#/components/parameters/JobId"}]
+    post:
+      summary: Undo this job's latest change that is neither undone nor an undo; the undo is itself a Change
+      description: >
+        Puts the change's before back. Again undoes the change before it. Works while the job is off /due too (an
+        upkeep job whose manual gives no interval, after {kind: manual}): an undo that brings its schedule back
+        answers 200 with its Due.
+        With {"own": true} (the MCP server's undo_my_change), that same change is undone only if the caller's token
+        made it (job_change.by_token is the caller's token id); otherwise 409 not_own and nothing changes. The
+        household token has no token id, so own is always not_own for it. No body, or own false, is as before.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                own: {type: boolean, default: false, description: "only if the latest change was made with this same token; a household-token caller cannot ask it"}
+      responses:
+        "200": {description: "The job's new Due", content: {application/json: {schema: {$ref: "#/components/schemas/Due"}}}}
+        "204": {description: "The job left /due: the undo took away the only schedule of a job whose manual gives no interval"}
+        "403": {description: "A viewer, or a read-scope token", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "409": {description: "nothing_to_undo; or not_own: the latest change was made by someone else (or own was asked with the household token); nothing was undone", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "422": {description: "invalid: a body that is not {own: boolean}", content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  /due:
+    get:
+      summary: Every upkeep job with its due date, computed by code from the card
+      parameters:
+        - {name: within_days, in: query, schema: {type: integer, minimum: 0}}
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/Due"}}}}}
+  /history:
+    get:
+      summary: Household history
+      parameters:
+        - {name: appliance_id, in: query, schema: {type: string}}
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/HistoryEntry"}}}}}
+    post:
+      summary: Add a user entry or voice note
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/HistoryEntry"}}}}
+      responses:
+        "201": {description: Created, content: {application/json: {schema: {$ref: "#/components/schemas/HistoryEntry"}}}}
+  /sessions:
+    get:
+      summary: This household's sessions
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/SessionSummary"}}}}}
+  /sessions/{session_id}:
+    parameters: [{$ref: "#/components/parameters/SessionId"}]
+    get:
+      summary: One session's summary
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {$ref: "#/components/schemas/SessionSummary"}}}}
+  /sessions/{session_id}/note:
+    parameters: [{$ref: "#/components/parameters/SessionId"}]
+    post:
+      summary: Write the technician note after a stop
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/TechnicianNoteIn"}}}}
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {$ref: "#/components/schemas/TechnicianNote"}}}}
+  /replay/{session_id}:
+    parameters: [{$ref: "#/components/parameters/SessionId"}]
+    get:
+      summary: A recorded session for ?replay=<id> (meta plus events; frames by URL).
+      description: >-
+        session_id may be the literal `golden`, which resolves to the curated recording (FIXIT_REPLAY_GOLDEN, else the
+        id in <replays>/GOLDEN); it is 404 until one is curated, and a home's own session is never golden. replay_id
+        is then the resolved id. It fails closed: a curated recording (deploy/curate.py: no household, in a replay
+        folder, never the sessions folder) needs no key; a home's session as recorded (its rooms, the rating plate) is
+        served only with that home's bearer (the household's own, or a person's app token that may change things);
+        a session as recorded that names no household is served to nobody. Anything refused is 404, as for no
+        recording. meta has no
+        household and a hello event has no household token.
+      security: [{}, {household: []}]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [meta, events]
+                properties:
+                  meta: {$ref: "session.schema.json#/$defs/SessionMeta"}
+                  events: {type: array, items: {$ref: "session.schema.json#/$defs/ClientEvent"}}
+                  replay_id: {type: string, description: "The resolved id (differs from the path for golden)"}
+                  summary: {$ref: "#/components/schemas/ReplaySummary"}
+        "404": {description: Not found}
+  /replay/{session_id}/frames/{frame_id}.jpg:
+    parameters:
+      - {$ref: "#/components/parameters/SessionId"}
+      - {name: frame_id, in: path, required: true, schema: {type: string}}
+    get:
+      summary: A recorded frame (session_id may be `golden`; a home's session needs its bearer, as above)
+      security: [{}, {household: []}]
+      responses:
+        "200": {description: JPEG, content: {image/jpeg: {}}}
+        "404": {description: Not found}
+  /preflight:
+    get:
+      summary: Every line green or red (models, ledger headroom, manuals, local, certificate, last replay)
+      security: []
+      responses:
+        "200": {description: OK, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/PreflightLine"}}}}}
+  /preflight/warm-up:
+    post:
+      summary: Load Glimmer (and SAM if configured) now, from the preflight page's button (calls.warm_up_local, up to ~2 min). Never run at startup. Tailnet only
+      security: []
+      responses:
+        "200": {description: Done or failed (ok says which), content: {application/json: {schema: {$ref: "#/components/schemas/PreflightLine"}}}}
+        "409": {description: A warm-up is already running, content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}

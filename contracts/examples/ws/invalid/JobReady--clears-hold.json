@@ -1,0 +1,8 @@
+{
+  "type": "job_ready",
+  "seq": 9,
+  "t_ms": 47800,
+  "job_id": "clean_debris_filter",
+  "ready": ["towel"],
+  "clear_hold": true
+}

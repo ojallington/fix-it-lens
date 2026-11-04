@@ -1,0 +1,31 @@
+# The integration's checks for HACS's default list: hacs/action and hassfest, on every push and pull request.
+name: Validate
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hacs:
+    name: HACS
+    runs-on: ubuntu-latest
+    steps:
+      - name: HACS validation
+        uses: hacs/action@main
+        with:
+          category: integration
+
+  hassfest:
+    name: Hassfest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7.0.1
+      - name: Hassfest validation
+        uses: home-assistant/actions/hassfest@master

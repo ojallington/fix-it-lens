@@ -1,0 +1,13 @@
+{
+  "session_id": "s_20261028_a",
+  "household": "h_own_1",
+  "appliance_id": "a_dishwasher",
+  "card": "cards/bosch/smv4hax40n.yaml",
+  "job_id": "clean_filter",
+  "started_at": "2026-10-28T19:02:00Z",
+  "mode": "api",
+  "lang": "nl",
+  "country": "nl",
+  "contracts_version": "1.0.0",
+  "commit": "abc1234"
+}

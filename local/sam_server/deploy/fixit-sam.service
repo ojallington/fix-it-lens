@@ -1,0 +1,29 @@
+# fixit-sam: Fix-It Lens local mode's SAM 3.1 (open weights) on the GPU host. Staged by
+# local/sam_server/deploy/stage.sh; not enabled until facebook/sam3.1 access is approved and the weights verify.
+[Unit]
+Description=fixit-sam — Fix-It Lens local SAM 3.1 (hosted sam-3.1 request in, events out), tailnet only
+Documentation=file:///opt/fixit-sam/local/sam_server/README.md
+After=network-online.target tailscaled.service ollama.service
+Wants=network-online.target
+
+[Service]
+Type=exec
+WorkingDirectory=/opt/fixit-sam
+Environment=SAM_WEIGHTS=/opt/fixit-sam/weights
+Environment=SAM_IDLE_S=900
+Environment=SAM_IDLE_EXIT=1
+Environment=HF_HUB_OFFLINE=1
+Environment=HF_HOME=/opt/fixit-sam/hf
+ExecStartPre=/bin/sh -c 'for i in $(seq 60); do ip -4 addr show tailscale0 | grep -q "inet 100[.]" && exit 0; sleep 2; done; exit 1'
+ExecStart=/bin/sh -c 'exec /opt/fixit-sam/local/sam_server/.venv/bin/uvicorn local.sam_server.server:app --host "$(tailscale ip -4)" --port 8088'
+Restart=always
+RestartSec=2
+TimeoutStartSec=120
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/opt/fixit-sam
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,24 @@
+# Default owner
+# The safety reviewers are the owners on the /rules/ lines below (rules/review.py reads them from here). There is no
+# GitHub team: today that is one person, so a safety change waits for a second reviewer.
+*                         @ojallington
+
+# Gas and mains rules need the safety reviewers
+/rules/**/*gas*  @ojallington
+/rules/**/*mains*  @ojallington
+/rules/*.yaml  @ojallington
+/rules/g1*  @ojallington
+# The code that reads the tables: G0, the step check, the engine and what they import (rules.review GUARDED_CODE)
+/rules/g0.py  @ojallington
+/rules/reading.py  @ojallington
+/rules/compose.py  @ojallington
+/rules/steps.py  @ojallington
+/rules/engine.py  @ojallington
+/rules/text.py  @ojallington
+/rules/country.py  @ojallington
+/rules/disclaimer.py  @ojallington
+/rules/review.py  @ojallington
+
+# Contracts change through a version bump (contracts/VERSION) and regenerated types
+/contracts/               @ojallington
+/calls/                   @ojallington

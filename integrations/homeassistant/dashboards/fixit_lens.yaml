@@ -1,0 +1,305 @@
+# Fix-It Lens: a ready dashboard from Home Assistant's own cards (no custom card). make.py writes it
+# for the demo home's appliances; Download diagnostics gives it for yours. Paste it into a new
+# dashboard's raw configuration editor, or use it as a YAML-mode dashboard.
+title: Upkeep
+views:
+- title: Upkeep
+  path: upkeep
+  icon: mdi:wrench-clock
+  type: sections
+  max_columns: 3
+  sections:
+  - type: grid
+    cards:
+    - type: heading
+      heading: To do
+      icon: mdi:clipboard-check-outline
+    - type: todo-list
+      entity: todo.fix_it_lens_upkeep
+      hide_create: true
+    - type: calendar
+      entities:
+      - calendar.fix_it_lens_upkeep
+      initial_view: listWeek
+      grid_options:
+        columns: full
+  - type: grid
+    cards:
+    - type: heading
+      heading: Dishwasher
+      icon: mdi:dishwasher
+    - type: conditional
+      conditions:
+      - condition: numeric_state
+        entity: sensor.dishwasher_overdue_jobs
+        above: 0
+      card:
+        type: markdown
+        text_only: true
+        content: '<ha-alert alert-type="error">{{ states("sensor.dishwasher_overdue_jobs") }} overdue: {{ state_attr("sensor.dishwasher_overdue_jobs",
+          "jobs") | join(", ") }}</ha-alert>'
+    - type: conditional
+      conditions:
+      - condition: numeric_state
+        entity: sensor.dishwasher_due_jobs
+        above: 0
+      - condition: numeric_state
+        entity: sensor.dishwasher_overdue_jobs
+        below: 1
+      card:
+        type: markdown
+        text_only: true
+        content: '<ha-alert alert-type="warning">{{ states("sensor.dishwasher_due_jobs") }} due now: {{ state_attr("sensor.dishwasher_due_jobs",
+          "jobs") | join(", ") }}</ha-alert>'
+    - type: entities
+      state_color: true
+      entities:
+      - entity: sensor.dishwasher_next_job
+        name: Next job
+      - type: attribute
+        entity: sensor.dishwasher_next_job
+        attribute: due_on
+        name: Due on
+      - entity: sensor.dishwasher_due_jobs
+        name: Due now
+      - entity: sensor.dishwasher_overdue_jobs
+        name: Overdue
+    - type: markdown
+      content: |-
+        {%- set n = 'sensor.dishwasher_next_job' -%}
+        {%- set due = state_attr(n, 'due_on') -%}
+        {%- if due -%}
+        {%- set d = (strptime(due, '%Y-%m-%d').date() - now().date()).days -%}
+        **{{ states(n) }}**: due {{ 'today' if d == 0 else 'tomorrow' if d == 1 else 'yesterday' if d == -1
+          else ('in %d days' % d) if d > 0 else ('%d days ago' % -d) }}
+        {%- else -%}
+        No job with a date yet.
+        {%- endif -%}
+        {%- if state_attr(n, 'link') %}
+
+        [Open the job in Fix-It Lens]({{ state_attr(n, 'link') }})
+        {%- endif -%}
+  - type: grid
+    cards:
+    - type: heading
+      heading: Washer
+      icon: mdi:washing-machine
+    - type: conditional
+      conditions:
+      - condition: numeric_state
+        entity: sensor.washer_overdue_jobs
+        above: 0
+      card:
+        type: markdown
+        text_only: true
+        content: '<ha-alert alert-type="error">{{ states("sensor.washer_overdue_jobs") }} overdue: {{ state_attr("sensor.washer_overdue_jobs",
+          "jobs") | join(", ") }}</ha-alert>'
+    - type: conditional
+      conditions:
+      - condition: numeric_state
+        entity: sensor.washer_due_jobs
+        above: 0
+      - condition: numeric_state
+        entity: sensor.washer_overdue_jobs
+        below: 1
+      card:
+        type: markdown
+        text_only: true
+        content: '<ha-alert alert-type="warning">{{ states("sensor.washer_due_jobs") }} due now: {{ state_attr("sensor.washer_due_jobs",
+          "jobs") | join(", ") }}</ha-alert>'
+    - type: entities
+      state_color: true
+      entities:
+      - entity: sensor.washer_next_job
+        name: Next job
+      - type: attribute
+        entity: sensor.washer_next_job
+        attribute: due_on
+        name: Due on
+      - entity: sensor.washer_due_jobs
+        name: Due now
+      - entity: sensor.washer_overdue_jobs
+        name: Overdue
+    - type: markdown
+      content: |-
+        {%- set n = 'sensor.washer_next_job' -%}
+        {%- set due = state_attr(n, 'due_on') -%}
+        {%- if due -%}
+        {%- set d = (strptime(due, '%Y-%m-%d').date() - now().date()).days -%}
+        **{{ states(n) }}**: due {{ 'today' if d == 0 else 'tomorrow' if d == 1 else 'yesterday' if d == -1
+          else ('in %d days' % d) if d > 0 else ('%d days ago' % -d) }}
+        {%- else -%}
+        No job with a date yet.
+        {%- endif -%}
+        {%- if state_attr(n, 'link') %}
+
+        [Open the job in Fix-It Lens]({{ state_attr(n, 'link') }})
+        {%- endif -%}
+  - type: grid
+    cards:
+    - type: heading
+      heading: Boiler
+      icon: mdi:water-boiler
+    - type: conditional
+      conditions:
+      - condition: numeric_state
+        entity: sensor.boiler_overdue_jobs
+        above: 0
+      card:
+        type: markdown
+        text_only: true
+        content: '<ha-alert alert-type="error">{{ states("sensor.boiler_overdue_jobs") }} overdue: {{ state_attr("sensor.boiler_overdue_jobs",
+          "jobs") | join(", ") }}</ha-alert>'
+    - type: conditional
+      conditions:
+      - condition: numeric_state
+        entity: sensor.boiler_due_jobs
+        above: 0
+      - condition: numeric_state
+        entity: sensor.boiler_overdue_jobs
+        below: 1
+      card:
+        type: markdown
+        text_only: true
+        content: '<ha-alert alert-type="warning">{{ states("sensor.boiler_due_jobs") }} due now: {{ state_attr("sensor.boiler_due_jobs",
+          "jobs") | join(", ") }}</ha-alert>'
+    - type: entities
+      state_color: true
+      entities:
+      - entity: sensor.boiler_next_job
+        name: Next job
+      - type: attribute
+        entity: sensor.boiler_next_job
+        attribute: due_on
+        name: Due on
+      - entity: sensor.boiler_due_jobs
+        name: Due now
+      - entity: sensor.boiler_overdue_jobs
+        name: Overdue
+    - type: markdown
+      content: |-
+        {%- set n = 'sensor.boiler_next_job' -%}
+        {%- set due = state_attr(n, 'due_on') -%}
+        {%- if due -%}
+        {%- set d = (strptime(due, '%Y-%m-%d').date() - now().date()).days -%}
+        **{{ states(n) }}**: due {{ 'today' if d == 0 else 'tomorrow' if d == 1 else 'yesterday' if d == -1
+          else ('in %d days' % d) if d > 0 else ('%d days ago' % -d) }}
+        {%- else -%}
+        No job with a date yet.
+        {%- endif -%}
+        {%- if state_attr(n, 'link') %}
+
+        [Open the job in Fix-It Lens]({{ state_attr(n, 'link') }})
+        {%- endif -%}
+  - type: grid
+    cards:
+    - type: heading
+      heading: Fridge
+      icon: mdi:fridge
+    - type: conditional
+      conditions:
+      - condition: numeric_state
+        entity: sensor.fridge_overdue_jobs
+        above: 0
+      card:
+        type: markdown
+        text_only: true
+        content: '<ha-alert alert-type="error">{{ states("sensor.fridge_overdue_jobs") }} overdue: {{ state_attr("sensor.fridge_overdue_jobs",
+          "jobs") | join(", ") }}</ha-alert>'
+    - type: conditional
+      conditions:
+      - condition: numeric_state
+        entity: sensor.fridge_due_jobs
+        above: 0
+      - condition: numeric_state
+        entity: sensor.fridge_overdue_jobs
+        below: 1
+      card:
+        type: markdown
+        text_only: true
+        content: '<ha-alert alert-type="warning">{{ states("sensor.fridge_due_jobs") }} due now: {{ state_attr("sensor.fridge_due_jobs",
+          "jobs") | join(", ") }}</ha-alert>'
+    - type: entities
+      state_color: true
+      entities:
+      - entity: sensor.fridge_next_job
+        name: Next job
+      - type: attribute
+        entity: sensor.fridge_next_job
+        attribute: due_on
+        name: Due on
+      - entity: sensor.fridge_due_jobs
+        name: Due now
+      - entity: sensor.fridge_overdue_jobs
+        name: Overdue
+    - type: markdown
+      content: |-
+        {%- set n = 'sensor.fridge_next_job' -%}
+        {%- set due = state_attr(n, 'due_on') -%}
+        {%- if due -%}
+        {%- set d = (strptime(due, '%Y-%m-%d').date() - now().date()).days -%}
+        **{{ states(n) }}**: due {{ 'today' if d == 0 else 'tomorrow' if d == 1 else 'yesterday' if d == -1
+          else ('in %d days' % d) if d > 0 else ('%d days ago' % -d) }}
+        {%- else -%}
+        No job with a date yet.
+        {%- endif -%}
+        {%- if state_attr(n, 'link') %}
+
+        [Open the job in Fix-It Lens]({{ state_attr(n, 'link') }})
+        {%- endif -%}
+  - type: grid
+    cards:
+    - type: heading
+      heading: Oven
+      icon: mdi:stove
+    - type: conditional
+      conditions:
+      - condition: numeric_state
+        entity: sensor.oven_overdue_jobs
+        above: 0
+      card:
+        type: markdown
+        text_only: true
+        content: '<ha-alert alert-type="error">{{ states("sensor.oven_overdue_jobs") }} overdue: {{ state_attr("sensor.oven_overdue_jobs",
+          "jobs") | join(", ") }}</ha-alert>'
+    - type: conditional
+      conditions:
+      - condition: numeric_state
+        entity: sensor.oven_due_jobs
+        above: 0
+      - condition: numeric_state
+        entity: sensor.oven_overdue_jobs
+        below: 1
+      card:
+        type: markdown
+        text_only: true
+        content: '<ha-alert alert-type="warning">{{ states("sensor.oven_due_jobs") }} due now: {{ state_attr("sensor.oven_due_jobs",
+          "jobs") | join(", ") }}</ha-alert>'
+    - type: entities
+      state_color: true
+      entities:
+      - entity: sensor.oven_next_job
+        name: Next job
+      - type: attribute
+        entity: sensor.oven_next_job
+        attribute: due_on
+        name: Due on
+      - entity: sensor.oven_due_jobs
+        name: Due now
+      - entity: sensor.oven_overdue_jobs
+        name: Overdue
+    - type: markdown
+      content: |-
+        {%- set n = 'sensor.oven_next_job' -%}
+        {%- set due = state_attr(n, 'due_on') -%}
+        {%- if due -%}
+        {%- set d = (strptime(due, '%Y-%m-%d').date() - now().date()).days -%}
+        **{{ states(n) }}**: due {{ 'today' if d == 0 else 'tomorrow' if d == 1 else 'yesterday' if d == -1
+          else ('in %d days' % d) if d > 0 else ('%d days ago' % -d) }}
+        {%- else -%}
+        No job with a date yet.
+        {%- endif -%}
+        {%- if state_attr(n, 'link') %}
+
+        [Open the job in Fix-It Lens]({{ state_attr(n, 'link') }})
+        {%- endif -%}

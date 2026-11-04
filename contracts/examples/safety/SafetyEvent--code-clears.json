@@ -1,0 +1,9 @@
+{
+  "t_ms": 5400,
+  "source": "code",
+  "kind": "clear",
+  "to": {
+    "state": "OK"
+  },
+  "reason": "side view confirmed"
+}

@@ -1,0 +1,30 @@
+mark_done:
+  fields:
+    job:
+      required: true
+      example: "a_1:machine_cleaning"
+      selector:
+        text:
+    date:
+      required: false
+      selector:
+        date:
+snooze:
+  fields:
+    job:
+      required: true
+      example: "a_1:machine_cleaning"
+      selector:
+        text:
+    until:
+      required: false
+      selector:
+        date:
+    days:
+      required: false
+      example: 7
+      selector:
+        number:
+          min: 1
+          max: 365
+          unit_of_measurement: days

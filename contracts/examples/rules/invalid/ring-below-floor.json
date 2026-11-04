@@ -1,0 +1,78 @@
+{
+  "country": "xx",
+  "version": "0.1.0",
+  "languages": [
+    "en",
+    "nl"
+  ],
+  "emergency": {
+    "en": "Test country: no real emergency number. Leave the room and call for help.",
+    "nl": "Testland: geen echt alarmnummer."
+  },
+  "allow_lists": {
+    "sealed_boiler": [
+      {
+        "id": "read_pressure",
+        "names": {
+          "en": "read the pressure",
+          "nl": "de druk aflezen"
+        },
+        "sources": [
+          {
+            "title": "Acme WM-0000 user manual (fake)",
+            "section": "1 Safety",
+            "page": 2
+          }
+        ]
+      }
+    ]
+  },
+  "rules": [
+    {
+      "id": "xx.mains.casing",
+      "family": "mains",
+      "zone": "casing",
+      "parts": {
+        "en": [
+          "back panel",
+          "casing"
+        ],
+        "nl": [
+          "achterwand",
+          "behuizing"
+        ]
+      },
+      "verbs": {
+        "en": [
+          "open",
+          "remove",
+          "unscrew"
+        ],
+        "nl": [
+          "openen",
+          "verwijderen",
+          "losdraaien"
+        ]
+      },
+      "action": "STOP",
+      "line": {
+        "en": "Behind the back panel is mains power. That's a technician.",
+        "nl": "Achter de achterwand zit netspanning. Dat is voor een monteur."
+      },
+      "script": {
+        "en": "Hands back. Leave the back panel on.",
+        "nl": "Handen terug. Laat de achterwand zitten."
+      },
+      "ring_cm": 1,
+      "landlord": false,
+      "sources": [
+        {
+          "title": "Acme WM-0000 user manual (fake)",
+          "section": "1 Safety",
+          "page": 2
+        }
+      ],
+      "look_only_exemptions": []
+    }
+  ]
+}

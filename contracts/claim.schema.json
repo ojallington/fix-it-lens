@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fixit.invalid/contracts/claim.schema.json",
+  "title": "Claim",
+  "description": "One line of eval/claims.json: every number that reaches the README or the video. A measured value that misses its target is printed as measured.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "value",
+    "unit",
+    "n",
+    "ci",
+    "measured_at",
+    "commit",
+    "command",
+    "rows",
+    "readme_anchor"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+$"
+    },
+    "value": {
+      "type": [
+        "number",
+        "string",
+        "null"
+      ]
+    },
+    "unit": {
+      "type": "string"
+    },
+    "n": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "ci": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "[low, high], e.g. Wilson 95%"
+        }
+      ]
+    },
+    "measured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{7,40}$"
+    },
+    "command": {
+      "type": "string"
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "eval/rows.toml row ids"
+    },
+    "readme_anchor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target": {
+      "description": "the figure the design aimed for, e.g. \"2 of 40\"; the published number is value, whether or not it meets it",
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": [
+            "number",
+            "string"
+          ]
+        }
+      ]
+    },
+    "note": {
+      "type": "string"
+    }
+  }
+}
