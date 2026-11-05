@@ -14,4 +14,4 @@ repo_public = true
 url = "https://app.craftycast.com/try"
 watch = "https://watch.craftycast.com/"  # for the site's build; the README links no hosted page
 # The film's public URL; empty until it has one, and the block then stays empty.
-video = ""
+video = "https://youtu.be/82TwKP4tkw4"

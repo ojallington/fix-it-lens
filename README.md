@@ -9,6 +9,7 @@ your hand into the ring around a marked gas or mains part, the screen turns red.
 and the safety rules are code.
 
 <!-- try: written by tools/make_try_block.py from docs/readme/try.toml -->
+**Watch it work:** [the film](https://youtu.be/82TwKP4tkw4).
 <!-- /try -->
 
 ![Three real clips: in a replay of a recorded run the app outlines the filter on the camera picture and names it from the manual; in another run a hand takes out the filter and taps “I did it”, confirmed by the person, not the camera; then Job done, every step confirmed by the person, with the middle steps cut](docs/readme/stop.gif)

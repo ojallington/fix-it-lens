@@ -25,3 +25,8 @@ def test_the_image_copies_every_folder_its_code_imports() -> None:
                         imported.setdefault(head, str(py.relative_to(ROOT)))
     assert imported == {}, f"imported but not in the image: {imported}"
     assert all(f"!{top}/" in allowed for top in copied)
+
+
+def test_both_images_install_what_the_video_witness_runs() -> None:
+    for image in ("deploy/Dockerfile", "integrations/homeassistant/addon/fixit_lens/Dockerfile"):
+        assert re.search(r"^RUN apt-get .*install .*\bffmpeg\b", (ROOT / image).read_text(), re.M), image
