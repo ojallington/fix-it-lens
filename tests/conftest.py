@@ -3,12 +3,20 @@ FIXIT_PRIVATE to a folder of its own first."""
 
 from __future__ import annotations
 
+import shutil
 from collections.abc import Iterator
 from typing import Any
 
 import pytest
 
 import calls
+
+
+@pytest.fixture
+def ffmpeg() -> None:
+    """Without ffmpeg app/witness.py drops the video check and goes on, so a test of that check says what it lacks"""
+    if shutil.which("ffmpeg") is None:
+        pytest.fail("this test needs ffmpeg on PATH: the video witness builds its clips with it")
 
 
 @pytest.fixture(autouse=True)

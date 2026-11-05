@@ -473,7 +473,8 @@ make ci           # lint, types, contracts, guard, boundary, tests, eval and cla
 make hooks        # the pre-commit guard: no PDFs, keys, request bodies or private identifiers
 ```
 
-`CONTRIBUTING.md` covers cards, rule files and the safety review.
+`make ci` also needs `ffmpeg` on your PATH: the video witness builds its clips with it, and the tests that cover it
+fail without it. `CONTRIBUTING.md` covers cards, rule files and the safety review.
 
 ## Built during the event
 

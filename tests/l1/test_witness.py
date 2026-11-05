@@ -6,6 +6,8 @@ from __future__ import annotations
 import asyncio
 from typing import Any
 
+import pytest
+
 from app.geometry import Region
 from app.models import Models
 from app.recorder import Recorder
@@ -57,6 +59,7 @@ def clip() -> list[Any]:
     return [frame(i, 1000 + 200 * i) for i in range(10)]
 
 
+@pytest.mark.usefixtures("ffmpeg")
 async def test_video_slower_than_judge_falls_back_to_frame() -> None:
     client = FakeClient(video=sam_result(ON_DRAIN), image=sam_result([("1", None, (420.0, 620.0, 580.0, 780.0), 0.9)]),
                         video_delay=5)
@@ -72,6 +75,7 @@ async def test_video_slower_than_judge_falls_back_to_frame() -> None:
     assert v.witnesses.sam == "frame"
 
 
+@pytest.mark.usefixtures("ffmpeg")
 async def test_video_faster_than_judge_is_used() -> None:
     client = FakeClient(video=sam_result(IN_HAND))
     m = models(client)

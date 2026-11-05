@@ -143,6 +143,7 @@ def check_replay_badge(rec: recorder.Recording, root: Path) -> None:
 # ---- the tests -----------------------------------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("ffmpeg")
 async def test_m1_synthetic(tmp_path: Path) -> None:
     rec, tape = await synthetic(tmp_path / "sessions")
     check_record(rec, live=False)

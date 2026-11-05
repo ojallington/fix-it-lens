@@ -18,5 +18,7 @@ jobs:
           cache: npm
           cache-dependency-path: contracts/ts/package-lock.json
       - run: uv python install 3.12
+      # The video witness builds its clips with ffmpeg, and the runner image has none.
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       # No key and no network calls: calls/ runs in replay mode (FIXIT_CALLS unset) and live tests are deselected.
       - run: make ci
